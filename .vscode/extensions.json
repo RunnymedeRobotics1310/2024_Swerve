@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "vscjava.vscode-java-pack",
+        "wpilibsuite.vscode-wpilib",
+        "redhat.java",
+        "sonarsource.sonarlint-vscode",
+        "eamodio.gitlens"
+    ]
+}
