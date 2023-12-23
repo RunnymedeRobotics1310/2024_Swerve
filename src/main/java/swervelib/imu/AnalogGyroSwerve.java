@@ -4,11 +4,10 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import java.util.Optional;
 
 /**
- * Creates a IMU for {@link AnalogGyro} devices, only uses yaw.
+ * Creates a IMU for {@link edu.wpi.first.wpilibj.AnalogGyro} devices, only uses yaw.
  */
 public class AnalogGyroSwerve extends SwerveIMU
 {

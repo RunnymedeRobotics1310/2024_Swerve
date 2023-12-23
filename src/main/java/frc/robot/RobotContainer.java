@@ -18,6 +18,10 @@ import frc.robot.commands.swervedrive.DefaultSwerveDriveCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 
+import static frc.robot.commands.operator.OperatorInput.Stick.LEFT;
+import static frc.robot.commands.operator.OperatorInput.Stick.RIGHT;
+import static frc.robot.commands.operator.OperatorInput.Axis.X;
+import static frc.robot.commands.operator.OperatorInput.Axis.Y;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -41,8 +45,13 @@ public class RobotContainer {
 
         // Initialize all Subsystem default commands
         swerveDriveSubsystem.setDefaultCommand(
-            new DefaultSwerveDriveCommand(operatorInput, swerveDriveSubsystem,
-                () -> true, false, false));
+                 new DefaultSwerveDriveCommand(swerveDriveSubsystem,
+                         () -> operatorInput.getDriverControllerAxis(LEFT, X),
+                         () -> operatorInput.getDriverControllerAxis(LEFT, Y),
+                         () -> operatorInput.getDriverControllerAxis(RIGHT, X),
+                         () -> operatorInput.getDriverControllerAxis(RIGHT, Y)
+                 )
+        );
         // Configure the trigger bindings
         configureBindings();
     }

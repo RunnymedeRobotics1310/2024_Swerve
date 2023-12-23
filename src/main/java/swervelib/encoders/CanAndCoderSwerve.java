@@ -1,6 +1,7 @@
 package swervelib.encoders;
 
 import com.reduxrobotics.sensors.canandcoder.CANandcoder;
+import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * HELIUM {@link CANandcoder} from ReduxRobotics absolute encoder, attached through the CAN bus.
@@ -76,5 +77,31 @@ public class CanAndCoderSwerve extends SwerveAbsoluteEncoder
   public Object getAbsoluteEncoder()
   {
     return encoder;
+  }
+
+  /**
+   * Cannot set the offset of the CanAndCoder.
+   *
+   * @param offset the offset the Absolute Encoder uses as the zero point.
+   * @return always false due to CanAndCoder not supporting offset changing.
+   */
+  @Override
+  public boolean setAbsoluteEncoderOffset(double offset)
+  {
+    //CanAndCoder does not support Absolute Offset Changing
+    DriverStation.reportWarning("Cannot Set Absolute Encoder Offset of CanAndCoders ID: " + encoder.getAddress(),
+                                false);
+    return false;
+  }
+
+  /**
+   * Get the velocity in degrees/sec.
+   *
+   * @return velocity in degrees/sec.
+   */
+  @Override
+  public double getVelocity()
+  {
+    return encoder.getVelocity();
   }
 }

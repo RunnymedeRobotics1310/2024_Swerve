@@ -1,17 +1,21 @@
 package swervelib.math;
 
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.List;
 import swervelib.SwerveController;
 import swervelib.SwerveModule;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveModuleConfiguration;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
-
-import java.util.List;
 
 /**
  * Mathematical functions which pertain to swerve drive.
@@ -20,8 +24,8 @@ public class SwerveMath
 {
 
   /**
-   * Calculate the meters per rotation for the integrated encoder. Calculation: 4in diameter wheels * pi [circumfrence]
-   * / gear ratio.
+   * Calculate the meters per rotation for the integrated encoder. Calculation: (PI * WHEEL DIAMETER IN METERS) / (GEAR
+   * RATIO * ENCODER RESOLUTION)
    *
    * @param wheelDiameter    Wheel diameter in meters.
    * @param driveGearRatio   The gear ratio of the drive motor.
@@ -60,6 +64,27 @@ public class SwerveMath
     return scaled
            ? ((1 / (1 - deadband)) * (Math.abs(value) - deadband)) * Math.signum(value)
            : value;
+  }
+
+  /**
+   * Create the drive feedforward for swerve modules.
+   *
+   * @param optimalVoltage                 Optimal voltage to calculate kV (voltage/max Velocity)
+   * @param maxSpeed                       Maximum velocity in meters per second to use for the feed forward, should be
+   *                                       as close to physical max as possible.
+   * @param wheelGripCoefficientOfFriction Wheel grip coefficient of friction for kA (voltage/(cof*9.81))
+   * @return Drive feedforward for drive motor on a swerve module.
+   */
+  public static SimpleMotorFeedforward createDriveFeedforward(double optimalVoltage, double maxSpeed,
+                                                              double wheelGripCoefficientOfFriction)
+  {
+    double kv = optimalVoltage / maxSpeed;
+    /// ^ Volt-seconds per meter (max voltage divided by max speed)
+    double ka =
+        optimalVoltage
+        / calculateMaxAcceleration(wheelGripCoefficientOfFriction);
+    /// ^ Volt-seconds^2 per meter (max voltage divided by max accel)
+    return new SimpleMotorFeedforward(0, kv, ka);
   }
 
   /**
@@ -365,7 +390,7 @@ public class SwerveMath
    *
    * @param moduleState     Current {@link SwerveModuleState} requested.
    * @param lastModuleState Previous {@link SwerveModuleState} used.
-   * @param maxSpeed        Maximum speed of the modules, should be in {@link SwerveDriveConfiguration#maxSpeed}.
+   * @param maxSpeed        Maximum speed of the modules.
    */
   public static void antiJitter(SwerveModuleState moduleState, SwerveModuleState lastModuleState, double maxSpeed)
   {
