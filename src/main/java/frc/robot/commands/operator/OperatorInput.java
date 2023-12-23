@@ -29,9 +29,9 @@ public class OperatorInput {
         operatorController = new RunnymedeGameController(operatorControllerPort);
     }
 
-    // provide doExampleCommand input when the B button is pressed
-    public boolean doExampleCommand() {
-        return operatorController.getBButton();
+    public OperatorInput(int driverControllerPort) {
+        driverController = new RunnymedeGameController(driverControllerPort);
+        operatorController = null;
     }
 
     public boolean doHeadingCorrection() {

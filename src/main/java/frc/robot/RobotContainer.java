@@ -36,7 +36,7 @@ public class RobotContainer {
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final OperatorInput        operatorInput        = new OperatorInput(
-        OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
+            OiConstants.DRIVER_CONTROLLER_PORT /*, OiConstants.OPERATOR_CONTROLLER_PORT*/);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -71,7 +71,7 @@ public class RobotContainer {
 
         // Schedule `exampleMethodCommand` when the doExampleCommand input is provided by the operator
         // cancelling on release.
-        new Trigger(operatorInput::doExampleCommand).whileTrue(m_exampleSubsystem.exampleMethodCommand());
+//        new Trigger(operatorInput::doExampleCommand).whileTrue(m_exampleSubsystem.exampleMethodCommand());
     }
 
     /**
