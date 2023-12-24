@@ -4,20 +4,24 @@
 
 package frc.robot;
 
+import java.io.File;
+
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OiConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.DefaultSwerveDriveCommand;
 import frc.robot.subsystems.ExampleSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 
-import java.io.File;
-
+import static frc.robot.commands.operator.OperatorInput.Stick.LEFT;
+import static frc.robot.commands.operator.OperatorInput.Stick.RIGHT;
+import static frc.robot.commands.operator.OperatorInput.Axis.X;
+import static frc.robot.commands.operator.OperatorInput.Axis.Y;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -26,12 +30,14 @@ import java.io.File;
  */
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-    private final SwerveDriveSubsystem swerveDriveSubsystem = new SwerveDriveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
+    private final ExampleSubsystem     m_exampleSubsystem   = new ExampleSubsystem();
+    private final SwerveDriveSubsystem swerveDriveSubsystem = new SwerveDriveSubsystem(
+        new File(Filesystem.getDeployDirectory(), "swerve/neo"));
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final OperatorInput operatorInput                 = new OperatorInput(
-            OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
+    private final OperatorInput        operatorInput        = new OperatorInput(
+            OiConstants.DRIVER_CONTROLLER_PORT /*, OiConstants.OPERATOR_CONTROLLER_PORT*/);
+
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -39,8 +45,12 @@ public class RobotContainer {
 
         // Initialize all Subsystem default commands
         swerveDriveSubsystem.setDefaultCommand(
-                new DefaultSwerveDriveCommand(operatorInput, swerveDriveSubsystem,
-                        () -> true, false, true)
+                 new DefaultSwerveDriveCommand(swerveDriveSubsystem,
+                         () -> operatorInput.getDriverControllerAxis(LEFT, X),
+                         () -> operatorInput.getDriverControllerAxis(LEFT, Y),
+                         () -> operatorInput.getDriverControllerAxis(RIGHT, X),
+                         () -> operatorInput.getDriverControllerAxis(RIGHT, Y)
+                 )
         );
         // Configure the trigger bindings
         configureBindings();
@@ -61,7 +71,7 @@ public class RobotContainer {
 
         // Schedule `exampleMethodCommand` when the doExampleCommand input is provided by the operator
         // cancelling on release.
-        new Trigger(operatorInput::doExampleCommand).whileTrue(m_exampleSubsystem.exampleMethodCommand());
+//        new Trigger(operatorInput::doExampleCommand).whileTrue(m_exampleSubsystem.exampleMethodCommand());
     }
 
     /**

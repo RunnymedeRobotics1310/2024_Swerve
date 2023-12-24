@@ -1,20 +1,16 @@
 {
-  "wheelDiameter": 4,
-  "gearRatio": {
-    "drive": 6.75,
-    "angle": 12.8
+  "conversionFactor": {
+    "drive": 0.047286787200699704,
+    "angle": 28.125
   },
   "currentLimit": {
     "drive": 40,
     "angle": 20
   },
   "rampRate": {
-    "drive": 0.25,
-    "angle": 0.25
+    "drive": 0.15,
+    "angle": 0.05
   },
-  "encoderPulsePerRotation": {
-    "drive": 1,
-    "angle": 1
-  },
-  "wheelGripCoefficientOfFriction": 1.19
+  "wheelGripCoefficientOfFriction": 1.19,
+  "optimalVoltage": 12
 }

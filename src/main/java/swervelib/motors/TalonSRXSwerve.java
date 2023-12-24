@@ -1,6 +1,10 @@
 package swervelib.motors;
 
-import com.ctre.phoenix.motorcontrol.*;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Timer;
@@ -11,7 +15,7 @@ import swervelib.simulation.ctre.PhysicsSim;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
 /**
- * {@link WPI_TalonSRX} Swerve Motor.
+ * {@link com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX} Swerve Motor.
  */
 public class TalonSRXSwerve extends SwerveMotor
 {
@@ -352,7 +356,7 @@ public class TalonSRXSwerve extends SwerveMotor
   {
     if (!absoluteEncoder && !SwerveDriveTelemetry.isSimulation)
     {
-      motor.setSelectedSensorPosition(position / positionConversionFactor, 0, 250);
+      motor.setSelectedSensorPosition(position / positionConversionFactor, 0, 0);
     }
   }
 

@@ -8,55 +8,37 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
-import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
 import java.io.File;
 
-public class SwerveDriveSubsystem extends SubsystemBase
-{
+public class SwerveDriveSubsystem extends SubsystemBase {
 
     /**
      * Swerve drive object.
      */
     private final SwerveDrive swerveDrive;
-    /**
-     * The auto builder for PathPlanner, there can only ever be one created so we save it just incase we generate multiple
-     * paths with events.
-     */
-    //private       SwerveAutoBuilder autoBuilder = null;
 
     /**
      * Initialize {@link SwerveDrive} with the directory provided.
      *
      * @param configDirectory Directory of swerve drive config files.
      */
-    public SwerveDriveSubsystem(File configDirectory)
-    {
+    public SwerveDriveSubsystem(File configDirectory) {
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
         SwerveDriveTelemetry.verbosity = SwerveDriveTelemetry.TelemetryVerbosity.HIGH;
-        try
-        {
-            swerveDrive = new SwerveParser(configDirectory).createSwerveDrive();
-        } catch (Exception e)
-        {
+        try {
+            swerveDrive = new SwerveParser(configDirectory).createSwerveDrive(Constants.SwerveDriveConstants.MAX_SPEED_MPS);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
+        swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
 
-    /**
-     * Construct the swerve drive using configuration objects.
-     *
-     * @param driveCfg      SwerveDriveConfiguration for the swerve.
-     * @param controllerCfg Swerve Controller.
-     */
-    public SwerveDriveSubsystem(SwerveDriveConfiguration driveCfg, SwerveControllerConfiguration controllerCfg)
-    {
-        swerveDrive = new SwerveDrive(driveCfg, controllerCfg);
     }
 
     /**
@@ -72,30 +54,34 @@ public class SwerveDriveSubsystem extends SubsystemBase
      * @param rotation      Robot angular rate, in radians per second. CCW positive.  Unaffected by field/robot
      *                      relativity.
      * @param fieldRelative Drive mode.  True for field-relative, false for robot-relative.
-     * @param isOpenLoop    Whether to use closed-loop velocity control.  Set to true to disable closed-loop.
+     * @param isOpenLoop    Whether to use closed-loop velocity control.  Set to true to disable closed-loop. Should
+     *                      usually be set to false
      */
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop)
-    {
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
         swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop);
     }
 
-    @Override
-    public void periodic()
-    {
+    /**
+     * Drive according to the chassis robot oriented velocity.
+     *
+     * @param velocity Robot oriented {@link ChassisSpeeds}
+     */
+    public void drive(ChassisSpeeds velocity) {
+        swerveDrive.drive(velocity);
     }
 
+
     @Override
-    public void simulationPeriodic()
-    {
+    public void periodic() {
     }
+
 
     /**
      * Get the swerve drive kinematics object.
      *
      * @return {@link SwerveDriveKinematics} of the swerve drive.
      */
-    public SwerveDriveKinematics getKinematics()
-    {
+    public SwerveDriveKinematics getKinematics() {
         return swerveDrive.kinematics;
     }
 
@@ -106,8 +92,7 @@ public class SwerveDriveSubsystem extends SubsystemBase
      *
      * @param initialHolonomicPose The pose to set the odometry to
      */
-    public void resetOdometry(Pose2d initialHolonomicPose)
-    {
+    public void resetOdometry(Pose2d initialHolonomicPose) {
         swerveDrive.resetOdometry(initialHolonomicPose);
     }
 
@@ -116,8 +101,7 @@ public class SwerveDriveSubsystem extends SubsystemBase
      *
      * @return The robot's pose
      */
-    public Pose2d getPose()
-    {
+    public Pose2d getPose() {
         return swerveDrive.getPose();
     }
 
@@ -126,8 +110,7 @@ public class SwerveDriveSubsystem extends SubsystemBase
      *
      * @param chassisSpeeds Chassis Speeds to set.
      */
-    public void setChassisSpeeds(ChassisSpeeds chassisSpeeds)
-    {
+    public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
         swerveDrive.setChassisSpeeds(chassisSpeeds);
     }
 
@@ -136,16 +119,14 @@ public class SwerveDriveSubsystem extends SubsystemBase
      *
      * @param trajectory The trajectory to post.
      */
-    public void postTrajectory(Trajectory trajectory)
-    {
+    public void postTrajectory(Trajectory trajectory) {
         swerveDrive.postTrajectory(trajectory);
     }
 
     /**
      * Resets the gyro angle to zero and resets odometry to the same position, but facing toward 0.
      */
-    public void zeroGyro()
-    {
+    public void zeroGyro() {
         swerveDrive.zeroGyro();
     }
 
@@ -154,8 +135,7 @@ public class SwerveDriveSubsystem extends SubsystemBase
      *
      * @param brake True to set motors to brake mode, false for coast.
      */
-    public void setMotorBrake(boolean brake)
-    {
+    public void setMotorBrake(boolean brake) {
         swerveDrive.setMotorIdleMode(brake);
     }
 
@@ -164,8 +144,7 @@ public class SwerveDriveSubsystem extends SubsystemBase
      *
      * @return The yaw angle
      */
-    public Rotation2d getHeading()
-    {
+    public Rotation2d getHeading() {
         return swerveDrive.getYaw();
     }
 
@@ -179,11 +158,10 @@ public class SwerveDriveSubsystem extends SubsystemBase
      * @param headingY Y joystick which controls the angle of the robot.
      * @return {@link ChassisSpeeds} which can be sent to th Swerve Drive.
      */
-    public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, double headingX, double headingY)
-    {
+    public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, double headingX, double headingY) {
         xInput = Math.pow(xInput, 3);
         yInput = Math.pow(yInput, 3);
-        return swerveDrive.swerveController.getTargetSpeeds(xInput, yInput, headingX, headingY, getHeading().getRadians());
+        return swerveDrive.swerveController.getTargetSpeeds(xInput, yInput, headingX, headingY, getHeading().getRadians(), Constants.SwerveDriveConstants.MAX_SPEED_MPS);
     }
 
     /**
@@ -194,11 +172,14 @@ public class SwerveDriveSubsystem extends SubsystemBase
      * @param angle  The angle in as a {@link Rotation2d}.
      * @return {@link ChassisSpeeds} which can be sent to th Swerve Drive.
      */
-    public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, Rotation2d angle)
-    {
+    public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, Rotation2d angle) {
         xInput = Math.pow(xInput, 3);
         yInput = Math.pow(yInput, 3);
-        return swerveDrive.swerveController.getTargetSpeeds(xInput, yInput, angle.getRadians(), getHeading().getRadians());
+        return swerveDrive.swerveController.getTargetSpeeds(xInput,
+                yInput,
+                angle.getRadians(),
+                getHeading().getRadians(),
+                Constants.SwerveDriveConstants.MAX_SPEED_MPS);
     }
 
     /**
@@ -206,8 +187,7 @@ public class SwerveDriveSubsystem extends SubsystemBase
      *
      * @return A ChassisSpeeds object of the current field-relative velocity
      */
-    public ChassisSpeeds getFieldVelocity()
-    {
+    public ChassisSpeeds getFieldVelocity() {
         return swerveDrive.getFieldVelocity();
     }
 
@@ -216,8 +196,7 @@ public class SwerveDriveSubsystem extends SubsystemBase
      *
      * @return A {@link ChassisSpeeds} object of the current velocity
      */
-    public ChassisSpeeds getRobotVelocity()
-    {
+    public ChassisSpeeds getRobotVelocity() {
         return swerveDrive.getRobotVelocity();
     }
 
@@ -226,8 +205,7 @@ public class SwerveDriveSubsystem extends SubsystemBase
      *
      * @return {@link SwerveController} from the {@link SwerveDrive}.
      */
-    public SwerveController getSwerveController()
-    {
+    public SwerveController getSwerveController() {
         return swerveDrive.swerveController;
     }
 
@@ -236,16 +214,14 @@ public class SwerveDriveSubsystem extends SubsystemBase
      *
      * @return The {@link SwerveDriveConfiguration} fpr the current drive.
      */
-    public SwerveDriveConfiguration getSwerveDriveConfiguration()
-    {
+    public SwerveDriveConfiguration getSwerveDriveConfiguration() {
         return swerveDrive.swerveDriveConfiguration;
     }
 
     /**
      * Lock the swerve drive to prevent it from moving.
      */
-    public void lock()
-    {
+    public void lock() {
         swerveDrive.lockPose();
     }
 
@@ -254,59 +230,15 @@ public class SwerveDriveSubsystem extends SubsystemBase
      *
      * @return The heading as a {@link Rotation2d} angle
      */
-    public Rotation2d getPitch()
-    {
+    public Rotation2d getPitch() {
         return swerveDrive.getPitch();
     }
 
     /**
      * Add a fake vision reading for testing purposes.
      */
-    public void addFakeVisionReading()
-    {
-        swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp(), true, 4);
+    public void addFakeVisionReading() {
+        swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
     }
 
-    /**
-     * Factory to fetch the PathPlanner command to follow the defined path.
-     *
-     * @param path             Path planner path to specify.
-     * @param constraints      {@link PathConstraints} for {@link com.pathplanner.lib.PathPlanner#loadPathGroup} function
-     *                         limiting velocity and acceleration.
-     * @param eventMap         {@link java.util.HashMap} of commands corresponding to path planner events given as
-     *                         strings.
-     * @param translation      The {@link PIDConstants} for the translation of the robot while following the path.
-     * @param rotation         The {@link PIDConstants} for the rotation of the robot while following the path.
-     * @param useAllianceColor Automatically transform the path based on alliance color.
-     * @return PathPlanner command to follow the given path.
-     */
-//    public Command creatPathPlannerCommand(String path, PathConstraints constraints, Map<String, Command> eventMap,
-//                                           PIDConstants translation, PIDConstants rotation, boolean useAllianceColor)
-//    {
-//        List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(path, constraints);
-////    SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
-////      Pose2d supplier,
-////      Pose2d consumer- used to reset odometry at the beginning of auto,
-////      PID constants to correct for translation error (used to create the X and Y PID controllers),
-////      PID constants to correct for rotation error (used to create the rotation controller),
-////      Module states consumer used to output to the drive subsystem,
-////      Should the path be automatically mirrored depending on alliance color. Optional- defaults to true
-////   )
-//        if (autoBuilder == null)
-//        {
-//            autoBuilder = new SwerveAutoBuilder(
-//                    swerveDrive::getPose,
-//                    swerveDrive::resetOdometry,
-//                    translation,
-//                    rotation,
-//                    swerveDrive::setChassisSpeeds,
-//                    eventMap,
-//                    useAllianceColor,
-//                    this
-//            );
-//        }
-//
-//        return autoBuilder.fullAuto(pathGroup);
-//    }
 }
-

@@ -1,16 +1,20 @@
 package swervelib.motors;
 
-import com.revrobotics.*;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
+import com.revrobotics.REVLibError;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxAlternateEncoder;
+import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxRelativeEncoder.Type;
 import edu.wpi.first.wpilibj.DriverStation;
+import java.util.function.Supplier;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.parser.PIDFConfig;
-
-import java.util.function.Supplier;
 
 /**
  * Brushed motor control with SparkMax.
@@ -84,8 +88,8 @@ public class SparkMaxBrushedMotorSwerve extends SwerveMotor
       // Configure feedback of the PID controller as the integrated encoder.
       configureSparkMax(() -> pid.setFeedbackDevice(encoder));
     }
-
-    configureSparkMax(() -> motor.setCANTimeout(0)); // Spin off configurations in a different thread.
+    // Spin off configurations in a different thread.
+    // configureSparkMax(() -> motor.setCANTimeout(0)); // Commented it out because it prevents feedback.
   }
 
   /**

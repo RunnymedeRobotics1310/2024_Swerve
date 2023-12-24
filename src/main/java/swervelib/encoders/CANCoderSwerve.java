@@ -1,7 +1,12 @@
 package swervelib.encoders;
 
 import com.ctre.phoenix.ErrorCode;
-import com.ctre.phoenix.sensors.*;
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
+import com.ctre.phoenix.sensors.CANCoderConfiguration;
+import com.ctre.phoenix.sensors.MagnetFieldStrength;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
+import com.ctre.phoenix.sensors.SensorTimeBase;
+import com.ctre.phoenix.sensors.WPI_CANCoder;
 import edu.wpi.first.wpilibj.DriverStation;
 
 /**
@@ -131,5 +136,35 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
   public Object getAbsoluteEncoder()
   {
     return encoder;
+  }
+
+  /**
+   * Sets the Absolute Encoder Offset inside of the CANcoder's Memory.
+   *
+   * @param offset the offset the Absolute Encoder uses as the zero point.
+   * @return if setting Absolute Encoder Offset was successful or not.
+   */
+  @Override
+  public boolean setAbsoluteEncoderOffset(double offset)
+  {
+    ErrorCode error = encoder.configMagnetOffset(offset);
+    if (error == ErrorCode.OK)
+    {
+      return true;
+    }
+    DriverStation.reportWarning(
+        "Failure to set CANCoder " + encoder.getDeviceID() + " Absolute Encoder Offset Error: " + error, false);
+    return false;
+  }
+
+  /**
+   * Get the velocity in degrees/sec.
+   *
+   * @return velocity in degrees/sec.
+   */
+  @Override
+  public double getVelocity()
+  {
+    return encoder.getVelocity();
   }
 }

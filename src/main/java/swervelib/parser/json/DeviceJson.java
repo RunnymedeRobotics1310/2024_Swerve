@@ -5,9 +5,26 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort.Port;
-import swervelib.encoders.*;
-import swervelib.imu.*;
-import swervelib.motors.*;
+import swervelib.encoders.AnalogAbsoluteEncoderSwerve;
+import swervelib.encoders.CANCoderSwerve;
+import swervelib.encoders.CanAndCoderSwerve;
+import swervelib.encoders.PWMDutyCycleEncoderSwerve;
+import swervelib.encoders.SparkMaxAnalogEncoderSwerve;
+import swervelib.encoders.SparkMaxEncoderSwerve;
+import swervelib.encoders.SwerveAbsoluteEncoder;
+import swervelib.imu.ADIS16448Swerve;
+import swervelib.imu.ADIS16470Swerve;
+import swervelib.imu.ADXRS450Swerve;
+import swervelib.imu.AnalogGyroSwerve;
+import swervelib.imu.NavXSwerve;
+import swervelib.imu.Pigeon2Swerve;
+import swervelib.imu.PigeonSwerve;
+import swervelib.imu.SwerveIMU;
+import swervelib.motors.SparkMaxBrushedMotorSwerve;
+import swervelib.motors.SparkMaxSwerve;
+import swervelib.motors.SwerveMotor;
+import swervelib.motors.TalonFXSwerve;
+import swervelib.motors.TalonSRXSwerve;
 
 /**
  * Device JSON parsed class. Used to access the JSON data.
@@ -37,12 +54,20 @@ public class DeviceJson
    */
   public SwerveAbsoluteEncoder createEncoder(SwerveMotor motor)
   {
+    if (id > 40)
+    {
+      DriverStation.reportWarning("CAN IDs greater than 40 can cause undefined behaviour, please use a CAN ID below 40!",
+                                  false);
+    }
     switch (type)
     {
       case "none":
+        return null;
       case "integrated":
       case "attached":
-        return null;
+        return new SparkMaxEncoderSwerve(motor, 1);
+      case "sparkmax_analog":
+        return new SparkMaxAnalogEncoderSwerve(motor);
       case "canandcoder":
         return new SparkMaxEncoderSwerve(motor, 360);
       case "canandcoder_can":
@@ -50,11 +75,11 @@ public class DeviceJson
       case "ma3":
       case "ctre_mag":
       case "rev_hex":
+      case "throughbore":
       case "am_mag":
       case "dutycycle":
         return new PWMDutyCycleEncoderSwerve(id);
       case "thrifty":
-      case "throughbore":
       case "analog":
         return new AnalogAbsoluteEncoderSwerve(id);
       case "cancoder":
@@ -71,6 +96,11 @@ public class DeviceJson
    */
   public SwerveIMU createIMU()
   {
+    if (id > 40)
+    {
+      DriverStation.reportWarning("CAN IDs greater than 40 can cause undefined behaviour, please use a CAN ID below 40!",
+                                  false);
+    }
     switch (type)
     {
       case "adis16448":
@@ -81,6 +111,7 @@ public class DeviceJson
         return new ADXRS450Swerve();
       case "analog":
         return new AnalogGyroSwerve(id);
+      case "navx":
       case "navx_spi":
         return new NavXSwerve(SPI.Port.kMXP);
       case "navx_i2c":
@@ -90,19 +121,16 @@ public class DeviceJson
             ".html#onboard-i2c-causing-system-lockups",
             false);
         return new NavXSwerve(I2C.Port.kMXP);
-      case "navx_onborard":
-        return new NavXSwerve(Port.kOnboard);
       case "navx_usb":
         return new NavXSwerve(Port.kUSB);
       case "navx_mxp":
-      case "navx":
         return new NavXSwerve(Port.kMXP);
       case "pigeon":
         return new PigeonSwerve(id);
       case "pigeon2":
         return new Pigeon2Swerve(id, canbus != null ? canbus : "");
       default:
-        throw new RuntimeException(type + " is not a recognized absolute encoder type.");
+        throw new RuntimeException(type + " is not a recognized imu/gyroscope type.");
     }
   }
 
@@ -114,6 +142,11 @@ public class DeviceJson
    */
   public SwerveMotor createMotor(boolean isDriveMotor)
   {
+    if (id > 40)
+    {
+      DriverStation.reportWarning("CAN IDs greater than 40 can cause undefined behaviour, please use a CAN ID below 40!",
+                                  false);
+    }
     switch (type)
     {
       case "sparkmax_brushed":
@@ -148,47 +181,7 @@ public class DeviceJson
       case "talonsrx":
         return new TalonSRXSwerve(id, isDriveMotor);
       default:
-        throw new RuntimeException(type + " is not a recognized absolute encoder type.");
-    }
-  }
-
-  /**
-   * Create a {@link SwerveAbsoluteEncoder} from the data port on the motor controller.
-   *
-   * @param motor The motor to create the absolute encoder from.
-   * @return {@link SwerveAbsoluteEncoder} from the motor controller.
-   */
-  public SwerveAbsoluteEncoder createIntegratedEncoder(SwerveMotor motor)
-  {
-    switch (type)
-    {
-      case "sparkmax":
-        return new SparkMaxEncoderSwerve(motor, 1);
-      case "falcon":
-      case "talonfx":
-        return null;
-    }
-    throw new RuntimeException(
-        "Could not create absolute encoder from data port of " + type + " id " + id);
-  }
-
-  /**
-   * Get the encoder pulse per rotation based off of the encoder type.
-   *
-   * @param angleEncoderPulsePerRotation The configured pulse per rotation.
-   * @return The correct pulse per rotation based off of the encoder type.
-   */
-  public int getPulsePerRotation(int angleEncoderPulsePerRotation)
-  {
-    switch (type)
-    {
-      case "canandcoder":
-        return 360;
-      case "falcon":
-      case "talonfx":
-        return 2048;
-      default:
-        return angleEncoderPulsePerRotation;
+        throw new RuntimeException(type + " is not a recognized motor type.");
     }
   }
 }

@@ -2,7 +2,6 @@ package swervelib.imu;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
-
 import java.util.Optional;
 
 /**
