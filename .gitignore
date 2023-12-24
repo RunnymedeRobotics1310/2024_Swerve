@@ -110,6 +110,10 @@ Temporary Items
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# IDEA ignores
+.idea/aws.xml
+
+
 ### Windows ###
 # Windows thumbnail cache files
 Thumbs.db
@@ -158,4 +162,3 @@ gradle-app.setting
 .settings/
 bin/
 imgui.ini
-
