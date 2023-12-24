@@ -22,9 +22,9 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     private final CANSparkMax backRightTurnMotor    = new CANSparkMax(31, MotorType.kBrushless);
     private final CANCoder    backRightAngleSensor  = new CANCoder(32);
 
-    private final CANSparkMax backLeftDriveMotor    = new CANSparkMax(40, MotorType.kBrushless);
-    private final CANSparkMax backLeftTurnMotor     = new CANSparkMax(41, MotorType.kBrushless);
-    private final CANCoder    backLeftAngleSensor   = new CANCoder(42);
+    private final CANSparkMax backLeftDriveMotor    = new CANSparkMax(35, MotorType.kBrushless);
+    private final CANSparkMax backLeftTurnMotor     = new CANSparkMax(36, MotorType.kBrushless);
+    private final CANCoder    backLeftAngleSensor   = new CANCoder(37);
 
     public void setMotorSpeeds(SwerveModule swerveModule, double speed, double turn) {
 
