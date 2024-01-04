@@ -712,6 +712,169 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "10,4": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Gyro",
+              "_source0": "network_table:///SmartDashboard/Pigeon 2 [13]",
+              "_title": "Pigeon 2 [13]",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Visuals/Major tick spacing": 45.0,
+              "Visuals/Starting angle": 180.0,
+              "Visuals/Show tick mark ring": true,
+              "Visuals/Counter clockwise": false
+            }
+          },
+          "10,0": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Field",
+              "_source0": "network_table:///SmartDashboard/Field",
+              "_title": "Field",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Game/Game": "A2023_Charged_Up",
+              "Visuals/Robot Icon Size": 50.0,
+              "Visuals/Show Outside Circles": false
+            }
+          },
+          "2,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/navX-Sensor[4]/Value",
+              "_title": "navX-Sensor[4]/Value",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,4": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Module[frontleft] Absolute Encoder Read Issue",
+              "_title": "Module[frontleft] Absolute Encoder Read Issue",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "5,5": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Module[frontright] Absolute Encoder Read Issue",
+              "_title": "Module[frontright] Absolute Encoder Read Issue",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,5": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Module[backleft] Absolute Encoder Read Issue",
+              "_title": "Module[backleft] Absolute Encoder Read Issue",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "5,6": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Module[backright] Absolute Encoder Read Issue",
+              "_title": "Module[backright] Absolute Encoder Read Issue",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "8,6": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/currentVelocity",
+              "_title": "currentVelocity",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,6": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/deltaV",
+              "_title": "deltaV",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "10,6": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/calcMaxAccel",
+              "_title": "calcMaxAccel",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "11,6": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/LimitedTranslation",
+              "_title": "LimitedTranslation",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,6": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Translation",
+              "_title": "Translation",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
@@ -740,9 +903,9 @@
         "vgap": 16.0,
         "titleType": 0,
         "tiles": {
-          "3,4": {
+          "1,4": {
             "size": [
-              2,
+              3,
               1
             ],
             "content": {
@@ -753,9 +916,9 @@
               "_showGlyph": false
             }
           },
-          "3,5": {
+          "1,5": {
             "size": [
-              2,
+              3,
               1
             ],
             "content": {
@@ -766,9 +929,9 @@
               "_showGlyph": false
             }
           },
-          "5,5": {
+          "4,5": {
             "size": [
-              2,
+              3,
               1
             ],
             "content": {
@@ -779,9 +942,9 @@
               "_showGlyph": false
             }
           },
-          "5,4": {
+          "4,4": {
             "size": [
-              2,
+              3,
               1
             ],
             "content": {
@@ -870,9 +1033,9 @@
               "_showGlyph": false
             }
           },
-          "3,0": {
+          "1,0": {
             "size": [
-              2,
+              3,
               1
             ],
             "content": {
@@ -883,9 +1046,9 @@
               "_showGlyph": false
             }
           },
-          "5,0": {
+          "4,0": {
             "size": [
-              2,
+              3,
               1
             ],
             "content": {
@@ -896,9 +1059,9 @@
               "_showGlyph": false
             }
           },
-          "3,1": {
+          "1,1": {
             "size": [
-              2,
+              3,
               1
             ],
             "content": {
@@ -909,9 +1072,9 @@
               "_showGlyph": false
             }
           },
-          "5,1": {
+          "4,1": {
             "size": [
-              2,
+              3,
               1
             ],
             "content": {
@@ -1020,7 +1183,7 @@
   "windowGeometry": {
     "x": 0.0,
     "y": 0.0,
-    "width": 1741.0,
+    "width": 1910.0,
     "height": 1157.0
   }
 }
