@@ -1175,6 +1175,32 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "3,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/LimitedTranslation",
+              "_title": "SmartDashboard/LimitedTranslation",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "2,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Translation",
+              "_title": "SmartDashboard/Translation",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }

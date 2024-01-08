@@ -1,7 +1,5 @@
 package frc.robot.commands.operator;
 
-import edu.wpi.first.wpilibj.GenericHID;
-
 /**
  * The DriverController exposes all driver functions
  */
@@ -21,16 +19,16 @@ public class OperatorInput {
     /**
      * Construct an OperatorInput class that is fed by a DriverController and an OperatorController.
      *
-     * @param driverControllerPort   on the driver station which the driver joystick is plugged into
+     * @param driverControllerPort on the driver station which the driver joystick is plugged into
      * @param operatorControllerPort on the driver station which the aux joystick is plugged into
      */
     public OperatorInput(int driverControllerPort, int operatorControllerPort) {
-        driverController = new RunnymedeGameController(driverControllerPort);
+        driverController   = new RunnymedeGameController(driverControllerPort);
         operatorController = new RunnymedeGameController(operatorControllerPort);
     }
 
     public OperatorInput(int driverControllerPort) {
-        driverController = new RunnymedeGameController(driverControllerPort);
+        driverController   = new RunnymedeGameController(driverControllerPort);
         operatorController = null;
     }
 
@@ -38,27 +36,31 @@ public class OperatorInput {
         return driverController.getRightBumper();
     }
 
+    public boolean isZeroGyro() {
+        return driverController.getStartButton();
+    }
+
     public double getDriverControllerAxis(Stick stick, Axis axis) {
 
         switch (stick) {
 
-            case LEFT:
-                switch (axis) {
-                    case X:
-                        return driverController.getLeftX();
-                    case Y:
-                        return driverController.getLeftY();
-                }
-                break;
+        case LEFT:
+            switch (axis) {
+            case X:
+                return driverController.getLeftX();
+            case Y:
+                return driverController.getLeftY();
+            }
+            break;
 
-            case RIGHT:
-                switch (axis) {
-                    case X:
-                        return driverController.getRightX();
-                    case Y:
-                        return driverController.getRightY();
-                }
-                break;
+        case RIGHT:
+            switch (axis) {
+            case X:
+                return driverController.getRightX();
+            case Y:
+                return driverController.getRightY();
+            }
+            break;
         }
 
         return 0;
