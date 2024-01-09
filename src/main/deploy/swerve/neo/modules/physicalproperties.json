@@ -1,7 +1,7 @@
 {
   "conversionFactor": {
-    "drive": 0.047286787200699704,
-    "angle": 28.125
+    "drive": 0.021127417218543,
+    "angle": 16.799
   },
   "currentLimit": {
     "drive": 40,
@@ -14,3 +14,10 @@
   "wheelGripCoefficientOfFriction": 1.19,
   "optimalVoltage": 12
 }
+/*
+The formula for the angle motor conversion factor is
+ 360 / (angleGearRatio  * pulsePerRotation)
+
+ The formula for the drive motor conversion factor is
+ (Math.PI * wheelDiameterInMeters) / (driveGearRatio * pulsePerRotation)
+*/
