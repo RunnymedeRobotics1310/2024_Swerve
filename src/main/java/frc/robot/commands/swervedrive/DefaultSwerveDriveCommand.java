@@ -7,13 +7,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
-import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.RunnymedeCommand;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 import swervelib.SwerveController;
 import swervelib.math.SwerveMath;
 
 
-public class DefaultSwerveDriveCommand extends RunnymedeCommandBase {
+public class DefaultSwerveDriveCommand extends RunnymedeCommand {
 
     private final boolean              isOpenLoop   = false;
     private final SwerveDriveSubsystem swerve;
