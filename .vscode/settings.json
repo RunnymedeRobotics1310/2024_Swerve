@@ -35,7 +35,7 @@
     "addOverride"
   ],
   "editor.codeActionsOnSave": {
-    "source.organizeImports": true
+    "source.organizeImports": "explicit"
   },
   "[java]": {
   	"editor.formatOnPaste": true,
