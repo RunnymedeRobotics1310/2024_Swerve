@@ -42,5 +42,6 @@
   },
   "git.allowForcePush": true,
   "gitlens.telemetry.enabled": false,
-  "gitlens.codeLens.dateFormat": ""
+  "gitlens.codeLens.dateFormat": "",
+  "todo-tree.regex.regex": "(//|#|<!--|;|/\\*{1,2}|^\\s*\\*|^|^\\s*(-|\\d+.))\\s*($TAGS)"
 }
