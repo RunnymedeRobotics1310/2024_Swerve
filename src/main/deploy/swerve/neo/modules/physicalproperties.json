@@ -14,10 +14,3 @@
   "wheelGripCoefficientOfFriction": 1.19,
   "optimalVoltage": 12
 }
-/*
-The formula for the angle motor conversion factor is
- 360 / (angleGearRatio  * pulsePerRotation)
-
- The formula for the drive motor conversion factor is
- (Math.PI * wheelDiameterInMeters) / (driveGearRatio * pulsePerRotation)
-*/
