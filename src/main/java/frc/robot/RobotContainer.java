@@ -51,7 +51,7 @@ public class RobotContainer {
                 () -> operatorInput.getDriverControllerAxis(LEFT, X),
                 () -> operatorInput.getDriverControllerAxis(LEFT, Y),
                 () -> operatorInput.getDriverControllerAxis(RIGHT, X),
-                () -> operatorInput.getDriverControllerAxis(RIGHT, Y)));
+                operatorInput::jumpAngle));
         // Configure the trigger bindings
         configureBindings();
     }

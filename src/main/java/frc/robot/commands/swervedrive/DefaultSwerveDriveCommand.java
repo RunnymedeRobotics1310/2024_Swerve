@@ -1,25 +1,19 @@
 package frc.robot.commands.swervedrive;
 
-import java.util.List;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.commands.RunnymedeCommand;
 import frc.robot.subsystems.SwerveDriveSubsystem;
-import swervelib.SwerveController;
-import swervelib.math.SwerveMath;
 
 
 public class DefaultSwerveDriveCommand extends RunnymedeCommand {
 
-    private final boolean              isOpenLoop   = false;
     private final SwerveDriveSubsystem swerve;
     private final DoubleSupplier       vX, vY;
-    private final DoubleSupplier       headingHorizontal, headingVertical;
-    private boolean                    initRotation = false;
+    private final DoubleSupplier       rotationAngularVelocity, jumpAngle;
 
     /**
      * Used to drive a swerve robot in full field-centric mode. vX and vY supply translation inputs, where x is
@@ -33,22 +27,15 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
      * @param vY DoubleSupplier that supplies the y-translation joystick input. Should be in the range -1
      * to 1 with deadband already accounted for. Positive Y is towards the left wall when
      * looking through the driver station glass.
-     * @param headingHorizontal DoubleSupplier that supplies the horizontal component of the robot's heading angle. In the
-     * robot coordinate system, this is along the same axis as vY. Should range from -1 to 1 with
-     * no deadband. Positive is towards the left wall when looking through the driver station
-     * glass.
-     * @param headingVertical DoubleSupplier that supplies the vertical component of the robot's heading angle. In the
-     * robot coordinate system, this is along the same axis as vX. Should range from -1 to 1
-     * with no deadband. Positive is away from the alliance wall.
      */
     public DefaultSwerveDriveCommand(SwerveDriveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY,
-        DoubleSupplier headingHorizontal,
-        DoubleSupplier headingVertical) {
+        DoubleSupplier rotationAngularVelocity,
+        DoubleSupplier jumpAngle) {
         this.swerve            = swerve;
         this.vX                = vX;
         this.vY                = vY;
-        this.headingHorizontal = headingHorizontal;
-        this.headingVertical   = headingVertical;
+        this.rotationAngularVelocity   = rotationAngularVelocity;
+        this.jumpAngle = jumpAngle;
 
         addRequirements(swerve);
     }
@@ -56,43 +43,23 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
     @Override
     public void initialize() {
         super.initialize();
-        initRotation = true;
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        // Get the desired chassis speeds based on a 2 joystick module.
-        ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(vX.getAsDouble(), vY.getAsDouble(),
-            -headingHorizontal.getAsDouble(),
-            headingVertical.getAsDouble());
 
-        // Prevent Movement After Auto
-        if (initRotation) {
-            if (headingHorizontal.getAsDouble() == 0 && headingVertical.getAsDouble() == 0) {
-                // Get the currentHeading
-                double firstLoopHeading = swerve.getHeading().getRadians();
+        double xVelocity   = Math.pow(vX.getAsDouble(), 3);
+        double yVelocity   = Math.pow(vY.getAsDouble(), 3);
+        double angVelocity = -Math.pow(rotationAngularVelocity.getAsDouble(), 3);
+        SmartDashboard.putNumber("vX", xVelocity);
+        SmartDashboard.putNumber("vY", yVelocity);
+        SmartDashboard.putNumber("rotationAngularVelocity", angVelocity);
 
-                // Set the Current Heading to the desired Heading
-                desiredSpeeds = swerve.getTargetSpeeds(0, 0, Math.sin(firstLoopHeading), Math.cos(firstLoopHeading));
-            }
-            // Don't Init Rotation Again
-            initRotation = false;
-        }
-
-        // Limit velocity to prevent tippy
-        Translation2d translation = SwerveController.getTranslation2d(desiredSpeeds);
-        translation = SwerveMath.limitVelocity(
-            translation, swerve.getFieldVelocity(), swerve.getPose(),
-            Constants.SwerveDriveConstants.LOOP_TIME, Constants.SwerveDriveConstants.ROBOT_MASS,
-            List.of(Constants.SwerveDriveConstants.CHASSIS),
-            swerve.getSwerveDriveConfiguration());
-        SmartDashboard.putNumber("LimitedTranslation", translation.getX());
-        SmartDashboard.putString("Translation", translation.toString());
-
-        // Make the robot move
-        swerve.drive(translation, desiredSpeeds.omegaRadiansPerSecond, true, isOpenLoop);
-
+        Translation2d vector = new Translation2d(xVelocity * Constants.SwerveDriveConstants.MAX_SPEED_MPS, yVelocity * Constants.SwerveDriveConstants.MAX_SPEED_MPS);
+        double rotation = angVelocity * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC;
+        // Drive using raw values.
+        swerve.drive(vector, rotation, true, false);
     }
 
     // Called once the command ends or is interrupted.

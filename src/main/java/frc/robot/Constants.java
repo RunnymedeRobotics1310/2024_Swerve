@@ -32,5 +32,6 @@ public final class Constants {
          * swervelib.SwerveController and drive feedforward in SwerveMath#createDriveFeedforward(double, double, double).
          */
         public static final double MAX_SPEED_MPS = 4.42;
+        public static final double MAX_ROTATION_RADIANS_PER_SEC = 6;
     }
 }

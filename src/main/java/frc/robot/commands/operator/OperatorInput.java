@@ -40,6 +40,10 @@ public class OperatorInput {
         return driverController.getStartButton();
     }
 
+    public double jumpAngle() {
+        return driverController.getPOV();
+    }
+
     public double getDriverControllerAxis(Stick stick, Axis axis) {
 
         switch (stick) {
