@@ -1,10 +1,14 @@
 {
+  "System Joysticks": {
+    "window": {
+      "visible": false
+    }
+  },
   "keyboardJoysticks": [
     {
       "axisConfig": [
         {
-          "decKey": 65,
-          "incKey": 68
+          "decKey": 65
         },
         {
           "decKey": 87,
@@ -69,9 +73,15 @@
         {
           "decKey": 265,
           "incKey": 264
+        },
+        {},
+        {},
+        {
+          "decKey": 68,
+          "incKey": 70
         }
       ],
-      "axisCount": 2,
+      "axisCount": 6,
       "buttonCount": 6,
       "buttonKeys": [
         260,
@@ -93,5 +103,6 @@
     {
       "guid": "Keyboard2"
     }
-  ]
+  ],
+  "useEstopHotkey": true
 }
