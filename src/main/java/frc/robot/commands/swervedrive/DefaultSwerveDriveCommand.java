@@ -59,7 +59,7 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
         Translation2d vector = new Translation2d(xVelocity * Constants.SwerveDriveConstants.MAX_SPEED_MPS, yVelocity * Constants.SwerveDriveConstants.MAX_SPEED_MPS);
         double rotation = angVelocity * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC;
         // Drive using raw values.
-        swerve.drive(vector, rotation, true, false);
+        swerve.drive(vector, rotation, true);
     }
 
     // Called once the command ends or is interrupted.

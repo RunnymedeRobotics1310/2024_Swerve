@@ -54,11 +54,9 @@ public class SwerveDriveSubsystem extends SubsystemBase {
      * @param rotation      Robot angular rate, in radians per second. CCW positive.  Unaffected by field/robot
      *                      relativity.
      * @param fieldRelative Drive mode.  True for field-relative, false for robot-relative.
-     * @param isOpenLoop    Whether to use closed-loop velocity control.  Set to true to disable closed-loop. Should
-     *                      usually be set to false
      */
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop);
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
+        swerveDrive.drive(translation, rotation, fieldRelative, false);
     }
 
     /**
