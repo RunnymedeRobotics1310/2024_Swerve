@@ -1,12 +1,14 @@
 package frc.robot.commands.operator;
 
+import edu.wpi.first.wpilibj.XboxController;
+
 /**
  * The DriverController exposes all driver functions
  */
 public class OperatorInput {
 
-    private final RunnymedeGameController driverController;
-    private final RunnymedeGameController operatorController;
+    private final XboxController driverController;
+    private final XboxController operatorController;
 
     public enum Stick {
         LEFT, RIGHT
@@ -23,24 +25,15 @@ public class OperatorInput {
      * @param operatorControllerPort on the driver station which the aux joystick is plugged into
      */
     public OperatorInput(int driverControllerPort, int operatorControllerPort) {
-        driverController   = new RunnymedeGameController(driverControllerPort);
-        operatorController = new RunnymedeGameController(operatorControllerPort);
-    }
-
-    public OperatorInput(int driverControllerPort) {
-        driverController   = new RunnymedeGameController(driverControllerPort);
-        operatorController = null;
-    }
-
-    public boolean doHeadingCorrection() {
-        return driverController.getRightBumper();
+        driverController   = new XboxController(driverControllerPort); // drive base has built-in deadband and axis flipping
+        operatorController = new RunnymedeGameController(operatorControllerPort); // deadband support & axis flipping
     }
 
     public boolean isZeroGyro() {
         return driverController.getStartButton();
     }
 
-    public double jumpAngle() {
+    public int getJumpAngle() {
         return driverController.getPOV();
     }
 
@@ -53,7 +46,7 @@ public class OperatorInput {
             case X:
                 return driverController.getLeftX();
             case Y:
-                return driverController.getLeftY();
+                return -driverController.getLeftY();
             }
             break;
 
@@ -70,11 +63,4 @@ public class OperatorInput {
         return 0;
     }
 
-
-    /**
-     * return the raw underlying {@link RunnymedeGameController}. ONLY FOR USE IN TEST MODE.
-     */
-    public RunnymedeGameController getRawDriverController() {
-        return driverController;
-    }
 }

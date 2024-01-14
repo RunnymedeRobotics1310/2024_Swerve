@@ -51,12 +51,11 @@ public class SwerveDriveSubsystem extends SubsystemBase {
      *                      torwards port (left).  In field-relative mode, positive x is away from the alliance wall
      *                      (field North) and positive y is torwards the left wall when looking through the driver station
      *                      glass (field West).
-     * @param rotation      Robot angular rate, in radians per second. CCW positive.  Unaffected by field/robot
+     * @param rotationRadiansPerSec      Robot angular rate, in radians per second. CCW positive.  Unaffected by field/robot
      *                      relativity.
-     * @param fieldRelative Drive mode.  True for field-relative, false for robot-relative.
      */
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
-        swerveDrive.drive(translation, rotation, fieldRelative, false);
+    public void driveFieldOriented(Translation2d translation, double rotationRadiansPerSec) {
+        swerveDrive.drive(translation, rotationRadiansPerSec, true, false);
     }
 
     /**
@@ -64,8 +63,12 @@ public class SwerveDriveSubsystem extends SubsystemBase {
      *
      * @param velocity Robot oriented {@link ChassisSpeeds}
      */
-    public void drive(ChassisSpeeds velocity) {
+    public void driveRobotOriented(ChassisSpeeds velocity) {
         swerveDrive.drive(velocity);
+    }
+
+    public void driveFieldOriented(ChassisSpeeds velocity) {
+        swerveDrive.driveFieldOriented(velocity);
     }
 
 
@@ -144,40 +147,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
      */
     public Rotation2d getHeading() {
         return swerveDrive.getYaw();
-    }
-
-    /**
-     * Get the chassis speeds based on controller input of 2 joysticks. One for speeds in which direction. The other for
-     * the angle of the robot.
-     *
-     * @param xInput   X joystick input for the robot to move in the X direction.
-     * @param yInput   Y joystick input for the robot to move in the Y direction.
-     * @param headingX X joystick which controls the angle of the robot.
-     * @param headingY Y joystick which controls the angle of the robot.
-     * @return {@link ChassisSpeeds} which can be sent to th Swerve Drive.
-     */
-    public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, double headingX, double headingY) {
-        xInput = Math.pow(xInput, 3);
-        yInput = Math.pow(yInput, 3);
-        return swerveDrive.swerveController.getTargetSpeeds(xInput, yInput, headingX, headingY, getHeading().getRadians(), Constants.SwerveDriveConstants.MAX_SPEED_MPS);
-    }
-
-    /**
-     * Get the chassis speeds based on controller input of 1 joystick and one angle.
-     *
-     * @param xInput X joystick input for the robot to move in the X direction.
-     * @param yInput Y joystick input for the robot to move in the Y direction.
-     * @param angle  The angle in as a {@link Rotation2d}.
-     * @return {@link ChassisSpeeds} which can be sent to th Swerve Drive.
-     */
-    public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, Rotation2d angle) {
-        xInput = Math.pow(xInput, 3);
-        yInput = Math.pow(yInput, 3);
-        return swerveDrive.swerveController.getTargetSpeeds(xInput,
-                yInput,
-                angle.getRadians(),
-                getHeading().getRadians(),
-                Constants.SwerveDriveConstants.MAX_SPEED_MPS);
     }
 
     /**

@@ -33,5 +33,8 @@ public final class Constants {
          */
         public static final double MAX_SPEED_MPS = 4.42;
         public static final double MAX_ROTATION_RADIANS_PER_SEC = 6;
+
+        public static final double ROTATION_TOLERANCE_DEGREES = 2.0;
+        public static final double ROTATION_ANGULAR_VELOCITY_TOLERANCE_PCT = 0.08;
     }
 }

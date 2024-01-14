@@ -1,19 +1,26 @@
 package frc.robot.commands.swervedrive;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.commands.RunnymedeCommand;
 import frc.robot.subsystems.SwerveDriveSubsystem;
+import swervelib.SwerveController;
 
 
 public class DefaultSwerveDriveCommand extends RunnymedeCommand {
 
     private final SwerveDriveSubsystem swerve;
-    private final DoubleSupplier       vX, vY;
-    private final DoubleSupplier       rotationAngularVelocity, jumpAngle;
+    private final DoubleSupplier       translationXSupplier, translationYSupplier;
+    private final DoubleSupplier       rotationAngularVelocityPctSupplier;
+    private final IntSupplier jumpAngle;
+
+    private Rotation2d desiredJumpHeading = null;
 
     /**
      * Used to drive a swerve robot in full field-centric mode. vX and vY supply translation inputs, where x is
@@ -22,19 +29,18 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
      * will rotate to.
      *
      * @param swerve The swerve drivebase subsystem.
-     * @param vX DoubleSupplier that supplies the x-translation joystick input. Should be in the range -1
+     * @param translationXSupplier DoubleSupplier that supplies the x-translation joystick input. Should be in the range -1
      * to 1 with deadband already accounted for. Positive X is away from the alliance wall.
-     * @param vY DoubleSupplier that supplies the y-translation joystick input. Should be in the range -1
+     * @param translationYSupplier DoubleSupplier that supplies the y-translation joystick input. Should be in the range -1
      * to 1 with deadband already accounted for. Positive Y is towards the left wall when
      * looking through the driver station glass.
      */
-    public DefaultSwerveDriveCommand(SwerveDriveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY,
-        DoubleSupplier rotationAngularVelocity,
-        DoubleSupplier jumpAngle) {
+    public DefaultSwerveDriveCommand(SwerveDriveSubsystem swerve, DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier,
+        DoubleSupplier rotationAngularVelocityPctSupplier, IntSupplier jumpAngle) {
         this.swerve            = swerve;
-        this.vX                = vX;
-        this.vY                = vY;
-        this.rotationAngularVelocity   = rotationAngularVelocity;
+        this.translationXSupplier                = translationXSupplier;
+        this.translationYSupplier                = translationYSupplier;
+        this.rotationAngularVelocityPctSupplier   = rotationAngularVelocityPctSupplier;
         this.jumpAngle = jumpAngle;
 
         addRequirements(swerve);
@@ -49,17 +55,62 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
     @Override
     public void execute() {
 
-        double xVelocity   = Math.pow(vX.getAsDouble(), 3);
-        double yVelocity   = Math.pow(vY.getAsDouble(), 3);
-        double angVelocity = -Math.pow(rotationAngularVelocity.getAsDouble(), 3);
-        SmartDashboard.putNumber("vX", xVelocity);
-        SmartDashboard.putNumber("vY", yVelocity);
-        SmartDashboard.putNumber("rotationAngularVelocity", angVelocity);
+        // get user inputs
+        double vX   = translationXSupplier.getAsDouble();
+        double vY   = translationYSupplier.getAsDouble();
+        double rotationAngularVelocityPct = rotationAngularVelocityPctSupplier.getAsDouble();
+        int desiredHeadingDegrees = jumpAngle.getAsInt();
 
-        Translation2d vector = new Translation2d(xVelocity * Constants.SwerveDriveConstants.MAX_SPEED_MPS, yVelocity * Constants.SwerveDriveConstants.MAX_SPEED_MPS);
-        double rotation = angVelocity * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC;
-        // Drive using raw values.
-        swerve.drive(vector, rotation, true);
+        // write to dashboard
+        SmartDashboard.putNumber("vX", vX);
+        SmartDashboard.putNumber("vY", vY);
+        SmartDashboard.putNumber("rotationAngularVelocityPct", rotationAngularVelocityPct);
+        SmartDashboard.putNumber("jumpAngle", desiredHeadingDegrees);
+
+        // figure out the way we will set our heading
+        final boolean jumpToPOV;
+        if (desiredHeadingDegrees > -1) {
+            // someone has pressed the POV. Jump to there.
+            jumpToPOV = true;
+            desiredJumpHeading = Rotation2d.fromDegrees(desiredHeadingDegrees);
+        } else {
+            // not pressing POV
+            if (desiredJumpHeading != null) {
+                // we still have a heading from before!
+                if (Math.abs(rotationAngularVelocityPct) < Constants.SwerveDriveConstants.ROTATION_ANGULAR_VELOCITY_TOLERANCE_PCT) {
+                    // the user hasn't requested a turn so do not override the previous POV direction
+                    jumpToPOV = true;
+                } else {
+                    // direction override - clear POV and follow turn override
+                    jumpToPOV = false;
+                    desiredJumpHeading = null;
+                }
+            } else {
+                // we don't have a heading so we can't jump to the POV.
+                jumpToPOV = false;
+            }
+        }
+
+
+        // drive!
+        if (jumpToPOV) {
+            // jump
+            vX = Math.pow(vX, 3);
+            vY = Math.pow(vY, 3);
+            SwerveController controller = swerve.getSwerveController();
+            ChassisSpeeds desiredChassisSpeed = controller.getTargetSpeeds(vX, vY, desiredJumpHeading.getRadians(), swerve.getHeading().getRadians(), Constants.SwerveDriveConstants.MAX_SPEED_MPS);
+
+            swerve.driveFieldOriented(desiredChassisSpeed);
+        } else {
+            // steer
+            vX = Math.pow(vX, 3) * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
+            vY = Math.pow(vY, 3) * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
+            Translation2d vector = new Translation2d(vX, vY);
+
+            double rotationRadiansPerSec = Math.pow(rotationAngularVelocityPct, 3) * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC;
+
+            swerve.driveFieldOriented(vector, rotationRadiansPerSec);
+        }
     }
 
     // Called once the command ends or is interrupted.
@@ -74,5 +125,4 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
         super.isFinished();
         return false;
     }
-
 }
