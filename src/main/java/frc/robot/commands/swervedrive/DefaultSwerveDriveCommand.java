@@ -107,7 +107,12 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
             vY = Math.pow(vY, 3) * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
             Translation2d vector = new Translation2d(vX, vY);
 
-            double rotationRadiansPerSec = Math.pow(rotationAngularVelocityPct, 3) * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC;
+            final double rotationRadiansPerSec;
+            if (Math.abs(rotationAngularVelocityPct) > Constants.SwerveDriveConstants.ROTATION_ANGULAR_VELOCITY_TOLERANCE_PCT) {
+                rotationRadiansPerSec = Math.pow(rotationAngularVelocityPct, 3) * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC;
+            } else {
+                rotationRadiansPerSec = 0;
+            }
 
             swerve.driveFieldOriented(vector, rotationRadiansPerSec);
         }

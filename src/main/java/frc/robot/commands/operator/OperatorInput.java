@@ -34,7 +34,7 @@ public class OperatorInput {
     }
 
     public int getJumpAngle() {
-        return driverController.getPOV();
+        return -driverController.getPOV();
     }
 
     public double getDriverControllerAxis(Stick stick, Axis axis) {
@@ -53,7 +53,7 @@ public class OperatorInput {
         case RIGHT:
             switch (axis) {
             case X:
-                return driverController.getRightX();
+                return -driverController.getRightX();
             case Y:
                 return driverController.getRightY();
             }
