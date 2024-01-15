@@ -16,12 +16,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OiConstants;
-import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.DefaultSwerveDriveCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
-import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 
 /**
@@ -32,13 +29,12 @@ import frc.robot.subsystems.SwerveDriveSubsystem;
  */
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    private final ExampleSubsystem     m_exampleSubsystem   = new ExampleSubsystem();
     private final SwerveDriveSubsystem swerveDriveSubsystem = new SwerveDriveSubsystem(
         new File(Filesystem.getDeployDirectory(), "swerve/neo"));
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final OperatorInput        operatorInput        = new OperatorInput(
-        OiConstants.DRIVER_CONTROLLER_PORT /* , OiConstants.OPERATOR_CONTROLLER_PORT */);
+        OiConstants.DRIVER_CONTROLLER_PORT  , OiConstants.OPERATOR_CONTROLLER_PORT );
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -51,7 +47,7 @@ public class RobotContainer {
                 () -> operatorInput.getDriverControllerAxis(LEFT, X),
                 () -> operatorInput.getDriverControllerAxis(LEFT, Y),
                 () -> operatorInput.getDriverControllerAxis(RIGHT, X),
-                operatorInput::jumpAngle));
+                operatorInput::getJumpAngle));
         // Configure the trigger bindings
         configureBindings();
     }
@@ -66,13 +62,7 @@ public class RobotContainer {
      * joysticks}.
      */
     private void configureBindings() {
-        // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-        new Trigger(m_exampleSubsystem::exampleCondition).onTrue(new ExampleCommand(m_exampleSubsystem));
-        // new Trigger(operatorInput::isZeroGyro).onTrue(new ZeroGyroCommand(swerveDriveSubsystem));
-        new Trigger(() -> operatorInput.isZeroGyro()).onTrue(new ZeroGyroCommand(swerveDriveSubsystem));
-        // Schedule `exampleMethodCommand` when the doExampleCommand input is provided by the operator
-        // cancelling on release.
-        // new Trigger(operatorInput::doExampleCommand).whileTrue(m_exampleSubsystem.exampleMethodCommand());
+        new Trigger(operatorInput::isZeroGyro).onTrue(new ZeroGyroCommand(swerveDriveSubsystem));
     }
 
     /**
@@ -81,7 +71,6 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // An example command will be run in autonomous
-        return Autos.exampleAuto(m_exampleSubsystem);
+        return null; // todo: implement
     }
 }
