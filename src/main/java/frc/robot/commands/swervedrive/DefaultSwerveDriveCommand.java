@@ -99,22 +99,24 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
             vY = Math.pow(vY, 3);
             SwerveController controller = swerve.getSwerveController();
             ChassisSpeeds desiredChassisSpeed = controller.getTargetSpeeds(vX, vY, desiredJumpHeading.getRadians(), swerve.getHeading().getRadians(), Constants.SwerveDriveConstants.MAX_SPEED_MPS);
-
             swerve.driveFieldOriented(desiredChassisSpeed);
         } else {
             // steer
-            vX = Math.pow(vX, 3) * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
-            vY = Math.pow(vY, 3) * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
-            Translation2d vector = new Translation2d(vX, vY);
-
             final double rotationRadiansPerSec;
+            // are we actually turning?
             if (Math.abs(rotationAngularVelocityPct) > Constants.SwerveDriveConstants.ROTATION_ANGULAR_VELOCITY_TOLERANCE_PCT) {
+                // yes!
+                vX = Math.pow(vX, 3) * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
+                vY = Math.pow(vY, 3) * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
+                Translation2d vector = new Translation2d(vX, vY);
                 rotationRadiansPerSec = Math.pow(rotationAngularVelocityPct, 3) * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC;
+                swerve.driveFieldOriented(vector, rotationRadiansPerSec);
             } else {
-                rotationRadiansPerSec = 0;
+                // no! rather than set "don't turn", give the exact heading
+                SwerveController controller = swerve.getSwerveController();
+                ChassisSpeeds desiredChassisSpeed = controller.getTargetSpeeds(vX, vY, swerve.getHeading().getRadians(), swerve.getHeading().getRadians(), Constants.SwerveDriveConstants.MAX_SPEED_MPS);
+                swerve.driveFieldOriented(desiredChassisSpeed);
             }
-
-            swerve.driveFieldOriented(vector, rotationRadiansPerSec);
         }
     }
 

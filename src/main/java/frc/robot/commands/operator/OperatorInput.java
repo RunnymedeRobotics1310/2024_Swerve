@@ -34,7 +34,7 @@ public class OperatorInput {
     }
 
     public int getJumpAngle() {
-        return -driverController.getPOV();
+        return driverController.getPOV();
     }
 
     public double getDriverControllerAxis(Stick stick, Axis axis) {
