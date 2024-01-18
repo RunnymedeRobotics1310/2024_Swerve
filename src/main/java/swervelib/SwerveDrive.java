@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -68,6 +67,10 @@ public class SwerveDrive
    */
   private final Lock                     odometryLock                                    = new ReentrantLock();
   /**
+   * Deadband for speeds in heading correction.
+   */
+  private final double                   HEADING_CORRECTION_DEADBAND                     = 0.01;
+  /**
    * Field object.
    */
   public        Field2d                  field                                           = new Field2d();
@@ -104,6 +107,10 @@ public class SwerveDrive
    * Whether to correct heading when driving translationally. Set to true to enable.
    */
   public        boolean                  headingCorrection                               = false;
+  /**
+   * Whether heading correction PID is currently active.
+   */
+  private       boolean                  correctionEnabled                               = false;
   /**
    * Swerve IMU device for sensing the heading of the robot.
    */
@@ -401,15 +408,23 @@ public class SwerveDrive
 
     // Heading Angular Velocity Deadband, might make a configuration option later.
     // Originally made by Team 1466 Webb Robotics.
+    // Modified by Team 7525 Pioneers and BoiledBurntBagel of 6036
     if (headingCorrection)
     {
-      if (Math.abs(velocity.omegaRadiansPerSecond) < 0.01)
+      if (Math.abs(velocity.omegaRadiansPerSecond) < HEADING_CORRECTION_DEADBAND
+          && (Math.abs(velocity.vxMetersPerSecond) > HEADING_CORRECTION_DEADBAND
+              || Math.abs(velocity.vyMetersPerSecond) > HEADING_CORRECTION_DEADBAND))
       {
+        if (!correctionEnabled)
+        {
+          lastHeadingRadians = getYaw().getRadians();
+          correctionEnabled = true;
+        }
         velocity.omegaRadiansPerSecond =
             swerveController.headingCalculate(lastHeadingRadians, getYaw().getRadians());
       } else
       {
-        lastHeadingRadians = getYaw().getRadians();
+        correctionEnabled = false;
       }
     }
 
@@ -882,6 +897,7 @@ public class SwerveDrive
         if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH)
         {
           module.updateTelemetry();
+          SmartDashboard.putNumber("Adjusted IMU Yaw", getYaw().getDegrees());
         }
         if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.HIGH.ordinal())
         {
