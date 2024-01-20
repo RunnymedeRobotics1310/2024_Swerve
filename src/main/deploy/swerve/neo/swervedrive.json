@@ -1,10 +1,10 @@
 {
   "imu": {
-    "type": "navx",
+    "type": "navx_mxp",
     "id": -1,
     "canbus": "null"
   },
-  "invertedIMU": false,
+  "invertedIMU": true,
   "modules": [
     "frontleft.json",
     "frontright.json",
