@@ -22,19 +22,22 @@ import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     private final SwerveDriveSubsystem swerveDriveSubsystem = new SwerveDriveSubsystem(
-        new File(Filesystem.getDeployDirectory(), "swerve/neo"));
+            new File(Filesystem.getDeployDirectory(), "swerve/neo"));
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final OperatorInput        operatorInput        = new OperatorInput(
-        OiConstants.DRIVER_CONTROLLER_PORT  , OiConstants.OPERATOR_CONTROLLER_PORT );
+    private final OperatorInput operatorInput = new OperatorInput(
+            OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -43,22 +46,27 @@ public class RobotContainer {
 
         // Initialize all Subsystem default commands
         swerveDriveSubsystem.setDefaultCommand(
-            new DefaultSwerveDriveCommand(swerveDriveSubsystem,
-                () -> operatorInput.getDriverControllerAxis(LEFT, X),
-                () -> operatorInput.getDriverControllerAxis(LEFT, Y),
-                () -> operatorInput.getDriverControllerAxis(RIGHT, X),
-                operatorInput::getJumpAngle));
+                new DefaultSwerveDriveCommand(swerveDriveSubsystem,
+                        () -> operatorInput.getDriverControllerAxis(LEFT, X),
+                        () -> operatorInput.getDriverControllerAxis(LEFT, Y),
+                        () -> -operatorInput.getDriverControllerAxis(RIGHT, X),
+                        operatorInput::getJumpAngle));
         // Configure the trigger bindings
         configureBindings();
     }
 
     /**
-     * Use this method to define your trigger->command mappings. Triggers can be created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
+     * Use this method to define your trigger->command mappings. Triggers can be
+     * created via the
+     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+     * an arbitrary
      * predicate, or via the named factories in {@link
-     * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-     * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-     * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+     * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
+     * {@link
+     * CommandXboxController
+     * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
+     * PS4} controllers or
+     * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
      * joysticks}.
      */
     private void configureBindings() {
