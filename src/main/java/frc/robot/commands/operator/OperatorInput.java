@@ -45,7 +45,6 @@ public class OperatorInput {
         } else {
             retVal = (rawPOV + 90) % 360;
         }
-        System.out.println("getJumpAngle raw: " + rawPOV + " returned: " + retVal);
         return retVal;
 
     }

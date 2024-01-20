@@ -105,9 +105,11 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
             // jump
             vX = Math.pow(vX, 3);
             vY = Math.pow(vY, 3);
+            Rotation2d currentHeading = swerve.getHeading();
             SwerveController controller = swerve.getSwerveController();
             ChassisSpeeds desiredChassisSpeed = controller.getTargetSpeeds(vX, vY, desiredJumpHeading.getRadians(),
-                    swerve.getHeading().getRadians(), Constants.SwerveDriveConstants.MAX_SPEED_MPS);
+                    currentHeading.getRadians(), Constants.SwerveDriveConstants.MAX_SPEED_MPS);
+            System.out.println("Jump to pov mode! desired: "+desiredHeadingDegrees+", heading: "+currentHeading.getDegrees());
             swerve.driveFieldOriented(desiredChassisSpeed);
         } else {
             // steer
