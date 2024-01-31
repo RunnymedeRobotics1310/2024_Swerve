@@ -50,7 +50,8 @@ public class RobotContainer {
                         () -> operatorInput.getDriverControllerAxis(LEFT, X),
                         () -> operatorInput.getDriverControllerAxis(LEFT, Y),
                         () -> -operatorInput.getDriverControllerAxis(RIGHT, X),
-                        operatorInput::getJumpAngle));
+                        operatorInput::getJumpAngle,
+                        () -> operatorInput.getBoostMultiplier()));
         // Configure the trigger bindings
         configureBindings();
     }
@@ -71,6 +72,8 @@ public class RobotContainer {
      */
     private void configureBindings() {
         new Trigger(operatorInput::isZeroGyro).onTrue(new ZeroGyroCommand(swerveDriveSubsystem));
+        // new Trigger(operatorInput.isA().onTrue(new
+        // DriveDistanceCommand(swerveDriveSubsystem, null, null, 0.5)))
     }
 
     /**

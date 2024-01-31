@@ -1,6 +1,7 @@
 package frc.robot.commands.operator;
 
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Constants;
 
 /**
  * The DriverController exposes all driver functions
@@ -31,6 +32,22 @@ public class OperatorInput {
         driverController = new XboxController(driverControllerPort); // drive base has built-in deadband and axis
                                                                      // flipping
         operatorController = new RunnymedeGameController(operatorControllerPort); // deadband support & axis flipping
+    }
+
+    public double getBoostMultiplier() {
+
+        if (driverController.getLeftBumper()) {
+            return Constants.SwerveDriveConstants.SLOW_SPEED_FACTOR;
+        } else if (driverController.getRightBumper()) {
+            return Constants.SwerveDriveConstants.MAX_SPEED_FACTOR;
+        } else {
+            return Constants.SwerveDriveConstants.GENERAL_SPEED_FACTOR;
+        }
+    }
+
+    // Testing purposes only
+    public boolean isA() {
+        return driverController.getAButton();
     }
 
     public boolean isZeroGyro() {

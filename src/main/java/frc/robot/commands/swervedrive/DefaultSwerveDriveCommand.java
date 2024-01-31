@@ -18,6 +18,7 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
     private final DoubleSupplier translationXSupplier, translationYSupplier;
     private final DoubleSupplier rotationAngularVelocityPctSupplier;
     private final IntSupplier jumpAngle;
+    private final DoubleSupplier boostFactor;
 
     private Rotation2d desiredJumpHeading = null;
 
@@ -43,12 +44,13 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
      */
     public DefaultSwerveDriveCommand(SwerveDriveSubsystem swerve, DoubleSupplier translationXSupplier,
             DoubleSupplier translationYSupplier,
-            DoubleSupplier rotationAngularVelocityPctSupplier, IntSupplier jumpAngle) {
+            DoubleSupplier rotationAngularVelocityPctSupplier, IntSupplier jumpAngle, DoubleSupplier boostFactor) {
         this.swerve = swerve;
         this.translationXSupplier = translationXSupplier;
         this.translationYSupplier = translationYSupplier;
         this.rotationAngularVelocityPctSupplier = rotationAngularVelocityPctSupplier;
         this.jumpAngle = jumpAngle;
+        this.boostFactor = boostFactor;
 
         addRequirements(swerve);
     }
@@ -67,6 +69,7 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
         double vY = translationYSupplier.getAsDouble();
         double rotationAngularVelocityPct = rotationAngularVelocityPctSupplier.getAsDouble();
         int desiredHeadingDegrees = jumpAngle.getAsInt();
+        double boostFactor = this.boostFactor.getAsDouble();
 
         // write to dashboard
         SmartDashboard.putNumber("vX", vX);
@@ -120,8 +123,8 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
             if (Math.abs(
                     rotationAngularVelocityPct) > Constants.SwerveDriveConstants.ROTATION_ANGULAR_VELOCITY_TOLERANCE_PCT) {
                 // yes!
-                vX = Math.pow(vX, 3) * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
-                vY = Math.pow(vY, 3) * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
+                vX = Math.pow(vX, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
+                vY = Math.pow(vY, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
                 Translation2d vector = new Translation2d(vX, vY);
                 rotationRadiansPerSec = Math.pow(rotationAngularVelocityPct, 3)
                         * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC;
@@ -134,8 +137,8 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
                 // Constants.SwerveDriveConstants.MAX_SPEED_MPS);
                 // swerve.driveFieldOriented(desiredChassisSpeed);
 
-                vX = Math.pow(vX, 3) * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
-                vY = Math.pow(vY, 3) * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
+                vX = Math.pow(vX, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
+                vY = Math.pow(vY, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
                 Translation2d vector = new Translation2d(vX, vY);
                 rotationRadiansPerSec = 0;
                 swerve.driveFieldOriented(vector, rotationRadiansPerSec);
