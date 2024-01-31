@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.io.File;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -15,8 +17,6 @@ import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
-import java.io.File;
-
 public class SwerveDriveSubsystem extends SubsystemBase {
 
     /**
@@ -30,32 +30,45 @@ public class SwerveDriveSubsystem extends SubsystemBase {
      * @param configDirectory Directory of swerve drive config files.
      */
     public SwerveDriveSubsystem(File configDirectory) {
-        // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
+        // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
+        // objects being created.
         SwerveDriveTelemetry.verbosity = SwerveDriveTelemetry.TelemetryVerbosity.HIGH;
         try {
-            swerveDrive = new SwerveParser(configDirectory).createSwerveDrive(Constants.SwerveDriveConstants.MAX_SPEED_MPS);
+            swerveDrive = new SwerveParser(configDirectory)
+                    .createSwerveDrive(Constants.SwerveDriveConstants.MAX_SPEED_MPS);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot via angle.
+        swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot
+                                                // via angle.
 
     }
 
     /**
-     * The primary method for controlling the drivebase.  Takes a {@link Translation2d} and a rotation rate, and
-     * calculates and commands module states accordingly.  Can use either open-loop or closed-loop velocity control for
-     * the wheel velocities.  Also has field- and robot-relative modes, which affect how the translation vector is used.
+     * The primary method for controlling the drivebase. Takes a
+     * {@link Translation2d} and a rotation rate, and
+     * calculates and commands module states accordingly. Can use either open-loop
+     * or closed-loop velocity control for
+     * the wheel velocities. Also has field- and robot-relative modes, which affect
+     * how the translation vector is used.
      *
-     * @param translation   {@link Translation2d} that is the commanded linear velocity of the robot, in meters per
-     *                      second. In robot-relative mode, positive x is torwards the bow (front) and positive y is
-     *                      torwards port (left).  In field-relative mode, positive x is away from the alliance wall
-     *                      (field North) and positive y is torwards the left wall when looking through the driver station
-     *                      glass (field West).
-     * @param rotationRadiansPerSec      Robot angular rate, in radians per second. CCW positive.  Unaffected by field/robot
-     *                      relativity.
+     * @param translation           {@link Translation2d} that is the commanded
+     *                              linear velocity of the robot, in meters per
+     *                              second. In robot-relative mode, positive x is
+     *                              torwards the bow (front) and positive y is
+     *                              torwards port (left). In field-relative mode,
+     *                              positive x is away from the alliance wall
+     *                              (field North) and positive y is torwards the
+     *                              left wall when looking through the driver
+     *                              station
+     *                              glass (field West).
+     * @param rotationRadiansPerSec Robot angular rate, in radians per second. CCW
+     *                              positive. Unaffected by field/robot
+     *                              relativity.
      */
     public void driveFieldOriented(Translation2d translation, double rotationRadiansPerSec) {
         swerveDrive.drive(translation, rotationRadiansPerSec, true, false);
+
     }
 
     /**
@@ -71,11 +84,9 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         swerveDrive.driveFieldOriented(velocity);
     }
 
-
     @Override
     public void periodic() {
     }
-
 
     /**
      * Get the swerve drive kinematics object.
@@ -87,8 +98,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Resets odometry to the given pose. Gyro angle and module positions do not need to be reset when calling this
-     * method.  However, if either gyro angle or module position is reset, this must be called in order for odometry to
+     * Resets odometry to the given pose. Gyro angle and module positions do not
+     * need to be reset when calling this
+     * method. However, if either gyro angle or module position is reset, this must
+     * be called in order for odometry to
      * keep working.
      *
      * @param initialHolonomicPose The pose to set the odometry to
@@ -98,7 +111,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Gets the current pose (position and rotation) of the robot, as reported by odometry.
+     * Gets the current pose (position and rotation) of the robot, as reported by
+     * odometry.
      *
      * @return The robot's pose
      */
@@ -125,7 +139,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Resets the gyro angle to zero and resets odometry to the same position, but facing toward 0.
+     * Resets the gyro angle to zero and resets odometry to the same position, but
+     * facing toward 0.
      */
     public void zeroGyro() {
         swerveDrive.zeroGyro();
@@ -141,7 +156,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Gets the current yaw angle of the robot, as reported by the imu.  CCW positive, not wrapped.
+     * Gets the current yaw angle of the robot, as reported by the imu. CCW
+     * positive, not wrapped.
      *
      * @return The yaw angle
      */

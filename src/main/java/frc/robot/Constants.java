@@ -42,5 +42,10 @@ public final class Constants {
 
         public static final double ROTATION_TOLERANCE_DEGREES = 2.0;
         public static final double ROTATION_ANGULAR_VELOCITY_TOLERANCE_PCT = 0.08;
+
+        // Speed Factors - NOT TESTED
+        public static final double GENERAL_SPEED_FACTOR = .5;
+        public static final double MAX_SPEED_FACTOR = 1;
+        public static final double SLOW_SPEED_FACTOR = .1;
     }
 }
