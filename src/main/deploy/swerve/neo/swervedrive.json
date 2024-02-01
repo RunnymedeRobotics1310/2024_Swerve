@@ -1,6 +1,6 @@
 {
   "imu": {
-    "type": "navx_mxp",
+    "type": "navx",
     "id": -1,
     "canbus": "null"
   },

@@ -11,6 +11,8 @@ import static frc.robot.commands.operator.OperatorInput.Stick.RIGHT;
 
 import java.io.File;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -18,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OiConstants;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.DefaultSwerveDriveCommand;
+import frc.robot.commands.swervedrive.DriveDistanceCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 
@@ -72,8 +75,12 @@ public class RobotContainer {
      */
     private void configureBindings() {
         new Trigger(operatorInput::isZeroGyro).onTrue(new ZeroGyroCommand(swerveDriveSubsystem));
-        // new Trigger(operatorInput.isA().onTrue(new
-        // DriveDistanceCommand(swerveDriveSubsystem, null, null, 0.5)))
+
+        // drive forward
+        Translation2d fwd = new Translation2d(0, .25);
+        Rotation2d fwdHeading = Rotation2d.fromDegrees(0);
+        DriveDistanceCommand ddc = new DriveDistanceCommand(swerveDriveSubsystem, fwd, fwdHeading, .3);
+        new Trigger(operatorInput::isA).onTrue(ddc);
     }
 
     /**
