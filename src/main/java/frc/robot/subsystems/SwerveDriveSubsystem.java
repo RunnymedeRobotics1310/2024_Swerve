@@ -6,10 +6,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
+import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
@@ -30,12 +34,13 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         // objects being created.
         SwerveDriveTelemetry.verbosity = SwerveDriveTelemetry.TelemetryVerbosity.HIGH;
         try {
-            swerveDrive = new SwerveParser(configDirectory).createSwerveDrive(Constants.SwerveDriveConstants.MAX_SPEED_MPS);
+            swerveDrive = new SwerveParser(configDirectory)
+                    .createSwerveDrive(Constants.SwerveDriveConstants.MAX_SPEED_MPS);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot
-                                                // via angle.
+        // via angle.
 
     }
 
@@ -63,10 +68,46 @@ public class SwerveDriveSubsystem extends SubsystemBase {
      */
     public void driveFieldOriented(Translation2d translation, double rotationRadiansPerSec) {
         swerveDrive.drive(translation, rotationRadiansPerSec, true, false);
+
+    }
+
+    /**
+     * Drive according to the chassis robot oriented velocity.
+     *
+     * @param velocity Robot oriented {@link ChassisSpeeds}
+     */
+    public void driveRobotOriented(ChassisSpeeds velocity) {
+        swerveDrive.drive(velocity);
     }
 
     public void driveFieldOriented(ChassisSpeeds velocity) {
         swerveDrive.driveFieldOriented(velocity);
+    }
+
+    @Override
+    public void periodic() {
+    }
+
+    /**
+     * Get the swerve drive kinematics object.
+     *
+     * @return {@link SwerveDriveKinematics} of the swerve drive.
+     */
+    public SwerveDriveKinematics getKinematics() {
+        return swerveDrive.kinematics;
+    }
+
+    /**
+     * Resets odometry to the given pose. Gyro angle and module positions do not
+     * need to be reset when calling this
+     * method. However, if either gyro angle or module position is reset, this must
+     * be called in order for odometry to
+     * keep working.
+     *
+     * @param initialHolonomicPose The pose to set the odometry to
+     */
+    public void resetOdometry(Pose2d initialHolonomicPose) {
+        swerveDrive.resetOdometry(initialHolonomicPose);
     }
 
     /**
@@ -80,11 +121,38 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     }
 
     /**
+     * Set chassis speeds with closed-loop velocity control.
+     *
+     * @param chassisSpeeds Chassis Speeds to set.
+     */
+    public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+        swerveDrive.setChassisSpeeds(chassisSpeeds);
+    }
+
+    /**
+     * Post the trajectory to the field.
+     *
+     * @param trajectory The trajectory to post.
+     */
+    public void postTrajectory(Trajectory trajectory) {
+        swerveDrive.postTrajectory(trajectory);
+    }
+
+    /**
      * Resets the gyro angle to zero and resets odometry to the same position, but
      * facing toward 0.
      */
     public void zeroGyro() {
         swerveDrive.zeroGyro();
+    }
+
+    /**
+     * Sets the drive motors to brake/coast mode.
+     *
+     * @param brake True to set motors to brake mode, false for coast.
+     */
+    public void setMotorBrake(boolean brake) {
+        swerveDrive.setMotorIdleMode(brake);
     }
 
     /**
@@ -98,12 +166,62 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     }
 
     /**
+     * Gets the current field-relative velocity (x, y and omega) of the robot
+     *
+     * @return A ChassisSpeeds object of the current field-relative velocity
+     */
+    public ChassisSpeeds getFieldVelocity() {
+        return swerveDrive.getFieldVelocity();
+    }
+
+    /**
+     * Gets the current velocity (x, y and omega) of the robot
+     *
+     * @return A {@link ChassisSpeeds} object of the current velocity
+     */
+    public ChassisSpeeds getRobotVelocity() {
+        return swerveDrive.getRobotVelocity();
+    }
+
+    /**
      * Get the {@link SwerveController} in the swerve drive.
      *
      * @return {@link SwerveController} from the {@link SwerveDrive}.
      */
     public SwerveController getSwerveController() {
         return swerveDrive.swerveController;
+    }
+
+    /**
+     * Get the {@link SwerveDriveConfiguration} object.
+     *
+     * @return The {@link SwerveDriveConfiguration} fpr the current drive.
+     */
+    public SwerveDriveConfiguration getSwerveDriveConfiguration() {
+        return swerveDrive.swerveDriveConfiguration;
+    }
+
+    /**
+     * Lock the swerve drive to prevent it from moving.
+     */
+    public void lock() {
+        swerveDrive.lockPose();
+    }
+
+    /**
+     * Gets the current pitch angle of the robot, as reported by the imu.
+     *
+     * @return The heading as a {@link Rotation2d} angle
+     */
+    public Rotation2d getPitch() {
+        return swerveDrive.getPitch();
+    }
+
+    /**
+     * Add a fake vision reading for testing purposes.
+     */
+    public void addFakeVisionReading() {
+        swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
     }
 
 }
