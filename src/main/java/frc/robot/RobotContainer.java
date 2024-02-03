@@ -22,7 +22,7 @@ import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.DefaultSwerveDriveCommand;
 import frc.robot.commands.swervedrive.DriveDistanceCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
-import frc.robot.subsystems.SwerveDriveSubsystem;
+import frc.robot.subsystems.swerve.SwerveDriveSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since

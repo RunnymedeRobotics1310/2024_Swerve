@@ -1,7 +1,7 @@
 package frc.robot.commands.swervedrive;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.SwerveDriveSubsystem;
+import frc.robot.subsystems.swerve.SwerveDriveSubsystem;
 
 public class ZeroGyroCommand extends InstantCommand {
 
