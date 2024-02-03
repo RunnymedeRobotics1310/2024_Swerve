@@ -25,11 +25,9 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
      *                              left wall when looking through the driver
      *                              station
      *                              glass (field West).
-     * @param rotationRadiansPerSec Robot angular rate, in radians per second. CCW
-     *                              positive. Unaffected by field/robot
-     *                              relativity.
+     * @param omega                 Robot angular rate. CCW positive.
      */
-    public abstract void driveFieldOriented(Translation2d translation, double rotationRadiansPerSec);
+    public abstract void driveFieldOriented(Translation2d translation, Rotation2d omega);
 
 
     /**

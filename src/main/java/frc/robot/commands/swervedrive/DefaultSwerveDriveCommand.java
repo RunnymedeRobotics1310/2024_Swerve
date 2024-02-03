@@ -18,7 +18,9 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
     private final IntSupplier jumpAngle;
     private final DoubleSupplier boostFactor;
 
-    private Rotation2d desiredJumpHeading = null;
+    private Rotation2d previousHeading = null;
+
+    private Rotation2d desiredHeading = null;
 
     /**
      * Used to drive a swerve robot in full field-centric mode. vX and vY supply
@@ -80,54 +82,59 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
                 Math.pow(vY, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS);
 
 
-        // figure out the way we will set our heading
-        final boolean jumpToPOV;
+
+        // compute heading mode
         if (desiredHeadingDegrees > -1) {
             // someone has pressed the POV. Jump to there.
-            jumpToPOV = true;
-            desiredJumpHeading = Rotation2d.fromDegrees(desiredHeadingDegrees);
+            desiredHeading = Rotation2d.fromDegrees(desiredHeadingDegrees);
+            // previous heading is not important.
+            previousHeading = null;
         } else {
             // not pressing POV
-            if (desiredJumpHeading != null) {
+            if (desiredHeading != null) {
                 // we still have a heading from before!
-                if (Math.abs(
-                        rotationAngularVelocityPct) < Constants.SwerveDriveConstants.ROTATION_ANGULAR_VELOCITY_TOLERANCE_PCT) {
-                    // the user hasn't requested a turn so do not override the previous POV
-                    // direction
-                    jumpToPOV = true;
+                if (rotationAngularVelocityPct == 0) {
+                    // the user hasn't requested a turn so do not override the previous POV direction
                 } else {
-                    // direction override - clear POV and follow turn override
-                    jumpToPOV = false;
-                    desiredJumpHeading = null;
+                    // user is actively turning the robot. Clear desired heading.
+                    desiredHeading = null;
                 }
             } else {
-                // we don't have a heading so we can't jump to the POV.
-                jumpToPOV = false;
+                // user is not changing heading. keep it the same.
+                if (previousHeading == null) {
+                    // figure out what the heading is, so we can follow it
+                    previousHeading = swerve.getPose().getRotation();
+                }
+                // our desired heading is the same as it was last iteration
+                desiredHeading = previousHeading;
             }
         }
 
+
+
         final Rotation2d omega;
+
         // drive!
-        if (jumpToPOV) {
+        if (desiredHeading != null) {
             // jump
             Rotation2d currentHeading = swerve.getHeading();
-            omega = swerve.computeOmega(desiredJumpHeading, currentHeading);
+            omega = swerve.computeOmega(desiredHeading, currentHeading);
 
         } else {
             // steer
 
-            // are we actually turning?
+            // are we actually turning? Check deadband.
             if (Math.abs(
                     rotationAngularVelocityPct) > Constants.SwerveDriveConstants.ROTATION_ANGULAR_VELOCITY_TOLERANCE_PCT) {
                 // yes!
-                omega = Rotation2d.fromRadians(Math.pow(rotationAngularVelocityPct, 3) * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC);
+                omega = Rotation2d.fromRadians(Math.pow(rotationAngularVelocityPct, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC);
             } else {
                 // no! rather than set "don't turn", give the exact heading
                 omega = new Rotation2d();
             }
         }
 
-        swerve.driveFieldOriented(vector, omega.getRadians());
+        swerve.driveFieldOriented(vector, omega);
     }
 
     // Called once the command ends or is interrupted.

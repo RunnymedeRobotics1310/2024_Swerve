@@ -35,9 +35,8 @@ public class YagslSubsystem extends SwerveDriveSubsystem {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot
-        // via angle.
-
+        // Runnymede does its own heading correction in the commands.
+        swerveDrive.setHeadingCorrection(false);
     }
 
     /**
@@ -58,12 +57,10 @@ public class YagslSubsystem extends SwerveDriveSubsystem {
      *                              left wall when looking through the driver
      *                              station
      *                              glass (field West).
-     * @param rotationRadiansPerSec Robot angular rate, in radians per second. CCW
-     *                              positive. Unaffected by field/robot
-     *                              relativity.
+     * @param omega                 Robot angular rate. CCW positive.
      */
-    public void driveFieldOriented(Translation2d translation, double rotationRadiansPerSec) {
-        ChassisSpeeds velocity = ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotationRadiansPerSec, this.getPose().getRotation());
+    public void driveFieldOriented(Translation2d translation, Rotation2d omega) {
+        ChassisSpeeds velocity = ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), omega.getRadians(), this.getPose().getRotation());
         swerveDrive.drive(velocity, false, new Translation2d());
     }
 

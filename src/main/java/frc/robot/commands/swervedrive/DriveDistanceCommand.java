@@ -53,9 +53,9 @@ public class DriveDistanceCommand extends RunnymedeCommand {
         Rotation2d omega = swerve.computeOmega(heading, currentHeading);
 
         if (wentTheDistance()) {
-            swerve.driveFieldOriented(DONT_MOVE, omega.getRadians());
+            swerve.driveFieldOriented(DONT_MOVE, omega);
         } else {
-            swerve.driveFieldOriented(velocityVectorMps, omega.getRadians());
+            swerve.driveFieldOriented(velocityVectorMps, omega);
 
         }
     }
