@@ -5,12 +5,10 @@ import java.util.function.IntSupplier;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.commands.RunnymedeCommand;
 import frc.robot.subsystems.swerve.SwerveDriveSubsystem;
-import swervelib.SwerveController;
 
 public class DefaultSwerveDriveCommand extends RunnymedeCommand {
 
@@ -77,6 +75,11 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
         SmartDashboard.putNumber("rotationAngularVelocityPct", rotationAngularVelocityPct);
         SmartDashboard.putNumber("jumpAngle", desiredHeadingDegrees);
 
+        Translation2d vector = new Translation2d(
+                Math.pow(vX, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS,
+                Math.pow(vY, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS);
+
+
         // figure out the way we will set our heading
         final boolean jumpToPOV;
         if (desiredHeadingDegrees > -1) {
@@ -103,44 +106,28 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
             }
         }
 
+        final Rotation2d omega;
         // drive!
         if (jumpToPOV) {
             // jump
             Rotation2d currentHeading = swerve.getHeading();
-            Rotation2d omega = swerve.computeOmega(desiredJumpHeading, currentHeading);
-            vX = Math.pow(vX, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
-            vY = Math.pow(vY, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
-            Translation2d vector = new Translation2d(vX, vY);
-            swerve.driveFieldOriented(vector, omega.getRadians());
+            omega = swerve.computeOmega(desiredJumpHeading, currentHeading);
 
         } else {
             // steer
-            final double rotationRadiansPerSec;
+
             // are we actually turning?
             if (Math.abs(
                     rotationAngularVelocityPct) > Constants.SwerveDriveConstants.ROTATION_ANGULAR_VELOCITY_TOLERANCE_PCT) {
                 // yes!
-                vX = Math.pow(vX, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
-                vY = Math.pow(vY, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
-                Translation2d vector = new Translation2d(vX, vY);
-                rotationRadiansPerSec = Math.pow(rotationAngularVelocityPct, 3)
-                        * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC;
-                swerve.driveFieldOriented(vector, rotationRadiansPerSec);
+                omega = Rotation2d.fromRadians(Math.pow(rotationAngularVelocityPct, 3) * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC);
             } else {
                 // no! rather than set "don't turn", give the exact heading
-                // SwerveController controller = swerve.getSwerveController();
-                // ChassisSpeeds desiredChassisSpeed = controller.getTargetSpeeds(vX, vY,
-                // swerve.getHeading().getRadians(), swerve.getHeading().getRadians(),
-                // Constants.SwerveDriveConstants.MAX_SPEED_MPS);
-                // swerve.driveFieldOriented(desiredChassisSpeed);
-
-                vX = Math.pow(vX, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
-                vY = Math.pow(vY, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
-                Translation2d vector = new Translation2d(vX, vY);
-                rotationRadiansPerSec = 0;
-                swerve.driveFieldOriented(vector, rotationRadiansPerSec);
+                omega = new Rotation2d();
             }
         }
+
+        swerve.driveFieldOriented(vector, omega.getRadians());
     }
 
     // Called once the command ends or is interrupted.
