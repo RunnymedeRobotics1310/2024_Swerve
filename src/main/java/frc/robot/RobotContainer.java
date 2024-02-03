@@ -80,7 +80,7 @@ public class RobotContainer {
         // drive forward
         Translation2d fwd = new Translation2d(0, .25);
         Rotation2d fwdHeading = Rotation2d.fromDegrees(0);
-        DriveDistanceCommand ddc = new DriveDistanceCommand(swerveDriveSubsystem, fwd, fwdHeading, .1);
+        DriveDistanceCommand ddc = new DriveDistanceCommand(swerveDriveSubsystem, fwd, fwdHeading, 3);
         new Trigger(operatorInput::isA).onTrue(ddc);
     }
 
