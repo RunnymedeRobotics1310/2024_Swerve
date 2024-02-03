@@ -23,6 +23,7 @@ import frc.robot.commands.swervedrive.DefaultSwerveDriveCommand;
 import frc.robot.commands.swervedrive.DriveDistanceCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.subsystems.swerve.SwerveDriveSubsystem;
+import frc.robot.subsystems.swerve.yagsl.YagslSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -35,7 +36,7 @@ import frc.robot.subsystems.swerve.SwerveDriveSubsystem;
  */
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    private final SwerveDriveSubsystem swerveDriveSubsystem = new SwerveDriveSubsystem(
+    private final SwerveDriveSubsystem swerveDriveSubsystem = new YagslSubsystem(
             new File(Filesystem.getDeployDirectory(), "swerve/neo"));
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
