@@ -18,7 +18,7 @@ public class DriveDistanceCommand extends RunnymedeCommand {
 
     private Pose2d startingPose = null;
     private double travelled;
-    private double currentHeading;
+    private Rotation2d currentHeading;
 
     public DriveDistanceCommand(SwerveDriveSubsystem swerve, Translation2d velocityVectorMps,
             Rotation2d heading, double distanceMetres) {
@@ -35,7 +35,7 @@ public class DriveDistanceCommand extends RunnymedeCommand {
         super.initialize();
 
         travelled = 0;
-        currentHeading = 0;
+        currentHeading = new Rotation2d();
 
         startingPose = swerve.getPose();
         System.out.println("DriveDistanceCommand Initialized at " + startingPose);
@@ -48,12 +48,14 @@ public class DriveDistanceCommand extends RunnymedeCommand {
         Translation2d currentLocation = swerve.getPose().getTranslation();
         travelled = startingPose.getTranslation().getDistance(currentLocation);
 
-        currentHeading = swerve.getHeading().getDegrees();
+        currentHeading = swerve.getHeading();
+
+        Rotation2d omega = swerve.computeOmega(heading, currentHeading);
 
         if (wentTheDistance()) {
-            swerve.driveFieldOriented(DONT_MOVE, heading.getRadians());
+            swerve.driveFieldOriented(DONT_MOVE, omega.getRadians());
         } else {
-            swerve.driveFieldOriented(velocityVectorMps, heading.getRadians());
+            swerve.driveFieldOriented(velocityVectorMps, omega.getRadians());
 
         }
     }
@@ -67,7 +69,7 @@ public class DriveDistanceCommand extends RunnymedeCommand {
 
     private boolean lookingStraightAhead() {
 
-        double headingErr = heading.getDegrees() - currentHeading;
+        double headingErr = heading.getDegrees() - currentHeading.getDegrees();
 
         return Math.abs(headingErr) <= Constants.SwerveDriveConstants.ROTATION_TOLERANCE_DEGREES;
     }

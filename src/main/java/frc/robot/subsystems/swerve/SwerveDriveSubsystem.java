@@ -156,4 +156,6 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
      */
     public abstract void addFakeVisionReading();
 
+    public abstract Rotation2d computeOmega(Rotation2d heading, Rotation2d currentHeading);
+
 }

@@ -106,16 +106,13 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
         // drive!
         if (jumpToPOV) {
             // jump
-            vX = Math.pow(vX, 3);
-            vY = Math.pow(vY, 3);
             Rotation2d currentHeading = swerve.getHeading();
-            SwerveController controller = swerve.getSwerveController();
-            ChassisSpeeds desiredChassisSpeed = controller.getTargetSpeeds(vX, vY, desiredJumpHeading.getRadians(),
-                    currentHeading.getRadians(), Constants.SwerveDriveConstants.MAX_SPEED_MPS);
-            // System.out.println("Jump to pov mode! desired: " +
-            // desiredJumpHeading.getDegrees() + ", heading: "
-            // + currentHeading.getDegrees());
-            swerve.driveFieldOriented(desiredChassisSpeed);
+            Rotation2d omega = swerve.computeOmega(desiredJumpHeading, currentHeading);
+            vX = Math.pow(vX, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
+            vY = Math.pow(vY, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS;
+            Translation2d vector = new Translation2d(vX, vY);
+            swerve.driveFieldOriented(vector, omega.getRadians());
+
         } else {
             // steer
             final double rotationRadiansPerSec;

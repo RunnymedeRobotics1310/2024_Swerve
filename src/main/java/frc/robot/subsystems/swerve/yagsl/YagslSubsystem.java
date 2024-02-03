@@ -223,4 +223,11 @@ public class YagslSubsystem extends SwerveDriveSubsystem {
     public void addFakeVisionReading() {
         swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
     }
+
+    @Override
+    public Rotation2d computeOmega(Rotation2d targetHeading, Rotation2d currentHeading) {
+        SwerveController controller = getSwerveController();
+        double omegaRadiansPerSec = controller.headingCalculate(currentHeading.getRadians(), targetHeading.getRadians());
+        return Rotation2d.fromRadians(omegaRadiansPerSec);
+    }
 }
