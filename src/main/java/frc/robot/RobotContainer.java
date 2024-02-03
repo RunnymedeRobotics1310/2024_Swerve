@@ -53,7 +53,7 @@ public class RobotContainer {
                 new DefaultSwerveDriveCommand(swerveDriveSubsystem,
                         () -> operatorInput.getDriverControllerAxis(LEFT, X),
                         () -> operatorInput.getDriverControllerAxis(LEFT, Y),
-                        () -> operatorInput.getDriverControllerAxis(RIGHT, X),
+                        () -> -operatorInput.getDriverControllerAxis(RIGHT, X),
                         operatorInput::getJumpAngle,
                         () -> operatorInput.getBoostMultiplier()));
         // Configure the trigger bindings
