@@ -29,9 +29,8 @@ public class OperatorInput {
      *                               plugged into
      */
     public OperatorInput(int driverControllerPort, int operatorControllerPort) {
-        driverController = new XboxController(driverControllerPort); // drive base has built-in deadband and axis
-                                                                     // flipping
-        operatorController = new RunnymedeGameController(operatorControllerPort); // deadband support & axis flipping
+        driverController = new RunnymedeGameController(driverControllerPort);
+        operatorController = new RunnymedeGameController(operatorControllerPort);
     }
 
     public double getBoostMultiplier() {
@@ -75,16 +74,14 @@ public class OperatorInput {
                     case X:
                         return driverController.getLeftX();
                     case Y:
-                        return -driverController.getLeftY();
+                        return driverController.getLeftY();
                 }
                 break;
 
             case RIGHT:
                 switch (axis) {
                     case X:
-                        return -driverController.getRightX();
-                    case Y:
-                        return driverController.getRightY();
+                        return driverController.getRightX();
                 }
                 break;
         }

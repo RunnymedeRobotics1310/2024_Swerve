@@ -41,6 +41,12 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
      *                             to 1 with deadband already accounted for.
      *                             Positive Y is towards the left wall when
      *                             looking through the driver station glass.
+     * @param rotationAngularVelocityPctSupplier DoubleSupplier that supplies the
+     *                                           percentage of the maximum rotation
+     *                                           speed to be applied to the robot.
+     *                                           Should be in the range of -1 to
+     *                                           1 with deadband already accounted
+     *                                           for. Positive values are CCW.
      */
     public DefaultSwerveDriveCommand(SwerveDriveSubsystem swerve, DoubleSupplier translationXSupplier,
             DoubleSupplier translationYSupplier,
@@ -119,19 +125,9 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
             // jump
             Rotation2d currentHeading = swerve.getHeading();
             omega = swerve.computeOmega(desiredHeading, currentHeading);
-
         } else {
             // steer
-
-            // are we actually turning? Check deadband.
-            if (Math.abs(
-                    rotationAngularVelocityPct) > Constants.SwerveDriveConstants.ROTATION_ANGULAR_VELOCITY_TOLERANCE_PCT) {
-                // yes!
-                omega = Rotation2d.fromRadians(Math.pow(rotationAngularVelocityPct, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC);
-            } else {
-                // no! rather than set "don't turn", give the exact heading
-                omega = new Rotation2d();
-            }
+            omega = Rotation2d.fromRadians(Math.pow(rotationAngularVelocityPct, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC);
         }
 
         swerve.driveFieldOriented(vector, omega);
