@@ -10,7 +10,7 @@ import frc.robot.Constants;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
-public class DefaultSwerveDriveCommand extends LoggingCommand {
+public class TeleopDriveCommand extends LoggingCommand {
 
     private final SwerveSubsystem swerve;
     private final DoubleSupplier  translationXSupplier, translationYSupplier;
@@ -48,8 +48,7 @@ public class DefaultSwerveDriveCommand extends LoggingCommand {
      * 1 with deadband already accounted
      * for. Positive values are CCW.
      */
-    public DefaultSwerveDriveCommand(SwerveSubsystem swerve, DoubleSupplier translationXSupplier,
-        DoubleSupplier translationYSupplier,
+    public TeleopDriveCommand(SwerveSubsystem swerve, DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier,
         DoubleSupplier rotationAngularVelocityPctSupplier, IntSupplier jumpAngle, DoubleSupplier boostFactor) {
         this.swerve                             = swerve;
         this.translationXSupplier               = translationXSupplier;

@@ -19,11 +19,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OiConstants;
 import frc.robot.commands.operator.OperatorInput;
-import frc.robot.commands.swervedrive.DefaultSwerveDriveCommand;
+import frc.robot.commands.swervedrive.TeleopDriveCommand;
 import frc.robot.commands.swervedrive.DriveDistanceCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
-import frc.robot.subsystems.swerve.runnymede.RunnymedeSwerveSubsystem;
 import frc.robot.subsystems.swerve.yagsl.YagslSubsystem;
 
 /**
@@ -53,7 +52,7 @@ public class RobotContainer {
 
         // Initialize all Subsystem default commands
         swerveDriveSubsystem.setDefaultCommand(
-            new DefaultSwerveDriveCommand(swerveDriveSubsystem,
+            new TeleopDriveCommand(swerveDriveSubsystem,
                 () -> operatorInput.getDriverControllerAxis(LEFT, X),
                 () -> operatorInput.getDriverControllerAxis(LEFT, Y),
                 () -> -operatorInput.getDriverControllerAxis(RIGHT, X),
