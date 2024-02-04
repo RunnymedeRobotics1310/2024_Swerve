@@ -7,20 +7,20 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
-import frc.robot.commands.RunnymedeCommand;
+import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveDriveSubsystem;
 
-public class DefaultSwerveDriveCommand extends RunnymedeCommand {
+public class DefaultSwerveDriveCommand extends LoggingCommand {
 
     private final SwerveDriveSubsystem swerve;
-    private final DoubleSupplier translationXSupplier, translationYSupplier;
-    private final DoubleSupplier rotationAngularVelocityPctSupplier;
-    private final IntSupplier jumpAngle;
-    private final DoubleSupplier boostFactor;
+    private final DoubleSupplier       translationXSupplier, translationYSupplier;
+    private final DoubleSupplier       rotationAngularVelocityPctSupplier;
+    private final IntSupplier          jumpAngle;
+    private final DoubleSupplier       boostFactor;
 
-    private Rotation2d previousHeading = null;
+    private Rotation2d                 previousHeading = null;
 
-    private Rotation2d desiredHeading = null;
+    private Rotation2d                 desiredHeading  = null;
 
     /**
      * Used to drive a swerve robot in full field-centric mode. vX and vY supply
@@ -31,26 +31,26 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
      * converted to a polar angle, which the robot
      * will rotate to.
      *
-     * @param swerve               The swerve drivebase subsystem.
+     * @param swerve The swerve drivebase subsystem.
      * @param translationXSupplier DoubleSupplier that supplies the x-translation
-     *                             joystick input. Should be in the range -1
-     *                             to 1 with deadband already accounted for.
-     *                             Positive X is away from the alliance wall.
+     * joystick input. Should be in the range -1
+     * to 1 with deadband already accounted for.
+     * Positive X is away from the alliance wall.
      * @param translationYSupplier DoubleSupplier that supplies the y-translation
-     *                             joystick input. Should be in the range -1
-     *                             to 1 with deadband already accounted for.
-     *                             Positive Y is towards the left wall when
-     *                             looking through the driver station glass.
+     * joystick input. Should be in the range -1
+     * to 1 with deadband already accounted for.
+     * Positive Y is towards the left wall when
+     * looking through the driver station glass.
      */
     public DefaultSwerveDriveCommand(SwerveDriveSubsystem swerve, DoubleSupplier translationXSupplier,
-            DoubleSupplier translationYSupplier,
-            DoubleSupplier rotationAngularVelocityPctSupplier, IntSupplier jumpAngle, DoubleSupplier boostFactor) {
-        this.swerve = swerve;
-        this.translationXSupplier = translationXSupplier;
-        this.translationYSupplier = translationYSupplier;
+        DoubleSupplier translationYSupplier,
+        DoubleSupplier rotationAngularVelocityPctSupplier, IntSupplier jumpAngle, DoubleSupplier boostFactor) {
+        this.swerve                             = swerve;
+        this.translationXSupplier               = translationXSupplier;
+        this.translationYSupplier               = translationYSupplier;
         this.rotationAngularVelocityPctSupplier = rotationAngularVelocityPctSupplier;
-        this.jumpAngle = jumpAngle;
-        this.boostFactor = boostFactor;
+        this.jumpAngle                          = jumpAngle;
+        this.boostFactor                        = boostFactor;
 
         addRequirements(swerve);
     }
@@ -65,11 +65,11 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
     public void execute() {
 
         // get user inputs
-        double vX = translationXSupplier.getAsDouble();
-        double vY = translationYSupplier.getAsDouble();
+        double vX                         = translationXSupplier.getAsDouble();
+        double vY                         = translationYSupplier.getAsDouble();
         double rotationAngularVelocityPct = rotationAngularVelocityPctSupplier.getAsDouble();
-        int desiredHeadingDegrees = jumpAngle.getAsInt();
-        double boostFactor = this.boostFactor.getAsDouble();
+        int    desiredHeadingDegrees      = jumpAngle.getAsInt();
+        double boostFactor                = this.boostFactor.getAsDouble();
 
         // write to dashboard
         SmartDashboard.putNumber("vX", vX);
@@ -78,8 +78,8 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
         SmartDashboard.putNumber("jumpAngle", desiredHeadingDegrees);
 
         Translation2d vector = new Translation2d(
-                Math.pow(vX, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS,
-                Math.pow(vY, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS);
+            Math.pow(vX, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS,
+            Math.pow(vY, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS);
 
 
 
@@ -89,17 +89,21 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
             desiredHeading = Rotation2d.fromDegrees(desiredHeadingDegrees);
             // previous heading is not important.
             previousHeading = null;
-        } else {
+        }
+        else {
             // not pressing POV
             if (desiredHeading != null) {
                 // we still have a heading from before!
                 if (rotationAngularVelocityPct == 0) {
-                    // the user hasn't requested a turn so do not override the previous POV direction
-                } else {
+                    // the user hasn't requested a turn so do not override the previous POV
+                    // direction
+                }
+                else {
                     // user is actively turning the robot. Clear desired heading.
                     desiredHeading = null;
                 }
-            } else {
+            }
+            else {
                 // user is not changing heading. keep it the same.
                 if (previousHeading == null) {
                     // figure out what the heading is, so we can follow it
@@ -120,15 +124,18 @@ public class DefaultSwerveDriveCommand extends RunnymedeCommand {
             Rotation2d currentHeading = swerve.getHeading();
             omega = swerve.computeOmega(desiredHeading, currentHeading);
 
-        } else {
+        }
+        else {
             // steer
 
             // are we actually turning? Check deadband.
             if (Math.abs(
-                    rotationAngularVelocityPct) > Constants.SwerveDriveConstants.ROTATION_ANGULAR_VELOCITY_TOLERANCE_PCT) {
+                rotationAngularVelocityPct) > Constants.SwerveDriveConstants.ROTATION_ANGULAR_VELOCITY_TOLERANCE_PCT) {
                 // yes!
-                omega = Rotation2d.fromRadians(Math.pow(rotationAngularVelocityPct, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC);
-            } else {
+                omega = Rotation2d.fromRadians(Math.pow(rotationAngularVelocityPct, 3) * boostFactor
+                    * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC);
+            }
+            else {
                 // no! rather than set "don't turn", give the exact heading
                 omega = new Rotation2d();
             }
