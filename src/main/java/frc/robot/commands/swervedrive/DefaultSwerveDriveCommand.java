@@ -7,10 +7,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
-import frc.robot.commands.RunnymedeCommand;
+import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveDriveSubsystem;
 
-public class DefaultSwerveDriveCommand extends RunnymedeCommand {
+public class DefaultSwerveDriveCommand extends LoggingCommand {
 
     private final SwerveDriveSubsystem swerve;
     private final DoubleSupplier translationXSupplier, translationYSupplier;
