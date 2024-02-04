@@ -82,6 +82,12 @@ public final class Constants {
             public static final double MAX_TRANSLATION_SPEED_MPS           = 4.42;
             public static final double MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC = Rotation2d.fromRotations(0.75).getRadians();
             public static final double ROTATION_TOLERANCE_RADIANS          = Rotation2d.fromDegrees(2.0).getRadians();
+
+            public static final class HeadingPIDConfig {
+                public static final double P = 0.036;
+                public static final double I = 0;
+                public static final double D = 0;
+            }
         }
 
         public static final class Motor {

@@ -5,13 +5,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Constants;
 import frc.robot.commands.LoggingCommand;
-import frc.robot.subsystems.swerve.SwerveDriveSubsystem;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 public class DriveDistanceCommand extends LoggingCommand {
 
     private static final Translation2d DONT_MOVE    = new Translation2d(0, 0);
 
-    private final SwerveDriveSubsystem swerve;
+    private final SwerveSubsystem      swerve;
     private final Translation2d        velocityVectorMps;
     private final Rotation2d           heading;
     private final Double               distanceMetres;
@@ -20,7 +20,7 @@ public class DriveDistanceCommand extends LoggingCommand {
     private double                     travelled;
     private Rotation2d                 currentHeading;
 
-    public DriveDistanceCommand(SwerveDriveSubsystem swerve, Translation2d velocityVectorMps,
+    public DriveDistanceCommand(SwerveSubsystem swerve, Translation2d velocityVectorMps,
         Rotation2d heading, double distanceMetres) {
 
         this.swerve            = swerve;
@@ -50,7 +50,7 @@ public class DriveDistanceCommand extends LoggingCommand {
 
         currentHeading = swerve.getHeading();
 
-        Rotation2d omega = swerve.computeOmega(heading, currentHeading);
+        Rotation2d omega = swerve.computeOmega(heading);
 
         if (wentTheDistance()) {
             swerve.driveFieldOriented(DONT_MOVE, omega);

@@ -8,19 +8,19 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.commands.LoggingCommand;
-import frc.robot.subsystems.swerve.SwerveDriveSubsystem;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 public class DefaultSwerveDriveCommand extends LoggingCommand {
 
-    private final SwerveDriveSubsystem swerve;
-    private final DoubleSupplier       translationXSupplier, translationYSupplier;
-    private final DoubleSupplier       rotationAngularVelocityPctSupplier;
-    private final IntSupplier          jumpAngle;
-    private final DoubleSupplier       boostFactor;
+    private final SwerveSubsystem swerve;
+    private final DoubleSupplier  translationXSupplier, translationYSupplier;
+    private final DoubleSupplier  rotationAngularVelocityPctSupplier;
+    private final IntSupplier     jumpAngle;
+    private final DoubleSupplier  boostFactor;
 
-    private Rotation2d                 previousHeading = null;
+    private Rotation2d            previousHeading = null;
 
-    private Rotation2d                 desiredHeading  = null;
+    private Rotation2d            desiredHeading  = null;
 
     /**
      * Used to drive a swerve robot in full field-centric mode. vX and vY supply
@@ -48,7 +48,7 @@ public class DefaultSwerveDriveCommand extends LoggingCommand {
      * 1 with deadband already accounted
      * for. Positive values are CCW.
      */
-    public DefaultSwerveDriveCommand(SwerveDriveSubsystem swerve, DoubleSupplier translationXSupplier,
+    public DefaultSwerveDriveCommand(SwerveSubsystem swerve, DoubleSupplier translationXSupplier,
         DoubleSupplier translationYSupplier,
         DoubleSupplier rotationAngularVelocityPctSupplier, IntSupplier jumpAngle, DoubleSupplier boostFactor) {
         this.swerve                             = swerve;
@@ -127,8 +127,7 @@ public class DefaultSwerveDriveCommand extends LoggingCommand {
         // drive!
         if (desiredHeading != null) {
             // jump
-            Rotation2d currentHeading = swerve.getHeading();
-            omega = swerve.computeOmega(desiredHeading, currentHeading);
+            omega = swerve.computeOmega(desiredHeading);
         }
         else {
             // steer

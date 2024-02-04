@@ -1,7 +1,7 @@
 package frc.robot.commands.swervedrive;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.swerve.SwerveDriveSubsystem;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 public class ZeroGyroCommand extends InstantCommand {
 
@@ -10,7 +10,7 @@ public class ZeroGyroCommand extends InstantCommand {
      *
      * @param driveSubsystem
      */
-    public ZeroGyroCommand(SwerveDriveSubsystem driveSubsystem) {
+    public ZeroGyroCommand(SwerveSubsystem driveSubsystem) {
 
         super(() -> {
 

@@ -7,13 +7,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
-import frc.robot.subsystems.swerve.SwerveDriveSubsystem;
-import swervelib.SwerveController;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
 import swervelib.SwerveDrive;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
-public class YagslSubsystem extends SwerveDriveSubsystem {
+public class YagslSubsystem extends SwerveSubsystem {
 
     /**
      * Swerve drive object.
@@ -40,67 +39,29 @@ public class YagslSubsystem extends SwerveDriveSubsystem {
         swerveDrive.setHeadingCorrection(false);
     }
 
-    /**
-     * The primary method for controlling the drivebase. Takes a {@link Translation2d} and a
-     * rotation rate, and calculates and commands module states accordingly. Can use either
-     * open-loop or closed-loop velocity control for the wheel velocities. Also has field- and
-     * robot-relative modes, which affect how the translation vector is used.
-     * 
-     * @param translation {@link Translation2d} that is the commanded linear velocity of the robot,
-     * in meters per second. In robot-relative mode, positive x is torwards the bow (front) and
-     * positive y is torwards port (left). In field-relative mode, positive x is away from the
-     * alliance wall (field North) and positive y is torwards the left wall when looking through the
-     * driver station glass (field West).
-     * @param omega Robot angular rate. CCW positive.
-     */
-    public void driveFieldOriented(Translation2d translation, Rotation2d omega) {
-        ChassisSpeeds velocity = ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), omega.getRadians(),
-            this.getPose().getRotation());
-        swerveDrive.drive(velocity, false, new Translation2d());
+    @Override
+    public void driveRobotOriented(ChassisSpeeds velocity, Translation2d centerOfRotation) {
+        swerveDrive.drive(velocity, false, centerOfRotation);
     }
 
-
-
-    /**
-     * Gets the current pose (position and rotation) of the robot, as reported by
-     * odometry.
-     *
-     * @return The robot's pose
-     */
+    @Override
     public Pose2d getPose() {
         return swerveDrive.getPose();
     }
 
-    /**
-     * Resets the gyro angle to zero and resets odometry to the same position, but
-     * facing toward 0.
-     */
-    public void zeroGyro() {
-        swerveDrive.zeroGyro();
-    }
-
-    /**
-     * Gets the current yaw angle of the robot, as reported by the imu. CCW
-     * positive, not wrapped.
-     *
-     * @return The yaw angle
-     */
+    @Override
     public Rotation2d getHeading() {
         return swerveDrive.getYaw();
     }
 
-    /**
-     * Lock the swerve drive to prevent it from moving.
-     */
+    @Override
+    public void zeroGyro() {
+        swerveDrive.zeroGyro();
+    }
+
+    @Override
     public void lock() {
         swerveDrive.lockPose();
     }
 
-    @Override
-    public Rotation2d computeOmega(Rotation2d targetHeading, Rotation2d currentHeading) {
-        SwerveController controller         = swerveDrive.swerveController;
-        double           omegaRadiansPerSec = controller.headingCalculate(currentHeading.getRadians(),
-            targetHeading.getRadians());
-        return Rotation2d.fromRadians(omegaRadiansPerSec);
-    }
 }

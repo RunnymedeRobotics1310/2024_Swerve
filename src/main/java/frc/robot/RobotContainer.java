@@ -22,7 +22,7 @@ import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.DefaultSwerveDriveCommand;
 import frc.robot.commands.swervedrive.DriveDistanceCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
-import frc.robot.subsystems.swerve.SwerveDriveSubsystem;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.swerve.yagsl.YagslSubsystem;
 
 /**
@@ -36,11 +36,11 @@ import frc.robot.subsystems.swerve.yagsl.YagslSubsystem;
  */
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    private final SwerveDriveSubsystem swerveDriveSubsystem = new YagslSubsystem(
+    private final SwerveSubsystem swerveDriveSubsystem = new YagslSubsystem(
         new File(Filesystem.getDeployDirectory(), "swerve/neo"));
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final OperatorInput        operatorInput        = new OperatorInput(
+    private final OperatorInput   operatorInput        = new OperatorInput(
         OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
 
     /**
