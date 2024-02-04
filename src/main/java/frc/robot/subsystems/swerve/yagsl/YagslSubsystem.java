@@ -12,6 +12,8 @@ import swervelib.SwerveDrive;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
+import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
+
 public class YagslSubsystem extends SwerveSubsystem {
 
     /**
@@ -29,8 +31,7 @@ public class YagslSubsystem extends SwerveSubsystem {
         // objects being created.
         SwerveDriveTelemetry.verbosity = SwerveDriveTelemetry.TelemetryVerbosity.HIGH;
         try {
-            swerveDrive = new SwerveParser(configDirectory)
-                .createSwerveDrive(Constants.SwerveDriveConstants.MAX_SPEED_MPS);
+            swerveDrive = new SwerveParser(configDirectory).createSwerveDrive(MAX_TRANSLATION_SPEED_MPS);
         }
         catch (Exception e) {
             throw new RuntimeException(e);

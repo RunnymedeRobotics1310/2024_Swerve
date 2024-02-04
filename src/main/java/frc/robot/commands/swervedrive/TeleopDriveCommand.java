@@ -10,6 +10,9 @@ import frc.robot.Constants;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
+import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
+import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
+
 public class TeleopDriveCommand extends LoggingCommand {
 
     private final SwerveSubsystem swerve;
@@ -83,8 +86,8 @@ public class TeleopDriveCommand extends LoggingCommand {
         SmartDashboard.putNumber("jumpAngle", desiredHeadingDegrees);
 
         Translation2d vector = new Translation2d(
-            Math.pow(vX, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS,
-            Math.pow(vY, 3) * boostFactor * Constants.SwerveDriveConstants.MAX_SPEED_MPS);
+            Math.pow(vX, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS,
+            Math.pow(vY, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS);
 
 
 
@@ -131,7 +134,7 @@ public class TeleopDriveCommand extends LoggingCommand {
         else {
             // steer
             omega = Rotation2d.fromRadians(Math.pow(rotationAngularVelocityPct, 3) * boostFactor
-                * Constants.SwerveDriveConstants.MAX_ROTATION_RADIANS_PER_SEC);
+                * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC);
         }
 
         swerve.driveFieldOriented(vector, omega);

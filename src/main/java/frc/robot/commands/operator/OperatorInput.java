@@ -36,13 +36,13 @@ public class OperatorInput {
     public double getBoostMultiplier() {
 
         if (driverController.getLeftBumper()) {
-            return Constants.SwerveDriveConstants.SLOW_SPEED_FACTOR;
+            return Constants.Swerve.Chassis.SLOW_SPEED_FACTOR;
         }
         else if (driverController.getRightBumper()) {
-            return Constants.SwerveDriveConstants.MAX_SPEED_FACTOR;
+            return Constants.Swerve.Chassis.MAX_SPEED_FACTOR;
         }
         else {
-            return Constants.SwerveDriveConstants.GENERAL_SPEED_FACTOR;
+            return Constants.Swerve.Chassis.GENERAL_SPEED_FACTOR;
         }
     }
 

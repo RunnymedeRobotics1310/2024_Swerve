@@ -7,6 +7,8 @@ import frc.robot.Constants;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
+import static frc.robot.Constants.Swerve.Chassis.ROTATION_TOLERANCE_RADIANS;
+
 public class DriveDistanceCommand extends LoggingCommand {
 
     private static final Translation2d DONT_MOVE    = new Translation2d(0, 0);
@@ -70,9 +72,9 @@ public class DriveDistanceCommand extends LoggingCommand {
 
     private boolean lookingStraightAhead() {
 
-        double headingErr = heading.getDegrees() - currentHeading.getDegrees();
+        double headingErr = heading.getRadians() - currentHeading.getRadians();
 
-        return Math.abs(headingErr) <= Constants.SwerveDriveConstants.ROTATION_TOLERANCE_DEGREES;
+        return Math.abs(headingErr) <= ROTATION_TOLERANCE_RADIANS;
     }
 
     @Override

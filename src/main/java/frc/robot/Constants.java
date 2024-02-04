@@ -6,9 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
-import swervelib.math.Matter;
 
 import static edu.wpi.first.math.util.Units.inchesToMeters;
 
@@ -31,35 +28,6 @@ public final class Constants {
         public static final int OPERATOR_CONTROLLER_PORT = 1;
     }
 
-    public static final class SwerveDriveConstants {
-        /**
-         * 32lbs * kg per pound
-         */
-        public static final double ROBOT_MASS                              = (148 - 20.3) * 0.453592;
-        public static final Matter CHASSIS                                 = new Matter(
-            new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
-        /**
-         * s, 20ms + 110ms sprk max velocity lag
-         */
-        public static final double LOOP_TIME                               = 0.13;
-        /**
-         * Maximum speed of the robot in meters per second, used for both angular
-         * acceleration used in
-         * swervelib.SwerveController and drive feedforward in
-         * SwerveMath#createDriveFeedforward(double, double, double).
-         */
-        public static final double MAX_SPEED_MPS                           = 1;
-        public static final double MAX_ROTATION_RADIANS_PER_SEC            = 6;
-
-        public static final double ROTATION_TOLERANCE_DEGREES              = 2.0;
-        public static final double ROTATION_ANGULAR_VELOCITY_TOLERANCE_PCT = 0.08;
-
-        // Speed Factors - NOT TESTED
-        public static final double GENERAL_SPEED_FACTOR                    = .5;
-        public static final double MAX_SPEED_FACTOR                        = 1;
-        public static final double SLOW_SPEED_FACTOR                       = .1;
-    }
-
     public static final class Swerve {
 
         public static final class Chassis {
@@ -79,9 +47,29 @@ public final class Constants {
              * Practically speaking 4.42 m/s is a good max, but
              * consider 1-2 for development and 2-3 for competitions.
              */
-            public static final double MAX_TRANSLATION_SPEED_MPS           = 4.42;
+            public static final double MAX_TRANSLATION_SPEED_MPS           = 1;
             public static final double MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC = Rotation2d.fromRotations(0.75).getRadians();
             public static final double ROTATION_TOLERANCE_RADIANS          = Rotation2d.fromDegrees(2.0).getRadians();
+
+            /**
+             * Standard drive speed factor. Regular teleop drive will use this factor of the max
+             * translational speed.
+             */
+            public static final double GENERAL_SPEED_FACTOR                = .5;
+
+            /**
+             * Maximum drive speed factor. When boosting, this factor will be multiplied against the
+             * max translational speed.
+             * todo: tune
+             */
+            public static final double MAX_SPEED_FACTOR                    = 1;
+
+            /**
+             * Slow mode drive speed factor. When running in slow mode, this factor will be
+             * multiplied against the max translational speed.
+             * todo: tune
+             */
+            public static final double SLOW_SPEED_FACTOR                   = .1;
 
             public static final class HeadingPIDConfig {
                 public static final double P = 0.036;
@@ -107,7 +95,7 @@ public final class Constants {
                 DRIVE.inverted         = true;
                 DRIVE.currentLimitAmps = 40;
                 DRIVE.nominalVoltage   = 12;
-                DRIVE.rampRate         = 0.15;
+                DRIVE.rampRate         = 0.25;
                 DRIVE.gearRatio        = 6.75;     // SDS MK4i L2 --> 6.75:1
                 DRIVE.p                = 0.0020645;
                 DRIVE.i                = 0;
@@ -120,10 +108,10 @@ public final class Constants {
 
             static {
                 ANGLE.inverted         = true;
-                ANGLE.currentLimitAmps = 20;            // must not exceed 30 (fuse)
+                ANGLE.currentLimitAmps = 20;        // must not exceed 30 (fuse)
                 ANGLE.nominalVoltage   = 12;
-                ANGLE.rampRate         = 0.05;
-                ANGLE.gearRatio        = 21.4285714286; // SDS MK4i 150/7:1
+                ANGLE.rampRate         = 0.25;
+                ANGLE.gearRatio        = 150.0 / 7; // SDS MK4i 150/7:1
                 ANGLE.p                = 0.01;
                 ANGLE.i                = 0;
                 ANGLE.d                = 0;
