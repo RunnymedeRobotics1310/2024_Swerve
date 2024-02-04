@@ -32,14 +32,14 @@ public final class Constants {
 
         public static final class Chassis {
 
-            public static final double SDS_MK4I_WHEEL_RADIUS_METRES        = 0.0051;
+            public static final double SDS_MK4I_WHEEL_RADIUS_METRES           = 0.0051;
             /**
              * Specify the maximum speed a module can reach in m/s. This should be measured
              * so that we don't ask the module to do something it's not capable of doing. This
              * is NOT a value we should use to cap how fast the robot drives on the field. For
              * that, use {@link #MAX_TRANSLATION_SPEED_MPS}.
              */
-            public static final double MAX_MODULE_SPEED_MPS                = 5;
+            public static final double MAX_MODULE_SPEED_MPS                   = 5;
             /**
              * Set how fast you want the robot to actually translate across the field.
              * This is the "speed limit" of the robot.
@@ -47,29 +47,31 @@ public final class Constants {
              * Practically speaking 4.42 m/s is a good max, but
              * consider 1-2 for development and 2-3 for competitions.
              */
-            public static final double MAX_TRANSLATION_SPEED_MPS           = 1;
-            public static final double MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC = Rotation2d.fromRotations(0.75).getRadians();
-            public static final double ROTATION_TOLERANCE_RADIANS          = Rotation2d.fromDegrees(2.0).getRadians();
+            public static final double MAX_TRANSLATION_SPEED_MPS              = 1;
+            public static final double MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC    = Rotation2d.fromRotations(0.75).getRadians();
+            public static final double ROTATION_TOLERANCE_RADIANS             = Rotation2d.fromDegrees(2.0).getRadians();
+            public static final double MAX_ROTATION_ACCELERATION_RAD_PER_SEC2 = Rotation2d.fromRotations(1.0).getRadians();
+            public static final double MAX_TRANSLATION_ACCELERATION_MPS2      = 10;
 
             /**
              * Standard drive speed factor. Regular teleop drive will use this factor of the max
              * translational speed.
              */
-            public static final double GENERAL_SPEED_FACTOR                = .5;
+            public static final double GENERAL_SPEED_FACTOR                   = .5;
 
             /**
              * Maximum drive speed factor. When boosting, this factor will be multiplied against the
              * max translational speed.
              * todo: tune
              */
-            public static final double MAX_SPEED_FACTOR                    = 1;
+            public static final double MAX_SPEED_FACTOR                       = 1;
 
             /**
              * Slow mode drive speed factor. When running in slow mode, this factor will be
              * multiplied against the max translational speed.
              * todo: tune
              */
-            public static final double SLOW_SPEED_FACTOR                   = .1;
+            public static final double SLOW_SPEED_FACTOR                      = .1;
 
             public static final class HeadingPIDConfig {
                 public static final double P = 0.036;

@@ -60,15 +60,8 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
     }
 
 
-    /**
-     * Drive the robot according to the chassis speeds specified.
-     *
-     * @see ChassisSpeeds for how to calculate chassis speeds given omega
-     * @see ChassisSpeedUtils for how to calculate chassis speeds using other inputs
-     * @param desiredChassisSpeeds the desired chassis speed (including x, y, and rotation
-     * velocities)
-     */
-    public void driveRobotOriented(ChassisSpeeds desiredChassisSpeeds, Translation2d centerOfRotation) {
+    @Override
+    protected void driveRawRobotOriented(ChassisSpeeds desiredChassisSpeeds, Translation2d centerOfRotation) {
 
         System.out.println("User requested drive at " + desiredChassisSpeeds);
 
@@ -100,31 +93,30 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
             });
     }
 
-    /**
-     * Get the pose from odometry
-     */
+    @Override
     public Pose2d getPose() {
         return odometry.getPoseMeters();
     }
 
-    /**
-     * Get the heading from the gyroscope
-     */
+    @Override
     public Rotation2d getHeading() {
         return gyro.getRotation3d().minus(gyroOffset).toRotation2d();
     }
 
+    @Override
     public void zeroGyro() {
         gyroOffset = gyro.getRotation3d();
     }
 
+    @Override
     public void periodic() {
         updateOdometry();
     }
 
-
     @Override
     public void lock() {
+        // TODO: ADD SAFETY CODE
+
         // set speed to 0 and angle wheels to center
         frontLeft.setDesiredState(new SwerveModuleState(0.0, frontLeft.getPosition().angle));
         frontRight.setDesiredState(new SwerveModuleState(0.0, frontRight.getPosition().angle));
