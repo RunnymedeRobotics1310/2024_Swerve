@@ -4,29 +4,29 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Constants;
-import frc.robot.commands.RunnymedeCommand;
+import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveDriveSubsystem;
 
-public class DriveDistanceCommand extends RunnymedeCommand {
+public class DriveDistanceCommand extends LoggingCommand {
 
-    private static final Translation2d DONT_MOVE = new Translation2d(0, 0);
+    private static final Translation2d DONT_MOVE    = new Translation2d(0, 0);
 
     private final SwerveDriveSubsystem swerve;
-    private final Translation2d velocityVectorMps;
-    private final Rotation2d heading;
-    private final Double distanceMetres;
+    private final Translation2d        velocityVectorMps;
+    private final Rotation2d           heading;
+    private final Double               distanceMetres;
 
-    private Pose2d startingPose = null;
-    private double travelled;
-    private Rotation2d currentHeading;
+    private Pose2d                     startingPose = null;
+    private double                     travelled;
+    private Rotation2d                 currentHeading;
 
     public DriveDistanceCommand(SwerveDriveSubsystem swerve, Translation2d velocityVectorMps,
-            Rotation2d heading, double distanceMetres) {
+        Rotation2d heading, double distanceMetres) {
 
-        this.swerve = swerve;
+        this.swerve            = swerve;
         this.velocityVectorMps = velocityVectorMps;
-        this.heading = heading;
-        this.distanceMetres = distanceMetres;
+        this.heading           = heading;
+        this.distanceMetres    = distanceMetres;
 
     }
 
@@ -34,10 +34,10 @@ public class DriveDistanceCommand extends RunnymedeCommand {
     public void initialize() {
         super.initialize();
 
-        travelled = 0;
+        travelled      = 0;
         currentHeading = new Rotation2d();
 
-        startingPose = swerve.getPose();
+        startingPose   = swerve.getPose();
         System.out.println("DriveDistanceCommand Initialized at " + startingPose);
 
     }
@@ -46,7 +46,7 @@ public class DriveDistanceCommand extends RunnymedeCommand {
     public void execute() {
 
         Translation2d currentLocation = swerve.getPose().getTranslation();
-        travelled = startingPose.getTranslation().getDistance(currentLocation);
+        travelled      = startingPose.getTranslation().getDistance(currentLocation);
 
         currentHeading = swerve.getHeading();
 
@@ -54,7 +54,8 @@ public class DriveDistanceCommand extends RunnymedeCommand {
 
         if (wentTheDistance()) {
             swerve.driveFieldOriented(DONT_MOVE, omega);
-        } else {
+        }
+        else {
             swerve.driveFieldOriented(velocityVectorMps, omega);
 
         }
@@ -87,7 +88,7 @@ public class DriveDistanceCommand extends RunnymedeCommand {
         boolean isFinished = wentTheDistance() && lookingStraightAhead();
 
         System.out.println("isFinished goal: " + distanceMetres + "m at " + heading.getDegrees() + " actual "
-                + travelled + "m at " + currentHeading + ". done? " + isFinished);
+            + travelled + "m at " + currentHeading + ". done? " + isFinished);
         return isFinished;
     }
 }
