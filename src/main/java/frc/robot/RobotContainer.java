@@ -37,11 +37,11 @@ import frc.robot.subsystems.swerve.yagsl.YagslSubsystem;
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     private final SwerveDriveSubsystem swerveDriveSubsystem = new YagslSubsystem(
-            new File(Filesystem.getDeployDirectory(), "swerve/neo"));
+        new File(Filesystem.getDeployDirectory(), "swerve/neo"));
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final OperatorInput operatorInput = new OperatorInput(
-            OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
+    private final OperatorInput        operatorInput        = new OperatorInput(
+        OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -50,12 +50,12 @@ public class RobotContainer {
 
         // Initialize all Subsystem default commands
         swerveDriveSubsystem.setDefaultCommand(
-                new DefaultSwerveDriveCommand(swerveDriveSubsystem,
-                        () -> operatorInput.getDriverControllerAxis(LEFT, X),
-                        () -> operatorInput.getDriverControllerAxis(LEFT, Y),
-                        () -> -operatorInput.getDriverControllerAxis(RIGHT, X),
-                        operatorInput::getJumpAngle,
-                        () -> operatorInput.getBoostMultiplier()));
+            new DefaultSwerveDriveCommand(swerveDriveSubsystem,
+                () -> operatorInput.getDriverControllerAxis(LEFT, X),
+                () -> operatorInput.getDriverControllerAxis(LEFT, Y),
+                () -> -operatorInput.getDriverControllerAxis(RIGHT, X),
+                operatorInput::getJumpAngle,
+                () -> operatorInput.getBoostMultiplier()));
         // Configure the trigger bindings
         configureBindings();
     }
@@ -78,9 +78,9 @@ public class RobotContainer {
         new Trigger(operatorInput::isZeroGyro).onTrue(new ZeroGyroCommand(swerveDriveSubsystem));
 
         // drive forward
-        Translation2d fwd = new Translation2d(0, .25);
-        Rotation2d fwdHeading = Rotation2d.fromDegrees(0);
-        DriveDistanceCommand ddc = new DriveDistanceCommand(swerveDriveSubsystem, fwd, fwdHeading, 3);
+        Translation2d        fwd        = new Translation2d(0, .25);
+        Rotation2d           fwdHeading = Rotation2d.fromDegrees(0);
+        DriveDistanceCommand ddc        = new DriveDistanceCommand(swerveDriveSubsystem, fwd, fwdHeading, 3);
         new Trigger(operatorInput::isA).onTrue(ddc);
     }
 

@@ -23,13 +23,13 @@ public class OperatorInput {
      * Construct an OperatorInput class that is fed by a DriverController and an
      * OperatorController.
      *
-     * @param driverControllerPort   on the driver station which the driver joystick
-     *                               is plugged into
+     * @param driverControllerPort on the driver station which the driver joystick
+     * is plugged into
      * @param operatorControllerPort on the driver station which the aux joystick is
-     *                               plugged into
+     * plugged into
      */
     public OperatorInput(int driverControllerPort, int operatorControllerPort) {
-        driverController = new RunnymedeGameController(driverControllerPort);
+        driverController   = new RunnymedeGameController(driverControllerPort);
         operatorController = new RunnymedeGameController(operatorControllerPort);
     }
 
@@ -37,9 +37,11 @@ public class OperatorInput {
 
         if (driverController.getLeftBumper()) {
             return Constants.SwerveDriveConstants.SLOW_SPEED_FACTOR;
-        } else if (driverController.getRightBumper()) {
+        }
+        else if (driverController.getRightBumper()) {
             return Constants.SwerveDriveConstants.MAX_SPEED_FACTOR;
-        } else {
+        }
+        else {
             return Constants.SwerveDriveConstants.GENERAL_SPEED_FACTOR;
         }
     }
@@ -54,11 +56,12 @@ public class OperatorInput {
     }
 
     public int getJumpAngle() {
-        int rawPOV = driverController.getPOV();
+        int       rawPOV = driverController.getPOV();
         final int retVal;
         if (rawPOV == -1) {
             retVal = -1;
-        } else {
+        }
+        else {
             retVal = (rawPOV + 90) % 360;
         }
         return retVal;
@@ -69,21 +72,21 @@ public class OperatorInput {
 
         switch (stick) {
 
-            case LEFT:
-                switch (axis) {
-                    case X:
-                        return driverController.getLeftX();
-                    case Y:
-                        return driverController.getLeftY();
-                }
-                break;
+        case LEFT:
+            switch (axis) {
+            case X:
+                return driverController.getLeftX();
+            case Y:
+                return driverController.getLeftY();
+            }
+            break;
 
-            case RIGHT:
-                switch (axis) {
-                    case X:
-                        return driverController.getRightX();
-                }
-                break;
+        case RIGHT:
+            switch (axis) {
+            case X:
+                return driverController.getRightX();
+            }
+            break;
         }
 
         return 0;

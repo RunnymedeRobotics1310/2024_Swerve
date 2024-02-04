@@ -1,11 +1,11 @@
 package frc.robot.subsystems.swerve.runnymede;
 
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-
 import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
 import static frc.robot.Constants.Swerve.Chassis.ROTATION_TOLERANCE_RADIANS;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public final class ChassisSpeedUtils {
 

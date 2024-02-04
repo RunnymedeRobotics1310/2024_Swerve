@@ -1,7 +1,8 @@
 package frc.robot.subsystems.swerve.runnymede;
 
 
-import com.revrobotics.*;
+import com.revrobotics.CANSparkBase;
+
 import frc.robot.Constants;
 
 public class DriveMotor extends SparkMaxNeoMotor {

@@ -10,13 +10,13 @@ public class ZeroGyroCommand extends InstantCommand {
      *
      * @param driveSubsystem
      */
-    public ZeroGyroCommand(SwerveDriveSubsystem swerveDriveSubsystem) {
+    public ZeroGyroCommand(SwerveDriveSubsystem driveSubsystem) {
 
         super(() -> {
 
             System.out.println("ZeroGyroCommand: Set the current heading to 0");
 
-            swerveDriveSubsystem.zeroGyro();
+            driveSubsystem.zeroGyro();
         });
     }
 

@@ -1,10 +1,11 @@
 package frc.robot.subsystems.swerve.runnymede;
 
 
-import com.revrobotics.*;
-import edu.wpi.first.wpilibj.DriverStation;
-
 import java.util.function.Supplier;
+
+import com.revrobotics.*;
+
+import edu.wpi.first.wpilibj.DriverStation;
 
 abstract class SparkMaxNeoMotor {
 

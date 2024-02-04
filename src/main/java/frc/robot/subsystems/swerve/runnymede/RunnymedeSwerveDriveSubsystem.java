@@ -1,7 +1,13 @@
 package frc.robot.subsystems.swerve.runnymede;
 
 
+import static frc.robot.Constants.Swerve.Chassis.*;
+import static frc.robot.Constants.Swerve.Module.*;
+import static frc.robot.Constants.Swerve.Motor.ANGLE;
+import static frc.robot.Constants.Swerve.Motor.DRIVE;
+
 import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -9,11 +15,6 @@ import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-
-import static frc.robot.Constants.Swerve.Chassis.*;
-import static frc.robot.Constants.Swerve.Module.*;
-import static frc.robot.Constants.Swerve.Motor.ANGLE;
-import static frc.robot.Constants.Swerve.Motor.DRIVE;
 
 /**
  * Represents a swerve drive style drivetrain.
