@@ -16,12 +16,9 @@ import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.D;
 public abstract class SwerveSubsystem extends SubsystemBase {
 
     private final PIDController   headingPid   = new PIDController(P, I, D);
-    private final SlewRateLimiter xLimiter     = new SlewRateLimiter(
-        -MAX_TRANSLATION_ACCELERATION_MPS2, MAX_TRANSLATION_ACCELERATION_MPS2, 0);
-    private final SlewRateLimiter yLimiter     = new SlewRateLimiter(
-        -MAX_TRANSLATION_ACCELERATION_MPS2, MAX_TRANSLATION_ACCELERATION_MPS2, 0);
-    private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(
-        -MAX_ROTATION_ACCELERATION_RAD_PER_SEC2, MAX_ROTATION_ACCELERATION_RAD_PER_SEC2, 0);
+    private final SlewRateLimiter xLimiter     = new SlewRateLimiter(MAX_TRANSLATION_ACCELERATION_MPS2);
+    private final SlewRateLimiter yLimiter     = new SlewRateLimiter(MAX_TRANSLATION_ACCELERATION_MPS2);
+    private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(MAX_ROTATION_ACCELERATION_RAD_PER_SEC2);
 
     /**
      * The primary method for controlling the drivebase. The provided {@link ChassisSpeeds}
@@ -47,24 +44,24 @@ public abstract class SwerveSubsystem extends SubsystemBase {
      * Safety code - make sure that the input chassis speeds aren't too different from the
      * last measured chassis speeds.
      * 
-     * @param velocity desired velocity
+     * @param desiredVelocity desired velocity
      * @return safe velocity
      */
-    private ChassisSpeeds getSafeChassisSpeeds(ChassisSpeeds velocity) {
+    private ChassisSpeeds getSafeChassisSpeeds(ChassisSpeeds desiredVelocity) {
         // Limit change in values. Note this may not scale evenly - one may reach desired
         // speed before another. This will be corrected the next time drive() is called.
-        double        limitedX     = xLimiter.calculate(velocity.vxMetersPerSecond);
-        double        limitedY     = yLimiter.calculate(velocity.vyMetersPerSecond);
-        double        limitedOmega = omegaLimiter.calculate(velocity.omegaRadiansPerSecond);
+        double        limitedX     = xLimiter.calculate(desiredVelocity.vxMetersPerSecond);
+        double        limitedY     = yLimiter.calculate(desiredVelocity.vyMetersPerSecond);
+        double        limitedOmega = omegaLimiter.calculate(desiredVelocity.omegaRadiansPerSecond);
 
         // limit
         ChassisSpeeds safeVelocity = new ChassisSpeeds(limitedX, limitedY, limitedOmega);
 
         // report
-        if (velocity.vxMetersPerSecond != safeVelocity.vxMetersPerSecond
-            || velocity.vyMetersPerSecond != safeVelocity.vyMetersPerSecond
-            || velocity.omegaRadiansPerSecond != safeVelocity.omegaRadiansPerSecond) {
-            System.out.println("Velocity limited by SlewRateLimiters. Desired: " + velocity + ", actual: " + safeVelocity);
+        if (desiredVelocity.vxMetersPerSecond != safeVelocity.vxMetersPerSecond
+            || desiredVelocity.vyMetersPerSecond != safeVelocity.vyMetersPerSecond
+            || desiredVelocity.omegaRadiansPerSecond != safeVelocity.omegaRadiansPerSecond) {
+            System.out.println("Velocity limited by SlewRateLimiters. Desired: " + desiredVelocity + ", actual: " + safeVelocity);
         }
         return safeVelocity;
     }
