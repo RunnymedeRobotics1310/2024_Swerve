@@ -6,7 +6,6 @@ import java.util.function.IntSupplier;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
@@ -22,8 +21,6 @@ public class TeleopDriveCommand extends LoggingCommand {
     private final DoubleSupplier  boostFactor;
 
     private Rotation2d            previousHeading = null;
-
-    private Rotation2d            desiredHeading  = null;
 
     /**
      * Used to drive a swerve robot in full field-centric mode. vX and vY supply
@@ -89,55 +86,34 @@ public class TeleopDriveCommand extends LoggingCommand {
             Math.pow(vX, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS,
             Math.pow(vY, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS);
 
+        System.out.println("rotationAngularVelocityPct: " + rotationAngularVelocityPct + "     " + System.currentTimeMillis());
 
+        Rotation2d omega;
 
-        // compute heading mode
-        if (desiredHeadingDegrees > -1) {
-            // someone has pressed the POV. Jump to there.
-            desiredHeading = Rotation2d.fromDegrees(desiredHeadingDegrees);
-            // previous heading is not important.
-            previousHeading = null;
-        }
-        else {
-            // not pressing POV
-            if (desiredHeading != null) {
-                // we still have a heading from before!
-                if (rotationAngularVelocityPct == 0) {
-                    // the user hasn't requested a turn so do not override the previous POV
-                    // direction
-                }
-                else {
-                    // user is actively turning the robot. Clear desired heading.
-                    desiredHeading = null;
-                }
-            }
-            else {
-                // user is not changing heading. keep it the same.
-                if (previousHeading == null) {
-                    // figure out what the heading is, so we can follow it
-                    previousHeading = swerve.getPose().getRotation();
-                }
-                // our desired heading is the same as it was last iteration
-                desiredHeading = previousHeading;
-            }
-        }
-
-
-
-        final Rotation2d omega;
-
-        // drive!
-        if (desiredHeading != null) {
-            // jump
-            omega = swerve.computeOmega(desiredHeading);
-        }
-        else {
-            // steer
-            omega = Rotation2d.fromRadians(Math.pow(rotationAngularVelocityPct, 3) * boostFactor
+        // user is steering!
+        if (rotationAngularVelocityPct != 0) {
+            omega           = Rotation2d.fromRadians(Math.pow(rotationAngularVelocityPct, 3) * boostFactor
                 * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC);
+            previousHeading = swerve.getPose().getRotation();
+
+        }
+        else if (desiredHeadingDegrees > -1) {
+            // POV
+            Rotation2d desiredHeading = Rotation2d.fromDegrees(desiredHeadingDegrees);
+            previousHeading = desiredHeading;
+            omega           = swerve.computeOmega(desiredHeading);
+        }
+        else {
+            // translating only
+            if (previousHeading == null) {
+                previousHeading = swerve.getPose().getRotation();
+            }
+            omega = swerve.computeOmega(previousHeading);
         }
 
+        System.out.println("TeleopDrive attempting to drive " + vector + "m/s " + omega + "rad/s");
         swerve.driveFieldOriented(vector, omega);
+
     }
 
     // Called once the command ends or is interrupted.
