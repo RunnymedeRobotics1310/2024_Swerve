@@ -47,11 +47,11 @@ public final class Constants {
              * Practically speaking 4.42 m/s is a good max, but
              * consider 1-2 for development and 2-3 for competitions.
              */
-            public static final double MAX_TRANSLATION_SPEED_MPS              = 1;
-            public static final double MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC    = Rotation2d.fromRotations(0.75).getRadians();
-            public static final double ROTATION_TOLERANCE_RADIANS             = Rotation2d.fromDegrees(2.0).getRadians();
-            public static final double MAX_ROTATION_ACCELERATION_RAD_PER_SEC2 = Rotation2d.fromRotations(1.0).getRadians();
-            public static final double MAX_TRANSLATION_ACCELERATION_MPS2      = 10;
+            public static final double MAX_TRANSLATION_SPEED_MPS              = 4.42;
+            public static final double MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC    = Rotation2d.fromRotations(2).getRadians();
+            public static final double ROTATION_TOLERANCE_RADIANS             = Rotation2d.fromDegrees(0.5).getRadians();
+            public static final double MAX_ROTATION_ACCELERATION_RAD_PER_SEC2 = Rotation2d.fromRotations(4).getRadians();
+            public static final double MAX_TRANSLATION_ACCELERATION_MPS2      = 15;
 
             /**
              * Standard drive speed factor. Regular teleop drive will use this factor of the max
@@ -74,7 +74,8 @@ public final class Constants {
             public static final double SLOW_SPEED_FACTOR                      = .1;
 
             public static final class HeadingPIDConfig {
-                public static final double P = 0.036;
+                public static final double P = 0.04;
+                // .002 is too low but stable
                 public static final double I = 0;
                 public static final double D = 0;
             }
