@@ -1,29 +1,33 @@
 package frc.robot.commands.swervedrive;
 
+import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
+import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
+
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
-
-import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
-import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
 
 public class TeleopDriveCommand extends LoggingCommand {
 
     private final SwerveSubsystem swerve;
     private final DoubleSupplier  translationXSupplier, translationYSupplier;
     private final DoubleSupplier  rotationAngularVelocityPctSupplier;
-    private final IntSupplier     jumpAngle;
+    private final IntSupplier     rawPOV;
     private final DoubleSupplier  boostFactor;
 
-    private Rotation2d            previousHeading = null;
+    private Rotation2d            previousHeading       = null;
 
-    private Rotation2d            desiredHeading  = null;
+    private Rotation2d            desiredHeading        = null;
+    private int                   invert                = 1;
+    int                           desiredHeadingDegrees = -1;
 
     /**
      * Used to drive a swerve robot in full field-centric mode. vX and vY supply
@@ -52,12 +56,12 @@ public class TeleopDriveCommand extends LoggingCommand {
      * for. Positive values are CCW.
      */
     public TeleopDriveCommand(SwerveSubsystem swerve, DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier,
-        DoubleSupplier rotationAngularVelocityPctSupplier, IntSupplier jumpAngle, DoubleSupplier boostFactor) {
+        DoubleSupplier rotationAngularVelocityPctSupplier, IntSupplier rawPOV, DoubleSupplier boostFactor) {
         this.swerve                             = swerve;
         this.translationXSupplier               = translationXSupplier;
         this.translationYSupplier               = translationYSupplier;
         this.rotationAngularVelocityPctSupplier = rotationAngularVelocityPctSupplier;
-        this.jumpAngle                          = jumpAngle;
+        this.rawPOV                             = rawPOV;
         this.boostFactor                        = boostFactor;
 
         addRequirements(swerve);
@@ -73,12 +77,33 @@ public class TeleopDriveCommand extends LoggingCommand {
     public void execute() {
 
         // get user inputs
-        double vX                         = translationXSupplier.getAsDouble();
-        double vY                         = translationYSupplier.getAsDouble();
-        double rotationAngularVelocityPct = rotationAngularVelocityPctSupplier.getAsDouble();
-        int    desiredHeadingDegrees      = jumpAngle.getAsInt();
-        double boostFactor                = this.boostFactor.getAsDouble();
+        double             vX                         = translationXSupplier.getAsDouble();
+        double             vY                         = translationYSupplier.getAsDouble();
+        double             rotationAngularVelocityPct = rotationAngularVelocityPctSupplier.getAsDouble();
+        int                rawHeadingDegrees          = rawPOV.getAsInt();
+        double             boostFactor                = this.boostFactor.getAsDouble();
+        Optional<Alliance> alliance                   = DriverStation.getAlliance();
 
+        // invert for red alliance
+        if (alliance == Optional.of(Alliance.Red)) {
+            invert = -1;
+        }
+        else {
+            invert = 1;
+        }
+        // Compute jump heading
+        if (rawHeadingDegrees == -1) {
+            desiredHeadingDegrees = -1;
+        }
+        else {
+            if (alliance == Optional.of(Alliance.Red)) {
+                desiredHeadingDegrees = ((rawHeadingDegrees * -1) - 90 + 360) % 360;
+            }
+            else {
+                desiredHeadingDegrees = ((rawHeadingDegrees * -1) + 90 + 360) % 360;
+
+            }
+        }
         // write to dashboard
         SmartDashboard.putNumber("vX", vX);
         SmartDashboard.putNumber("vY", vY);
@@ -86,10 +111,8 @@ public class TeleopDriveCommand extends LoggingCommand {
         SmartDashboard.putNumber("jumpAngle", desiredHeadingDegrees);
 
         Translation2d vector = new Translation2d(
-            Math.pow(vX, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS,
-            Math.pow(vY, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS);
-
-
+            Math.pow(vX, 3) * boostFactor * invert * MAX_TRANSLATION_SPEED_MPS,
+            Math.pow(vY, 3) * boostFactor * invert * MAX_TRANSLATION_SPEED_MPS);
 
         // compute heading mode
         if (desiredHeadingDegrees > -1) {
