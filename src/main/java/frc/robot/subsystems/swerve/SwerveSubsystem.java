@@ -20,6 +20,11 @@ public abstract class SwerveSubsystem extends SubsystemBase {
     private final SlewRateLimiter yLimiter     = new SlewRateLimiter(MAX_TRANSLATION_ACCELERATION_MPS2);
     private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(MAX_ROTATION_ACCELERATION_RAD_PER_SEC2);
 
+    public SwerveSubsystem() {
+        super();
+        headingPid.enableContinuousInput(-0, 2 * Math.PI);
+    }
+
     /**
      * The primary method for controlling the drivebase. The provided {@link ChassisSpeeds}
      * specifies
