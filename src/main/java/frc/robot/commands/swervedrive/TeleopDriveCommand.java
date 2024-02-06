@@ -86,9 +86,7 @@ public class TeleopDriveCommand extends LoggingCommand {
             Math.pow(vX, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS,
             Math.pow(vY, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS);
 
-        System.out.println("rotationAngularVelocityPct: " + rotationAngularVelocityPct + "     " + System.currentTimeMillis());
-
-        Rotation2d omega;
+        Rotation2d    omega;
 
         // user is steering!
         if (rotationAngularVelocityPct != 0) {
