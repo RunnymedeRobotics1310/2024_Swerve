@@ -33,17 +33,12 @@ public class OperatorInput {
         operatorController = new RunnymedeGameController(operatorControllerPort);
     }
 
-    public double getBoostMultiplier() {
+    public boolean isDriverLeftBumper() {
+        return driverController.getLeftBumper();
+    }
 
-        if (driverController.getLeftBumper()) {
-            return Constants.Swerve.Chassis.SLOW_SPEED_FACTOR;
-        }
-        else if (driverController.getRightBumper()) {
-            return Constants.Swerve.Chassis.MAX_SPEED_FACTOR;
-        }
-        else {
-            return Constants.Swerve.Chassis.GENERAL_SPEED_FACTOR;
-        }
+    public boolean isDriverRightBumper() {
+        return driverController.getRightBumper();
     }
 
     // Testing purposes only
@@ -59,7 +54,7 @@ public class OperatorInput {
         return driverController.getStartButton();
     }
 
-    public int getJumpAngle() {
+    public int getPOV() {
         return driverController.getPOV();
     }
 

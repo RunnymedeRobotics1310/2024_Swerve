@@ -4,11 +4,6 @@
 
 package frc.robot;
 
-import static frc.robot.commands.operator.OperatorInput.Axis.X;
-import static frc.robot.commands.operator.OperatorInput.Axis.Y;
-import static frc.robot.commands.operator.OperatorInput.Stick.LEFT;
-import static frc.robot.commands.operator.OperatorInput.Stick.RIGHT;
-
 import java.io.File;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -37,14 +32,13 @@ import frc.robot.subsystems.swerve.yagsl.YagslSubsystem;
  */
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    private final File yagslConfig = new File(Filesystem.getDeployDirectory(), "swerve/neo");
+    private final File            yagslConfig          = new File(Filesystem.getDeployDirectory(), "swerve/neo");
     private final SwerveSubsystem swerveDriveSubsystem = new YagslSubsystem(yagslConfig);
     // private final SwerveSubsystem swerveDriveSubsystem = new
     // RunnymedeSwerveSubsystem();
 
-    // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final OperatorInput operatorInput = new OperatorInput(
-            OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
+    private final OperatorInput   operatorInput        = new OperatorInput(
+        OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -52,13 +46,7 @@ public class RobotContainer {
     public RobotContainer() {
 
         // Initialize all Subsystem default commands
-        swerveDriveSubsystem.setDefaultCommand(
-                new TeleopDriveCommand(swerveDriveSubsystem,
-                        () -> operatorInput.getDriverControllerAxis(LEFT, X),
-                        () -> operatorInput.getDriverControllerAxis(LEFT, Y),
-                        () -> -operatorInput.getDriverControllerAxis(RIGHT, X),
-                        operatorInput::getJumpAngle,
-                        () -> operatorInput.getBoostMultiplier()));
+        swerveDriveSubsystem.setDefaultCommand(new TeleopDriveCommand(swerveDriveSubsystem, operatorInput));
         // Configure the trigger bindings
         configureBindings();
     }
@@ -82,9 +70,9 @@ public class RobotContainer {
         new Trigger(operatorInput::isCancel).whileTrue(new CancelCommand(swerveDriveSubsystem));
 
         // drive forward
-        Translation2d fwd = new Translation2d(0, .25);
-        Rotation2d fwdHeading = Rotation2d.fromDegrees(0);
-        DriveDistanceCommand ddc = new DriveDistanceCommand(swerveDriveSubsystem, fwd, fwdHeading, 3);
+        Translation2d        fwd        = new Translation2d(0, .25);
+        Rotation2d           fwdHeading = Rotation2d.fromDegrees(0);
+        DriveDistanceCommand ddc        = new DriveDistanceCommand(swerveDriveSubsystem, fwd, fwdHeading, 3);
         new Trigger(operatorInput::isA).onTrue(ddc);
     }
 

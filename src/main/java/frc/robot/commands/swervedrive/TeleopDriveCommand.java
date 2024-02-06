@@ -1,62 +1,31 @@
 package frc.robot.commands.swervedrive;
 
-import java.util.function.DoubleSupplier;
-import java.util.function.IntSupplier;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.LoggingCommand;
+import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 import static edu.wpi.first.wpilibj.DriverStation.*;
-import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
-import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
+import static frc.robot.Constants.Swerve.Chassis.*;
+import static frc.robot.commands.operator.OperatorInput.Axis.X;
+import static frc.robot.commands.operator.OperatorInput.Axis.Y;
+import static frc.robot.commands.operator.OperatorInput.Stick.LEFT;
+import static frc.robot.commands.operator.OperatorInput.Stick.RIGHT;
 
 public class TeleopDriveCommand extends LoggingCommand {
 
     private final SwerveSubsystem swerve;
-    private final DoubleSupplier  translationXSupplier, translationYSupplier;
-    private final DoubleSupplier  rotationAngularVelocityPctSupplier;
-    private final IntSupplier     jumpAngle;
-    private final DoubleSupplier  boostFactor;
-
+    private final OperatorInput   oi;
     private Rotation2d            prevTheta = null;
 
     /**
-     * Used to drive a swerve robot in full field-centric mode. vX and vY supply
-     * translation inputs, where x is
-     * torwards/away from alliance wall and y is left/right. headingHorzontal and
-     * headingVertical are the Cartesian
-     * coordinates from which the robot's angle will be derived— they will be
-     * converted to a polar angle, which the robot
-     * will rotate to.
-     *
-     * @param swerve The swerve drivebase subsystem.
-     * @param translationXSupplier DoubleSupplier that supplies the x-translation
-     * joystick input. Should be in the range -1
-     * to 1 with deadband already accounted for.
-     * Positive X is away from the alliance wall.
-     * @param translationYSupplier DoubleSupplier that supplies the y-translation
-     * joystick input. Should be in the range -1
-     * to 1 with deadband already accounted for.
-     * Positive Y is towards the left wall when
-     * looking through the driver station glass.
-     * @param rotationAngularVelocityPctSupplier DoubleSupplier that supplies the
-     * percentage of the maximum rotation
-     * speed to be applied to the robot.
-     * Should be in the range of -1 to
-     * 1 with deadband already accounted
-     * for. Positive values are CCW.
+     * Used to drive a swerve robot in full field-centric mode.
      */
-    public TeleopDriveCommand(SwerveSubsystem swerve, DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier,
-        DoubleSupplier rotationAngularVelocityPctSupplier, IntSupplier jumpAngle, DoubleSupplier boostFactor) {
-        this.swerve                             = swerve;
-        this.translationXSupplier               = translationXSupplier;
-        this.translationYSupplier               = translationYSupplier;
-        this.rotationAngularVelocityPctSupplier = rotationAngularVelocityPctSupplier;
-        this.jumpAngle                          = jumpAngle;
-        this.boostFactor                        = boostFactor;
+    public TeleopDriveCommand(SwerveSubsystem swerve, OperatorInput operatorInput) {
+        this.swerve = swerve;
+        this.oi     = operatorInput;
 
         addRequirements(swerve);
     }
@@ -70,63 +39,81 @@ public class TeleopDriveCommand extends LoggingCommand {
     @Override
     public void execute() {
 
-        // get raw user inputs
-        double vX                         = translationXSupplier.getAsDouble();
-        double vY                         = translationYSupplier.getAsDouble();
-        double rotationAngularVelocityPct = rotationAngularVelocityPctSupplier.getAsDouble();
-        int    desiredHeadingDegrees      = jumpAngle.getAsInt();
-        double boostFactor                = this.boostFactor.getAsDouble();
+        // The FRC field-oriented ccoordinate system
+        // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
+        Alliance alliance             = getAlliance().orElse(Alliance.Blue);
+
+        // The coordinate system defines (0,0) as the right side of the blue alliance wall. The
+        // x-axis is positive toward the red alliance, and the y-axis is positive to the left.
+        // When the robot is on the red alliance, we need to invert inputs for the stick values
+        // to move the robot in the right direction.
+        int      invertFactor         = alliance == Alliance.Blue ? 1 : -1;
+
+        // With the driver standing behind the driver station glass, "forward" on the left stick is
+        // its y value, but that should convert into positive x movement on the field. The
+        // Runnymede Controller inverts stick y-axis values, so "forward" on stick is positive.
+        // Thus, positive y stick axis maps to positive x translation on the field.
+        double   vX                   = oi.getDriverControllerAxis(LEFT, Y);
+
+        // Left and right movement on the left stick (the stick's x-axis) maps to the y-axis on the
+        // field. Left on the stick (negative x) maps to positive y on the field, and vice versa.
+        // Thus, negative x stick axis maps to positive y translation on the field.
+        double   vY                   = -oi.getDriverControllerAxis(LEFT, X);
+
+        // Left and right on the right stick will change the direction the robot is facing - its
+        // heading. Positive x values on the stick translate to clockwise motion, and vice versa.
+        // The coordinate system has positive motion as CCW.
+        // Therefore, negative x stick value maps to positive rotation on the field.
+        double   ccwRotAngularVelPct  = -oi.getDriverControllerAxis(RIGHT, X);
+
+        // User wants to jump directly to a specific heading. Computation is deferred because it is
+        // complex
+        // and may not be necessary. See below for details.
+        int      rawDesiredHeadingDeg = oi.getPOV();
+
+        // Compute boost factor
+        boolean  isSlow               = oi.isDriverLeftBumper();
+        boolean  isFast               = oi.isDriverRightBumper();
+        double   boostFactor          = isSlow ? SLOW_SPEED_FACTOR : (isFast ? MAX_SPEED_FACTOR : GENERAL_SPEED_FACTOR);
 
         // write to dashboard
         SmartDashboard.putNumber("vX", vX);
         SmartDashboard.putNumber("vY", vY);
-        SmartDashboard.putNumber("rotationAngularVelocityPct", rotationAngularVelocityPct);
-        SmartDashboard.putNumber("jumpAngle", desiredHeadingDegrees);
+        SmartDashboard.putNumber("ccwRotAngularVelPct", ccwRotAngularVelPct);
+        SmartDashboard.putNumber("rawDesiredHeadingDeg", rawDesiredHeadingDeg);
+        SmartDashboard.putNumber("boostFactor", boostFactor);
 
-        // The FRC field-oriented ccoordinate system
-        // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
 
-        // The coordinate system defines 0,0 at the right side of the blue alliance wall. The
-        // x axis is positive toward the red alliance, and the y axis is positive to the left.
-        // When the robot is on the red alliance, we need to invert inputs for the stick values
-        // to move the robot in the right direction.
-        Alliance      alliance     = getAlliance().orElse(Alliance.Blue);
-        int           invertFactor = alliance == Alliance.Blue ? 1 : -1;
-
-        // With the driver standing behind the driver station glass, "forward" on the stick is
-        // its y value, but that should convert into positive x movement on the field. The
-        // Runnymede Controller inverts stick y axis values, so "forward" on stick is positive.
-        // Thus, vY maps to positive x translation.
-        // Left and right movement on the stick (the stick's x-axis) maps to the y-axis on the
-        // field. "Left" is stick negative x, and that should map to positive y on the field,
-        // and vice versa. Therefore, -vX maps to positive y translation.
-        Translation2d translation  = new Translation2d(
-            Math.pow(vY, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS * invertFactor,
-            Math.pow(-vX, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS * invertFactor);
+        Translation2d translation = new Translation2d(
+            Math.pow(vX, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS * invertFactor,
+            Math.pow(vY, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS * invertFactor);
 
         Rotation2d    omega;
 
         // User is steering!
-        if (rotationAngularVelocityPct != 0) {
-            double w = Math.pow(rotationAngularVelocityPct, 3) * boostFactor * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
+        if (ccwRotAngularVelPct != 0) {
+            // Compute omega
+            double w = Math.pow(ccwRotAngularVelPct, 3) * boostFactor * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
             omega     = Rotation2d.fromRadians(w);
+            // Save previous heading for when we are finished steering.
             prevTheta = swerve.getPose().getRotation();
-
         }
-        else if (desiredHeadingDegrees > -1) {
+        else if (rawDesiredHeadingDeg > -1) {
             // User wants to jump to POV
             // POV coordinates don't match field coordinates. POV is CW+ and field is CCW+. Also,
             // POV 0 is 90 degrees on the field (for blue alliance, and -90 for red).
             // Invert and rotate as required.
             // BLUE field = mod( (pov * -1) + 90 + 360, 360)
             // RED field = mod( (pov * -1) - 90 + 360, 360)
-            double     correctedDegrees = ((desiredHeadingDegrees * -1) + (invertFactor * 90) + 360) % 360;
+            double     correctedDegrees = ((rawDesiredHeadingDeg * -1) + (invertFactor * 90) + 360) % 360;
             Rotation2d desiredHeading   = Rotation2d.fromDegrees(correctedDegrees);
-            prevTheta = desiredHeading;
             omega     = swerve.computeOmega(desiredHeading);
+            // Save the previous heading for when the jump is done
+            prevTheta = desiredHeading;
         }
         else {
-            // translating only.
+            // Translating only. If we know our previous heading, keep it and don't change it.
+            // If we never set a specific heading before, just use the current one.
             if (prevTheta == null) {
                 prevTheta = swerve.getPose().getRotation();
             }
