@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
+import static edu.wpi.first.wpilibj.DriverStation.*;
 import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
 import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
 
@@ -20,7 +21,7 @@ public class TeleopDriveCommand extends LoggingCommand {
     private final IntSupplier     jumpAngle;
     private final DoubleSupplier  boostFactor;
 
-    private Rotation2d            previousHeading = null;
+    private Rotation2d            prevTheta = null;
 
     /**
      * Used to drive a swerve robot in full field-centric mode. vX and vY supply
@@ -69,7 +70,7 @@ public class TeleopDriveCommand extends LoggingCommand {
     @Override
     public void execute() {
 
-        // get user inputs
+        // get raw user inputs
         double vX                         = translationXSupplier.getAsDouble();
         double vY                         = translationYSupplier.getAsDouble();
         double rotationAngularVelocityPct = rotationAngularVelocityPctSupplier.getAsDouble();
@@ -82,35 +83,58 @@ public class TeleopDriveCommand extends LoggingCommand {
         SmartDashboard.putNumber("rotationAngularVelocityPct", rotationAngularVelocityPct);
         SmartDashboard.putNumber("jumpAngle", desiredHeadingDegrees);
 
-        Translation2d vector = new Translation2d(
-            Math.pow(vX, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS,
-            Math.pow(vY, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS);
+        // The FRC field-oriented ccoordinate system
+        // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
+
+        // The coordinate system defines 0,0 at the right side of the blue alliance wall. The
+        // x axis is positive toward the red alliance, and the y axis is positive to the left.
+        // When the robot is on the red alliance, we need to invert inputs for the stick values
+        // to move the robot in the right direction.
+        Alliance      alliance     = getAlliance().orElse(Alliance.Blue);
+        int           invertFactor = alliance == Alliance.Blue ? 1 : -1;
+
+        // With the driver standing behind the driver station glass, "forward" on the stick is
+        // its y value, but that should convert into positive x movement on the field. The
+        // Runnymede Controller inverts stick y axis values, so "forward" on stick is positive.
+        // Thus, vY maps to positive x translation.
+        // Left and right movement on the stick (the stick's x-axis) maps to the y-axis on the
+        // field. "Left" is stick negative x, and that should map to positive y on the field,
+        // and vice versa. Therefore, -vX maps to positive y translation.
+        Translation2d translation  = new Translation2d(
+            Math.pow(vY, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS * invertFactor,
+            Math.pow(-vX, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS * invertFactor);
 
         Rotation2d    omega;
 
-        // user is steering!
+        // User is steering!
         if (rotationAngularVelocityPct != 0) {
-            omega           = Rotation2d.fromRadians(Math.pow(rotationAngularVelocityPct, 3) * boostFactor
-                * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC);
-            previousHeading = swerve.getPose().getRotation();
+            double w = Math.pow(rotationAngularVelocityPct, 3) * boostFactor * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
+            omega     = Rotation2d.fromRadians(w);
+            prevTheta = swerve.getPose().getRotation();
 
         }
         else if (desiredHeadingDegrees > -1) {
-            // POV
-            Rotation2d desiredHeading = Rotation2d.fromDegrees(desiredHeadingDegrees);
-            previousHeading = desiredHeading;
-            omega           = swerve.computeOmega(desiredHeading);
+            // User wants to jump to POV
+            // POV coordinates don't match field coordinates. POV is CW+ and field is CCW+. Also,
+            // POV 0 is 90 degrees on the field (for blue alliance, and -90 for red).
+            // Invert and rotate as required.
+            // BLUE field = mod( (pov * -1) + 90 + 360, 360)
+            // RED field = mod( (pov * -1) - 90 + 360, 360)
+            double     correctedDegrees = ((desiredHeadingDegrees * -1) + (invertFactor * 90) + 360) % 360;
+            Rotation2d desiredHeading   = Rotation2d.fromDegrees(correctedDegrees);
+            prevTheta = desiredHeading;
+            omega     = swerve.computeOmega(desiredHeading);
         }
         else {
-            // translating only
-            if (previousHeading == null) {
-                previousHeading = swerve.getPose().getRotation();
+            // translating only.
+            if (prevTheta == null) {
+                prevTheta = swerve.getPose().getRotation();
             }
-            omega = swerve.computeOmega(previousHeading);
+            omega = swerve.computeOmega(prevTheta);
         }
 
-        System.out.println("TeleopDrive attempting to drive " + vector + "m/s " + omega + "rad/s");
-        swerve.driveFieldOriented(vector, omega);
+        SmartDashboard.putString("Drive ", translation + " m/s " + omega);
+        swerve.driveFieldOriented(translation, omega);
 
     }
 
