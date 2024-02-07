@@ -106,9 +106,8 @@ public class TeleopDriveCommand extends LoggingCommand {
             prevTheta = desiredHeading;
         }
         else {
-            // Translating only. If we know our previous heading, keep it and don't change it.
-            prevTheta = swerve.getPose().getRotation();
-            omega     = swerve.computeOmega(prevTheta);
+            // Translating only. Just drive on the last heading we knew.
+            omega = swerve.computeOmega(prevTheta);
         }
 
         // write to dashboard
