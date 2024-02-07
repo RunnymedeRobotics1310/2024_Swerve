@@ -20,11 +20,6 @@ public abstract class SwerveSubsystem extends SubsystemBase {
     private final SlewRateLimiter yLimiter     = new SlewRateLimiter(MAX_TRANSLATION_ACCELERATION_MPS2);
     private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(MAX_ROTATION_ACCELERATION_RAD_PER_SEC2);
 
-    public SwerveSubsystem() {
-        super();
-        headingPid.enableContinuousInput(-0, 2 * Math.PI);
-    }
-
     /**
      * The primary method for controlling the drivebase. The provided {@link ChassisSpeeds}
      * specifies
@@ -103,7 +98,8 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         double        y        = translation.getY();
         double        w        = omega.getRadians();
         Rotation2d    theta    = this.getPose().getRotation();
-        ChassisSpeeds velocity = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, w, theta);
+        // TODO: understand why these need to be negated. It should work without it.
+        ChassisSpeeds velocity = ChassisSpeeds.fromFieldRelativeSpeeds(-x, -y, -w, theta);
         this.driveRobotOriented(velocity, centerOfRotation);
     }
 
@@ -159,7 +155,9 @@ public abstract class SwerveSubsystem extends SubsystemBase {
      * @return The required rotation speed of the robot
      */
     public final Rotation2d computeOmega(Rotation2d heading) {
+        headingPid.enableContinuousInput(-2 * Math.PI, 2 * Math.PI);
         double currentHeadingRad = getPose().getRotation().getRadians();
+//        double currentHeadingRad = getHeading().getRadians(); yagsl is not syncing gyro with offset
         double desiredHeadingRad = heading.getRadians();
         double outputRad         = headingPid.calculate(currentHeadingRad, desiredHeadingRad);
         double omega             = outputRad * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;

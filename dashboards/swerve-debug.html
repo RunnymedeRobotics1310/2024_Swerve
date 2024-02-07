@@ -7,12 +7,13 @@
 >
     <frc-gyro
         source-provider="NetworkTables"
-        source-key="/SmartDashboard/navX-Sensor[4]"
-        style="transform: translate(86px, 231px);"
+        source-key="/SmartDashboard/swerve/robotRotation"
+        style="transform: translate(76px, 75px);"
+        counter-clockwise=""
     ></frc-gyro>
     <frc-swerve-drivebase
         source-provider="NetworkTables"
-        style="transform: translate(520px, 263px); width: 232px; height: 291px;"
+        style="transform: translate(559px, 92px); width: 232px; height: 291px;"
         source-key="/SmartDashboard/swerve"
         wheellocations="[2.5,2,2.5,-2,-2.5,2,-2.5,-2]"
         measuredstates="[0,0,0,0,0,0,0,0]"
@@ -20,4 +21,29 @@
         sizeleftright="4"
         sizefrontback="5"
     ></frc-swerve-drivebase>
+    <frc-field
+        source-key="/SmartDashboard/Field"
+        source-provider="NetworkTables"
+        style="transform: translate(40px, 591px);"
+        width="54.27083"
+        height="26.2916"
+        image="/field-images/2023-field.jpg"
+        top-left-field-corner-x="46"
+        top-left-field-corner-y="36"
+        bottom-right-field-corner-x="1088"
+        bottom-right-field-corner-y="544"
+    >
+        <frc-field-robot
+            source-key="/SmartDashboard/Field/Robot"
+            source-provider="NetworkTables"
+            style="width: 12.955472px; height: 19.433208px; transform: translate(9.290152px, 175.658485px) rotate(88.438891deg);"
+            opacity="100"
+            pose="[0,0,0]"
+        ></frc-field-robot>
+    </frc-field>
+    <frc-label
+        text="Robot Heading"
+        source-provider="NetworkTables"
+        style="width: 147.8125px; height: 44px; transform: translate(185px, 66px);"
+    ></frc-label>
 </dashboard-tab>
