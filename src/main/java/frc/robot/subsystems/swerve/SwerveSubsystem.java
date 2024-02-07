@@ -1,5 +1,12 @@
 package frc.robot.subsystems.swerve;
 
+import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
+import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATION_ACCELERATION_RAD_PER_SEC2;
+import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_ACCELERATION_MPS2;
+import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.D;
+import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.I;
+import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.P;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -7,11 +14,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import static frc.robot.Constants.Swerve.Chassis.*;
-import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.P;
-import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.I;
-import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.D;
 
 public abstract class SwerveSubsystem extends SubsystemBase {
 
@@ -155,12 +157,23 @@ public abstract class SwerveSubsystem extends SubsystemBase {
      * @return The required rotation speed of the robot
      */
     public final Rotation2d computeOmega(Rotation2d heading) {
-        headingPid.enableContinuousInput(-2 * Math.PI, 2 * Math.PI);
-        double currentHeadingRad = getPose().getRotation().getRadians();
-//        double currentHeadingRad = getHeading().getRadians(); yagsl is not syncing gyro with offset
-        double desiredHeadingRad = heading.getRadians();
-        double outputRad         = headingPid.calculate(currentHeadingRad, desiredHeadingRad);
-        double omega             = outputRad * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
+        // headingPid.enableContinuousInput(-2 * Math.PI, 2 * Math.PI);
+        // double currentHeadingRad = getPose().getRotation().getRadians();
+        // // double currentHeadingRad = getHeading().getRadians(); yagsl is not syncing gyro with
+        // offset
+        // double desiredHeadingRad = heading.getRadians();
+        // double outputRad = headingPid.calculate(currentHeadingRad, desiredHeadingRad);
+        // double omega = outputRad * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
+        // return Rotation2d.fromRadians(omega);
+
+        double error = (heading.getRadians() - getPose().getRotation().getRadians()) % 6;
+        if (error > 3) {
+            error -= 6;
+        }
+        double omega = (error * P) * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
+
+        // System.out.println("Error: " + error);
+
         return Rotation2d.fromRadians(omega);
     }
 

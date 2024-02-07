@@ -4,10 +4,10 @@
 
 package frc.robot;
 
+import static edu.wpi.first.math.util.Units.inchesToMeters;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-
-import static edu.wpi.first.math.util.Units.inchesToMeters;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -74,7 +74,7 @@ public final class Constants {
             public static final double SLOW_SPEED_FACTOR                      = .1;
 
             public static final class HeadingPIDConfig {
-                public static final double P = 0.04;
+                public static final double P = 0.4;
                 // .002 is too low but stable
                 public static final double I = 0;
                 public static final double D = 0;
