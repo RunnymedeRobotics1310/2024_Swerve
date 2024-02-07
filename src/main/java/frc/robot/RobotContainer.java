@@ -16,6 +16,7 @@ import frc.robot.Constants.OiConstants;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.DriveDistanceCommand;
+import frc.robot.commands.swervedrive.LockCommand;
 import frc.robot.commands.swervedrive.TeleopDriveCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -68,6 +69,7 @@ public class RobotContainer {
     private void configureBindings() {
         new Trigger(operatorInput::isZeroGyro).onTrue(new ZeroGyroCommand(swerveDriveSubsystem));
         new Trigger(operatorInput::isCancel).whileTrue(new CancelCommand(swerveDriveSubsystem));
+        new Trigger(operatorInput::isLock).whileTrue(new LockCommand(swerveDriveSubsystem));
 
         // drive forward
         Translation2d        fwd        = new Translation2d(0, .25);

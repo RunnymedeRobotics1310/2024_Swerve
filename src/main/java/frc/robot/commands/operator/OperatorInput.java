@@ -1,7 +1,6 @@
 package frc.robot.commands.operator;
 
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.Constants;
 
 /**
  * The DriverController exposes all driver functions
@@ -44,6 +43,10 @@ public class OperatorInput {
     // Testing purposes only
     public boolean isA() {
         return driverController.getAButton();
+    }
+
+    public boolean isLock() {
+        return driverController.getXButton();
     }
 
     public boolean isZeroGyro() {
