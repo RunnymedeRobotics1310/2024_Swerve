@@ -3,11 +3,8 @@ package frc.robot.subsystems.swerve;
 import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
 import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATION_ACCELERATION_RAD_PER_SEC2;
 import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_ACCELERATION_MPS2;
-import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.D;
-import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.I;
 import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.P;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class SwerveSubsystem extends SubsystemBase {
 
-    private final PIDController   headingPid   = new PIDController(P, I, D);
     private final SlewRateLimiter xLimiter     = new SlewRateLimiter(MAX_TRANSLATION_ACCELERATION_MPS2);
     private final SlewRateLimiter yLimiter     = new SlewRateLimiter(MAX_TRANSLATION_ACCELERATION_MPS2);
     private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(MAX_ROTATION_ACCELERATION_RAD_PER_SEC2);
@@ -60,11 +56,11 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         ChassisSpeeds safeVelocity = new ChassisSpeeds(limitedX, limitedY, limitedOmega);
 
         // report
-        if (desiredVelocity.vxMetersPerSecond != safeVelocity.vxMetersPerSecond
-            || desiredVelocity.vyMetersPerSecond != safeVelocity.vyMetersPerSecond
-            || desiredVelocity.omegaRadiansPerSecond != safeVelocity.omegaRadiansPerSecond) {
-            System.out.println("Velocity limited by SlewRateLimiters. Desired: " + desiredVelocity + ", actual: " + safeVelocity);
-        }
+//        if (desiredVelocity.vxMetersPerSecond != safeVelocity.vxMetersPerSecond
+//            || desiredVelocity.vyMetersPerSecond != safeVelocity.vyMetersPerSecond
+//            || desiredVelocity.omegaRadiansPerSecond != safeVelocity.omegaRadiansPerSecond) {
+//            System.out.println("Velocity limited by SlewRateLimiters. Desired: " + desiredVelocity + ", actual: " + safeVelocity);
+//        }
         return safeVelocity;
     }
 
@@ -100,8 +96,7 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         double        y        = translation.getY();
         double        w        = omega.getRadians();
         Rotation2d    theta    = this.getPose().getRotation();
-        // TODO: understand why these need to be negated. It should work without it.
-        ChassisSpeeds velocity = ChassisSpeeds.fromFieldRelativeSpeeds(-x, -y, -w, theta);
+        ChassisSpeeds velocity = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, w, theta);
         this.driveRobotOriented(velocity, centerOfRotation);
     }
 
@@ -157,22 +152,12 @@ public abstract class SwerveSubsystem extends SubsystemBase {
      * @return The required rotation speed of the robot
      */
     public final Rotation2d computeOmega(Rotation2d heading) {
-        // headingPid.enableContinuousInput(-2 * Math.PI, 2 * Math.PI);
-        // double currentHeadingRad = getPose().getRotation().getRadians();
-        // // double currentHeadingRad = getHeading().getRadians(); yagsl is not syncing gyro with
-        // offset
-        // double desiredHeadingRad = heading.getRadians();
-        // double outputRad = headingPid.calculate(currentHeadingRad, desiredHeadingRad);
-        // double omega = outputRad * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
-        // return Rotation2d.fromRadians(omega);
 
         double error = (heading.getRadians() - getPose().getRotation().getRadians()) % 6;
         if (error > 3) {
             error -= 6;
         }
         double omega = (error * P) * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
-
-        // System.out.println("Error: " + error);
 
         return Rotation2d.fromRadians(omega);
     }
