@@ -49,10 +49,10 @@ public class YagslSubsystem extends SwerveSubsystem {
         return swerveDrive.getPose();
     }
 
-    @Override
-    public Rotation2d getHeading() {
-        return swerveDrive.getYaw();
-    }
+//    @Override
+//    public Rotation2d getHeading() {
+//        return swerveDrive.getYaw();
+//    }
 
     @Override
     public void zeroGyro() {

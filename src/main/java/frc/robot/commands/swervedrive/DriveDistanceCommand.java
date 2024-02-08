@@ -10,24 +10,24 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 public class DriveDistanceCommand extends LoggingCommand {
 
-    private static final Translation2d DONT_MOVE = new Translation2d(0, 0);
+    private static final Translation2d DONT_MOVE    = new Translation2d(0, 0);
 
-    private final SwerveSubsystem swerve;
-    private final Translation2d velocityVectorMps;
-    private final Rotation2d heading;
-    private final Double distanceMetres;
+    private final SwerveSubsystem      swerve;
+    private final Translation2d        velocityVectorMps;
+    private final Rotation2d           heading;
+    private final Double               distanceMetres;
 
-    private Pose2d startingPose = null;
-    private double travelled;
-    private Rotation2d currentHeading;
+    private Pose2d                     startingPose = null;
+    private double                     travelled;
+    private Rotation2d                 currentHeading;
 
     public DriveDistanceCommand(SwerveSubsystem swerve, Translation2d velocityVectorMps,
-            Rotation2d heading, double distanceMetres) {
+        Rotation2d heading, double distanceMetres) {
 
-        this.swerve = swerve;
+        this.swerve            = swerve;
         this.velocityVectorMps = velocityVectorMps;
-        this.heading = heading;
-        this.distanceMetres = distanceMetres;
+        this.heading           = heading;
+        this.distanceMetres    = distanceMetres;
         addRequirements(swerve);
 
     }
@@ -36,10 +36,10 @@ public class DriveDistanceCommand extends LoggingCommand {
     public void initialize() {
         super.initialize();
 
-        travelled = 0;
+        travelled      = 0;
         currentHeading = new Rotation2d();
 
-        startingPose = swerve.getPose();
+        startingPose   = swerve.getPose();
         System.out.println("DriveDistanceCommand Initialized at " + startingPose);
 
     }
@@ -48,15 +48,16 @@ public class DriveDistanceCommand extends LoggingCommand {
     public void execute() {
 
         Translation2d currentLocation = swerve.getPose().getTranslation();
-        travelled = startingPose.getTranslation().getDistance(currentLocation);
+        travelled      = startingPose.getTranslation().getDistance(currentLocation);
 
-        currentHeading = swerve.getHeading();
+        currentHeading = swerve.getPose().getRotation();
 
         Rotation2d omega = swerve.computeOmega(heading);
 
         if (wentTheDistance()) {
             swerve.driveFieldOriented(DONT_MOVE, omega);
-        } else {
+        }
+        else {
             swerve.driveFieldOriented(velocityVectorMps, omega);
 
         }
@@ -89,7 +90,7 @@ public class DriveDistanceCommand extends LoggingCommand {
         boolean isFinished = wentTheDistance() && lookingStraightAhead();
 
         System.out.println("isFinished goal: " + distanceMetres + "m at " + heading.getDegrees() + " actual "
-                + travelled + "m at " + currentHeading + ". done? " + isFinished);
+            + travelled + "m at " + currentHeading + ". done? " + isFinished);
         return isFinished;
     }
 }

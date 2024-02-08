@@ -124,13 +124,13 @@ public abstract class SwerveSubsystem extends SubsystemBase {
      */
     public abstract Pose2d getPose();
 
-    /**
-     * Gets the current yaw angle of the robot, as reported by the imu. CCW
-     * positive, not wrapped.
-     *
-     * @return The yaw angle
-     */
-    public abstract Rotation2d getHeading();
+//    /**
+//     * Gets the current yaw angle of the robot, as reported by the imu. CCW
+//     * positive, not wrapped.
+//     *
+//     * @return The yaw angle
+//     */
+//    public abstract Rotation2d getHeading();
 
     /**
      * Resets the gyro angle to zero and resets odometry to the same position, but

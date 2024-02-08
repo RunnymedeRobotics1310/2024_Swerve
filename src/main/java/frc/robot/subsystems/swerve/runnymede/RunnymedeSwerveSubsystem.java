@@ -84,7 +84,7 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
      */
     public void updateOdometry() {
         odometry.update(
-            getHeading(),
+            gyro.getRotation3d().minus(gyroOffset).toRotation2d(),
             new SwerveModulePosition[] {
                     frontLeft.getPosition(),
                     frontRight.getPosition(),
@@ -98,10 +98,10 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
         return odometry.getPoseMeters();
     }
 
-    @Override
-    public Rotation2d getHeading() {
-        return gyro.getRotation3d().minus(gyroOffset).toRotation2d();
-    }
+//    @Override
+//    public Rotation2d getHeading() {
+//        return gyro.getRotation3d().minus(gyroOffset).toRotation2d();
+//    }
 
     @Override
     public void zeroGyro() {
