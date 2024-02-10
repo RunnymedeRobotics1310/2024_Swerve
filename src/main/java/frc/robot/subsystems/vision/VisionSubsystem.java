@@ -1,6 +1,7 @@
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -58,29 +59,6 @@ public class VisionSubsystem extends SubsystemBase {
         return currentVisionTarget;
     }
 
-    public void setVisionTarget(VisionTarget visionTarget) {
-
-        this.currentVisionTarget = visionTarget;
-
-        switch (visionTarget) {
-        case APRILTAGS:
-            this.pipeline.setNumber(PIPELINE_APRIL_TAG_DETECT);
-            this.camMode.setNumber(CAM_MODE_VISION);
-            this.ledMode.setNumber(LED_MODE_PIPELINE);
-            break;
-        case NOTE:
-            this.pipeline.setNumber(PIPELINE_NEURALNET_NOTE_DETECT);
-            this.camMode.setNumber(CAM_MODE_VISION);
-            this.ledMode.setNumber(LED_MODE_PIPELINE);
-            break;
-        case NONE:
-        default:
-            this.pipeline.setNumber(PIPELINE_VISUAL);
-            this.camMode.setNumber(CAM_MODE_DRIVER);
-            this.ledMode.setInteger(LED_MODE_OFF);
-            break;
-        }
-    }
 
     /**
      * Determine if a vision target of the current type is found.
@@ -189,6 +167,13 @@ public class VisionSubsystem extends SubsystemBase {
         return ty.getDouble(-1.0);
     }
 
+
+    /*
+     *
+     * PUBLIC API FROM HERE DOWN
+     *
+     */
+
     /**
      * Get the position of the robot as computed by the Vision Subsystem. Includes latency data.
      * 
@@ -196,10 +181,93 @@ public class VisionSubsystem extends SubsystemBase {
      * returns null
      * 
      * @return position info or null
+     * @since 2024-02-10
      */
     public VisionPositionInfo getPositionInfo() {
         return null;
     }
 
+    /**
+     *
+     * @since 2024-02-10
+     */
+    public Rotation2d getNoteOffset() {
+        return null;
+    }
 
+    /**
+     *
+     * @since 2024-02-10
+     */
+    public VisionTarget getVisionTarget() {
+        return null;
+    }
+
+    /**
+     *
+     * @since 2024-02-10
+     */
+    public void setVisionTarget(VisionTarget visionTarget) {
+
+        this.currentVisionTarget = visionTarget;
+
+        switch (visionTarget) {
+        case APRILTAGS:
+            this.pipeline.setNumber(PIPELINE_APRIL_TAG_DETECT);
+            this.camMode.setNumber(CAM_MODE_VISION);
+            this.ledMode.setNumber(LED_MODE_PIPELINE);
+            break;
+        case NOTE:
+            this.pipeline.setNumber(PIPELINE_NEURALNET_NOTE_DETECT);
+            this.camMode.setNumber(CAM_MODE_VISION);
+            this.ledMode.setNumber(LED_MODE_PIPELINE);
+            break;
+        case NONE:
+        default:
+            this.pipeline.setNumber(PIPELINE_VISUAL);
+            this.camMode.setNumber(CAM_MODE_DRIVER);
+            this.ledMode.setInteger(LED_MODE_OFF);
+            break;
+        }
+    }
+
+    /**
+     *
+     * @since 2024-02-10
+     */
+    public boolean isTargetVisible() {
+        return false;
+    }
+
+    /**
+     *
+     * @since 2024-02-10
+     */
+    public boolean isAlignedWithTarget() {
+        return false;
+    }
+
+    /**
+     *
+     * @since 2024-02-10
+     */
+    public double getDistanceToTargetMetres() {
+        return -1;
+    }
+
+    /**
+     *
+     * @since 2024-02-10
+     */
+    public Rotation2d getTargetOffset() {
+        return null;
+    }
+
+    /**
+     *
+     * @since 2024-02-10
+     */
+    public Translation2d getRobotTranslationToTarget() {
+        return null;
+    }
 }
