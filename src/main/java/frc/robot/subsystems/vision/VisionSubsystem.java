@@ -1,5 +1,6 @@
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -186,6 +187,18 @@ public class VisionSubsystem extends SubsystemBase {
      */
     private double getTargetY() {
         return ty.getDouble(-1.0);
+    }
+
+    /**
+     * Get the position of the robot as computed by the Vision Subsystem. Includes latency data.
+     * 
+     * If no valid position can be returned (due to bad or erratic data, blocked view, etc.),
+     * returns null
+     * 
+     * @return position info or null
+     */
+    public VisionPositionInfo getPositionInfo() {
+        return null;
     }
 
 
