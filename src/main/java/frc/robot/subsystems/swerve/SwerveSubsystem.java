@@ -11,12 +11,19 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.vision.VisionSubsystem;
 
 public abstract class SwerveSubsystem extends SubsystemBase {
+
+    private final VisionSubsystem visionSubsystem;
 
     private final SlewRateLimiter xLimiter     = new SlewRateLimiter(MAX_TRANSLATION_ACCELERATION_MPS2);
     private final SlewRateLimiter yLimiter     = new SlewRateLimiter(MAX_TRANSLATION_ACCELERATION_MPS2);
     private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(MAX_ROTATION_ACCELERATION_RAD_PER_SEC2);
+
+    public SwerveSubsystem(VisionSubsystem visionSubsystem) {
+        this.visionSubsystem = visionSubsystem;
+    }
 
     /**
      * The primary method for controlling the drivebase. The provided {@link ChassisSpeeds}

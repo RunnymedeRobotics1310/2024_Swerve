@@ -9,18 +9,19 @@ import static frc.robot.Constants.Swerve.Motor.DRIVE;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.wpilibj.SerialPort;
 import frc.robot.Robot;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 
 /**
  * Represents a swerve drive style drivetrain.
  */
 public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
+
     private final SwerveModule          frontLeft;
     private final SwerveModule          frontRight;
     private final SwerveModule          backLeft;
@@ -31,7 +32,8 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
     private final SwerveDriveKinematics kinematics;
     private final SwerveDriveOdometry   odometry;
 
-    public RunnymedeSwerveSubsystem() {
+    public RunnymedeSwerveSubsystem(VisionSubsystem visionSubsystem) {
+        super(visionSubsystem);
 
         kinematics = new SwerveDriveKinematics(
             FRONT_LEFT.locationMetres,

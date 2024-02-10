@@ -3,10 +3,10 @@ package frc.robot.subsystems.swerve.yagsl;
 import java.io.File;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import swervelib.SwerveDrive;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
@@ -25,7 +25,8 @@ public class YagslSubsystem extends SwerveSubsystem {
      *
      * @param configDirectory Directory of swerve drive config files.
      */
-    public YagslSubsystem(File configDirectory) {
+    public YagslSubsystem(File configDirectory, VisionSubsystem visionSubsystem) {
+        super(visionSubsystem);
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
         // objects being created.
         SwerveDriveTelemetry.verbosity = SwerveDriveTelemetry.TelemetryVerbosity.HIGH;
