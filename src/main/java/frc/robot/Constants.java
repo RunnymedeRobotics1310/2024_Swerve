@@ -182,8 +182,13 @@ public final class Constants {
         public static final double VISION_SWITCH_TIME_SEC = .25;
 
         public enum VisionTarget {
+            SPEAKER,
+            AMP,
+            SOURCE,
+            STAGE,
+            ROBOT,
             APRILTAGS,
-            NOTES,
+            NOTE,
             NONE;
 
             @Override

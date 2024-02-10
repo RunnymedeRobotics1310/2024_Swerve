@@ -68,7 +68,7 @@ public class VisionSubsystem extends SubsystemBase {
             this.camMode.setNumber(CAM_MODE_VISION);
             this.ledMode.setNumber(LED_MODE_PIPELINE);
             break;
-        case NOTES:
+        case NOTE:
             this.pipeline.setNumber(PIPELINE_NEURALNET_NOTE_DETECT);
             this.camMode.setNumber(CAM_MODE_VISION);
             this.ledMode.setNumber(LED_MODE_PIPELINE);
@@ -146,7 +146,7 @@ public class VisionSubsystem extends SubsystemBase {
         // read values periodically and post to smart dashboard periodically
         SmartDashboard.putBoolean("Limelight Target Found", isVisionTargetFound());
         SmartDashboard.putBoolean("Note",
-            (currentVisionTarget == VisionTarget.NOTES) && isVisionTargetFound());
+            (currentVisionTarget == VisionTarget.NOTE) && isVisionTargetFound());
         SmartDashboard.putBoolean("Tag", currentVisionTarget == VisionTarget.APRILTAGS && isVisionTargetFound());
         SmartDashboard.putNumber("Limelight tx-value", tx.getDouble(-1.0));
         SmartDashboard.putNumber("Limelight ty-value", ty.getDouble(-1.0));
