@@ -86,10 +86,8 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
         backRight.setDesiredState(swerveModuleStates[3]);
     }
 
-    /**
-     * Updates the field relative position of the robot.
-     */
-    public void updateOdometry() {
+    @Override
+    public void updateOdometryWithStates() {
         swerveDrivePoseEstimator.update(
             gyro.getRotation3d().minus(gyroOffset).toRotation2d(),
             new SwerveModulePosition[] {
@@ -113,11 +111,6 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
     @Override
     public void zeroGyro() {
         gyroOffset = gyro.getRotation3d();
-    }
-
-    @Override
-    public void periodic() {
-        updateOdometry();
     }
 
     @Override
