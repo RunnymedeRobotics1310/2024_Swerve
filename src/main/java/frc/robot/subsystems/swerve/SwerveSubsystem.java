@@ -4,6 +4,8 @@ import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER
 import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATION_ACCELERATION_RAD_PER_SEC2;
 import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_ACCELERATION_MPS2;
 import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.P;
+import static frc.robot.Constants.VisionConstants.CAMERA_LOC_REL_TO_ROBOT_CENTER;
+import static frc.robot.Constants.VisionConstants.getVisionStandardDeviation;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -13,7 +15,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.vision.VisionPositionInfo;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
 public abstract class SwerveSubsystem extends SubsystemBase {
@@ -166,45 +170,34 @@ public abstract class SwerveSubsystem extends SubsystemBase {
 
     abstract protected void addVisionMeasurement(Pose2d robotPose, double timestamp, Matrix<N3, N1> visionMeasurementStdDevs);
 
+    private void updateOdometryWithVisionInfo() {
+        VisionPositionInfo visPose = visionSubsystem.getPositionInfo();
 
-//    public void updatePoseEstimatorWithVisionBotPose() {
-//        PoseLatency visionBotPose = m_visionSystem.getPoseLatency();
-//        // invalid LL data
-//        if (visionBotPose.pose2d.getX() == 0.0) {
-//            return;
-//        }
-//
-//        // distance from current pose to vision estimated pose
-//        double poseDifference = m_poseEstimator.getEstimatedPosition().getTranslation()
-//                .getDistance(visionBotPose.pose2d.getTranslation());
-//
-//        if (m_visionSystem.areAnyTargetsValid()) {
-//            double xyStds;
-//            double degStds;
-//            // multiple targets detected
-//            if (m_visionSystem.getNumberOfTargetsVisible() >= 2) {
-//                xyStds = 0.5;
-//                degStds = 6;
-//            }
-//            // 1 target with large area and close to estimated pose
-//            else if (m_visionSystem.getBestTargetArea() > 0.8 && poseDifference < 0.5) {
-//                xyStds = 1.0;
-//                degStds = 12;
-//            }
-//            // 1 target farther away and estimated pose is close
-//            else if (m_visionSystem.getBestTargetArea() > 0.1 && poseDifference < 0.3) {
-//                xyStds = 2.0;
-//                degStds = 30;
-//            }
-//            // conditions don't match to add a vision measurement
-//            else {
-//                return;
-//            }
-//
-//            m_poseEstimator.setVisionMeasurementStdDevs(
-//                    VecBuilder.fill(xyStds, xyStds, Units.degreesToRadians(degStds)));
-//            m_poseEstimator.addVisionMeasurement(visionBotPose.pose2d,
-//                    Timer.getFPGATimestamp() - visionBotPose.latencySeconds);
-//        }
-//    }
+        // ignore unreliable info from vision subsystem
+        if (visPose == null) {
+            return;
+        }
+
+        // convert camera pose to robot pose
+        Pose2d         robotPose            = new Pose2d(visPose.pose().getTranslation().minus(CAMERA_LOC_REL_TO_ROBOT_CENTER),
+            visPose.pose().getRotation());
+
+        // how different is vision data from estimated data?
+        double         poseDifferenceMetres = getPose().getTranslation().getDistance(robotPose.getTranslation());
+
+        // todo: get confidence from VisionPositionInfo
+        Matrix<N3, N1> stds                 = getVisionStandardDeviation(1.0, poseDifferenceMetres);
+
+        // ignore drastically different data
+        if (stds == null)
+            return;
+
+        // todo: determine if these are the right latencies to use
+        double timestamp = Timer.getFPGATimestamp()
+            - visPose.captureLatencyMillis()
+            - visPose.targetingLatencyMillis();
+
+        this.addVisionMeasurement(visPose.pose(), timestamp, stds);
+    }
+
 }
