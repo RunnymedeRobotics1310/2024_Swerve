@@ -8,12 +8,15 @@ import static frc.robot.Constants.Swerve.Motor.DRIVE;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.SerialPort;
 import frc.robot.Robot;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -102,10 +105,10 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
         return swerveDrivePoseEstimator.getEstimatedPosition();
     }
 
-//    @Override
-//    public Rotation2d getHeading() {
-//        return gyro.getRotation3d().minus(gyroOffset).toRotation2d();
-//    }
+    @Override
+    protected void addVisionMeasurement(Pose2d robotPose, double timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
+        this.swerveDrivePoseEstimator.addVisionMeasurement(robotPose, timestamp, visionMeasurementStdDevs);
+    }
 
     @Override
     public void zeroGyro() {

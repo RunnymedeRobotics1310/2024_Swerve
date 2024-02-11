@@ -5,11 +5,14 @@ import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATION_ACCELERATION_RAD_P
 import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_ACCELERATION_MPS2;
 import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.P;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
@@ -131,14 +134,6 @@ public abstract class SwerveSubsystem extends SubsystemBase {
      */
     public abstract Pose2d getPose();
 
-//    /**
-//     * Gets the current yaw angle of the robot, as reported by the imu. CCW
-//     * positive, not wrapped.
-//     *
-//     * @return The yaw angle
-//     */
-//    public abstract Rotation2d getHeading();
-
     /**
      * Resets the gyro angle to zero and resets odometry to the same position, but
      * facing toward 0.
@@ -169,4 +164,47 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         return Rotation2d.fromRadians(omega);
     }
 
+    abstract protected void addVisionMeasurement(Pose2d robotPose, double timestamp, Matrix<N3, N1> visionMeasurementStdDevs);
+
+
+//    public void updatePoseEstimatorWithVisionBotPose() {
+//        PoseLatency visionBotPose = m_visionSystem.getPoseLatency();
+//        // invalid LL data
+//        if (visionBotPose.pose2d.getX() == 0.0) {
+//            return;
+//        }
+//
+//        // distance from current pose to vision estimated pose
+//        double poseDifference = m_poseEstimator.getEstimatedPosition().getTranslation()
+//                .getDistance(visionBotPose.pose2d.getTranslation());
+//
+//        if (m_visionSystem.areAnyTargetsValid()) {
+//            double xyStds;
+//            double degStds;
+//            // multiple targets detected
+//            if (m_visionSystem.getNumberOfTargetsVisible() >= 2) {
+//                xyStds = 0.5;
+//                degStds = 6;
+//            }
+//            // 1 target with large area and close to estimated pose
+//            else if (m_visionSystem.getBestTargetArea() > 0.8 && poseDifference < 0.5) {
+//                xyStds = 1.0;
+//                degStds = 12;
+//            }
+//            // 1 target farther away and estimated pose is close
+//            else if (m_visionSystem.getBestTargetArea() > 0.1 && poseDifference < 0.3) {
+//                xyStds = 2.0;
+//                degStds = 30;
+//            }
+//            // conditions don't match to add a vision measurement
+//            else {
+//                return;
+//            }
+//
+//            m_poseEstimator.setVisionMeasurementStdDevs(
+//                    VecBuilder.fill(xyStds, xyStds, Units.degreesToRadians(degStds)));
+//            m_poseEstimator.addVisionMeasurement(visionBotPose.pose2d,
+//                    Timer.getFPGATimestamp() - visionBotPose.latencySeconds);
+//        }
+//    }
 }
