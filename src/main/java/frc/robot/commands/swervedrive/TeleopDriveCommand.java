@@ -1,24 +1,32 @@
 package frc.robot.commands.swervedrive;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.LoggingCommand;
-import frc.robot.commands.operator.OperatorInput;
-import frc.robot.subsystems.swerve.SwerveSubsystem;
-
-import static edu.wpi.first.wpilibj.DriverStation.*;
-import static frc.robot.Constants.Swerve.Chassis.*;
+import static edu.wpi.first.wpilibj.DriverStation.getAlliance;
+import static frc.robot.Constants.Swerve.Chassis.GENERAL_SPEED_FACTOR;
+import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
+import static frc.robot.Constants.Swerve.Chassis.MAX_SPEED_FACTOR;
+import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
+import static frc.robot.Constants.Swerve.Chassis.SLOW_SPEED_FACTOR;
 import static frc.robot.commands.operator.OperatorInput.Axis.X;
 import static frc.robot.commands.operator.OperatorInput.Axis.Y;
 import static frc.robot.commands.operator.OperatorInput.Stick.LEFT;
 import static frc.robot.commands.operator.OperatorInput.Stick.RIGHT;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.commands.LoggingCommand;
+import frc.robot.commands.operator.OperatorInput;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
+
 public class TeleopDriveCommand extends LoggingCommand {
 
     private final SwerveSubsystem swerve;
     private final OperatorInput   oi;
-    private Rotation2d            prevTheta = Rotation2d.fromDegrees(0);
+    private Rotation2d            prevTheta         = Rotation2d.fromDegrees(0);
+    private final SlewRateLimiter inputOmegaLimiter = new SlewRateLimiter(4.42);
+
 
     /**
      * Used to drive a swerve robot in full field-centric mode.
@@ -41,52 +49,55 @@ public class TeleopDriveCommand extends LoggingCommand {
 
         // The FRC field-oriented ccoordinate system
         // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
-        final Alliance alliance             = getAlliance().orElse(Alliance.Blue);
+        final Alliance alliance                     = getAlliance().orElse(Alliance.Blue);
 
         // The coordinate system defines (0,0) as the right side of the blue alliance wall. The
         // x-axis is positive toward the red alliance, and the y-axis is positive to the left.
         // When the robot is on the red alliance, we need to invert inputs for the stick values
         // to move the robot in the right direction.
-        final boolean  invert               = alliance == Alliance.Red;
+        final boolean  invert                       = alliance == Alliance.Red;
 
         // With the driver standing behind the driver station glass, "forward" on the left stick is
         // its y value, but that should convert into positive x movement on the field. The
         // Runnymede Controller inverts stick y-axis values, so "forward" on stick is positive.
         // Thus, positive y stick axis maps to positive x translation on the field.
-        final double   vX                   = oi.getDriverControllerAxis(LEFT, Y);
+        final double   vX                           = oi.getDriverControllerAxis(LEFT, Y);
 
         // Left and right movement on the left stick (the stick's x-axis) maps to the y-axis on the
         // field. Left on the stick (negative x) maps to positive y on the field, and vice versa.
         // Thus, negative x stick axis maps to positive y translation on the field.
-        final double   vY                   = -oi.getDriverControllerAxis(LEFT, X);
+        final double   vY                           = -oi.getDriverControllerAxis(LEFT, X);
 
         // Left and right on the right stick will change the direction the robot is facing - its
         // heading. Positive x values on the stick translate to clockwise motion, and vice versa.
         // The coordinate system has positive motion as CCW.
         // Therefore, negative x stick value maps to positive rotation on the field.
-        final double   ccwRotAngularVelPct  = -oi.getDriverControllerAxis(RIGHT, X);
+        final double   ccwRotAngularVelPct          = -oi.getDriverControllerAxis(RIGHT, X);
 
         // User wants to jump directly to a specific heading. Computation is deferred because it is
         // complex
         // and may not be necessary. See below for details.
-        final int      rawDesiredHeadingDeg = oi.getPOV();
+        final int      rawDesiredHeadingDeg         = oi.getPOV();
 
         // Compute boost factor
-        final boolean  isSlow               = oi.isDriverLeftBumper();
-        final boolean  isFast               = oi.isDriverRightBumper();
-        final double   boostFactor          = isSlow ? SLOW_SPEED_FACTOR : (isFast ? MAX_SPEED_FACTOR : GENERAL_SPEED_FACTOR);
+        final boolean  isSlow                       = oi.isDriverLeftBumper();
+        final boolean  isFast                       = oi.isDriverRightBumper();
+        final double   boostFactor                  = isSlow ? SLOW_SPEED_FACTOR
+            : (isFast ? MAX_SPEED_FACTOR : GENERAL_SPEED_FACTOR);
 
 
-        Translation2d  translation          = new Translation2d(
+        Translation2d  translation                  = new Translation2d(
             Math.pow(vX, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS * (invert ? -1 : 1),
             Math.pow(vY, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS * (invert ? -1 : 1));
 
         Rotation2d     omega;
 
+        double         correctedCcwRotAngularVelPct = inputOmegaLimiter.calculate(ccwRotAngularVelPct);
+
         // User is steering!
-        if (ccwRotAngularVelPct != 0) {
+        if (correctedCcwRotAngularVelPct != 0) {
             // Compute omega
-            double w = Math.pow(ccwRotAngularVelPct, 3) * boostFactor * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
+            double w = Math.pow(correctedCcwRotAngularVelPct, 3) * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
             omega     = Rotation2d.fromRadians(w);
             // Save previous heading for when we are finished steering.
             prevTheta = swerve.getPose().getRotation();
