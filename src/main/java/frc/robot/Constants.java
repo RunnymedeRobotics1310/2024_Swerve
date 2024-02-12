@@ -6,8 +6,13 @@ package frc.robot;
 
 import static edu.wpi.first.math.util.Units.inchesToMeters;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -173,6 +178,66 @@ public final class Constants {
                 FRONT_RIGHT.encoderCANID                 = 22;
                 FRONT_RIGHT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.414795).getDegrees();
             }
+        }
+    }
+
+    public final class VisionConstants {
+
+        /** Time to switch pipelines and acquire a new vision target */
+        public static final double VISION_SWITCH_TIME_SEC = .25;
+
+        public enum VisionTarget {
+            SPEAKER,
+            AMP,
+            SOURCE,
+            STAGE,
+            ROBOT,
+            APRILTAGS,
+            NOTE,
+            NONE;
+
+            @Override
+            public String toString() {
+                return "VisionTarget: " + name();
+            }
+
+        }
+
+        // todo: correct this
+        public static Translation2d CAMERA_LOC_REL_TO_ROBOT_CENTER = new Translation2d(0, 30);
+
+        /**
+         * Utility method (STATIC) to map confidence and pose difference to a matrix of estimated
+         * standard
+         * deviations. The returned matrix values have been tuned based on the input and are not
+         * dynamically calculated.
+         *
+         * @param confidence rating from the vision subsystem
+         * @param poseDifferenceMetres difference between estimated pose and pose from vision
+         * @return matrix of standard deviations, or null if values are too far out of bounds
+         */
+        public static Matrix<N3, N1> getVisionStandardDeviation(double confidence, double poseDifferenceMetres) {
+            double xyMetresStds;
+            double degreesStds;
+
+            // todo: measure / tune these values
+            if (confidence > 0.8) {
+                xyMetresStds = 0.5;
+                degreesStds  = 6;
+            }
+            else if (poseDifferenceMetres < 0.5) {
+                xyMetresStds = 1.0;
+                degreesStds  = 12;
+            }
+            else if (poseDifferenceMetres < 0.8) {
+                xyMetresStds = 2.0;
+                degreesStds  = 24;
+            }
+            else {
+                return null;
+            }
+
+            return VecBuilder.fill(xyMetresStds, xyMetresStds, Units.degreesToRadians(degreesStds));
         }
     }
 }

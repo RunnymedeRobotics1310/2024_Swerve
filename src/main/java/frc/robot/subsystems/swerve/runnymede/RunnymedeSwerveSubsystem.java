@@ -8,55 +8,62 @@ import static frc.robot.Constants.Swerve.Motor.DRIVE;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.SerialPort;
 import frc.robot.Robot;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 
 /**
  * Represents a swerve drive style drivetrain.
  */
 public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
-    private final SwerveModule          frontLeft;
-    private final SwerveModule          frontRight;
-    private final SwerveModule          backLeft;
-    private final SwerveModule          backRight;
-    private final AHRS                  gyro;
-    private Rotation3d                  gyroOffset;
 
-    private final SwerveDriveKinematics kinematics;
-    private final SwerveDriveOdometry   odometry;
+    private final SwerveModule            frontLeft;
+    private final SwerveModule            frontRight;
+    private final SwerveModule            backLeft;
+    private final SwerveModule            backRight;
+    private final AHRS                    gyro;
+    private Rotation3d                    gyroOffset;
 
-    public RunnymedeSwerveSubsystem() {
+    private final SwerveDriveKinematics   kinematics;
+    public final SwerveDrivePoseEstimator swerveDrivePoseEstimator;
 
-        kinematics = new SwerveDriveKinematics(
+    public RunnymedeSwerveSubsystem(VisionSubsystem visionSubsystem) {
+        super(visionSubsystem);
+
+        kinematics                    = new SwerveDriveKinematics(
             FRONT_LEFT.locationMetres,
             FRONT_RIGHT.locationMetres,
             BACK_LEFT.locationMetres,
             BACK_RIGHT.locationMetres);
 
-        gyro       = new AHRS(SerialPort.Port.kMXP);
-        gyroOffset = gyro.getRotation3d();
+        gyro                          = new AHRS(SerialPort.Port.kMXP);
+        gyroOffset                    = gyro.getRotation3d();
 
-        frontLeft  = new SwerveModule(FRONT_LEFT, DRIVE, ANGLE);
-        frontRight = new SwerveModule(FRONT_RIGHT, DRIVE, ANGLE);
-        backLeft   = new SwerveModule(BACK_LEFT, DRIVE, ANGLE);
-        backRight  = new SwerveModule(BACK_RIGHT, DRIVE, ANGLE);
+        frontLeft                     = new SwerveModule(FRONT_LEFT, DRIVE, ANGLE);
+        frontRight                    = new SwerveModule(FRONT_RIGHT, DRIVE, ANGLE);
+        backLeft                      = new SwerveModule(BACK_LEFT, DRIVE, ANGLE);
+        backRight                     = new SwerveModule(BACK_RIGHT, DRIVE, ANGLE);
 
-        odometry   = new SwerveDriveOdometry(
-            kinematics,
+        this.swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(
+            this.kinematics,
             gyro.getRotation3d().minus(gyroOffset).toRotation2d(),
             new SwerveModulePosition[] {
                     frontLeft.getPosition(),
                     frontRight.getPosition(),
                     backLeft.getPosition(),
                     backRight.getPosition()
-            });
-
+            },
+            new Pose2d(new Translation2d(0.0, 0.0), Rotation2d.fromDegrees(0.0)));
     }
 
 
@@ -79,11 +86,9 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
         backRight.setDesiredState(swerveModuleStates[3]);
     }
 
-    /**
-     * Updates the field relative position of the robot.
-     */
-    public void updateOdometry() {
-        odometry.update(
+    @Override
+    public void updateOdometryWithStates() {
+        swerveDrivePoseEstimator.update(
             gyro.getRotation3d().minus(gyroOffset).toRotation2d(),
             new SwerveModulePosition[] {
                     frontLeft.getPosition(),
@@ -95,22 +100,17 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
 
     @Override
     public Pose2d getPose() {
-        return odometry.getPoseMeters();
+        return swerveDrivePoseEstimator.getEstimatedPosition();
     }
 
-//    @Override
-//    public Rotation2d getHeading() {
-//        return gyro.getRotation3d().minus(gyroOffset).toRotation2d();
-//    }
+    @Override
+    protected void addVisionMeasurement(Pose2d robotPose, double timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
+        this.swerveDrivePoseEstimator.addVisionMeasurement(robotPose, timestamp, visionMeasurementStdDevs);
+    }
 
     @Override
     public void zeroGyro() {
         gyroOffset = gyro.getRotation3d();
-    }
-
-    @Override
-    public void periodic() {
-        updateOdometry();
     }
 
     @Override

@@ -21,6 +21,7 @@ import frc.robot.commands.swervedrive.TeleopDriveCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.swerve.yagsl.YagslSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -34,9 +35,12 @@ import frc.robot.subsystems.swerve.yagsl.YagslSubsystem;
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     private final File            yagslConfig          = new File(Filesystem.getDeployDirectory(), "swerve/neo");
-    private final SwerveSubsystem swerveDriveSubsystem = new YagslSubsystem(yagslConfig);
+
+    private final VisionSubsystem visionSubsystem      = new VisionSubsystem();
+
+    private final SwerveSubsystem swerveDriveSubsystem = new YagslSubsystem(yagslConfig, visionSubsystem);
     // private final SwerveSubsystem swerveDriveSubsystem = new
-    // RunnymedeSwerveSubsystem();
+    // RunnymedeSwerveSubsystem(visionSubsystem);
 
     private final OperatorInput   operatorInput        = new OperatorInput(
         OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);

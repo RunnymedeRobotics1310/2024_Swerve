@@ -2,11 +2,14 @@ package frc.robot.subsystems.swerve.yagsl;
 
 import java.io.File;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import swervelib.SwerveDrive;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
@@ -25,7 +28,8 @@ public class YagslSubsystem extends SwerveSubsystem {
      *
      * @param configDirectory Directory of swerve drive config files.
      */
-    public YagslSubsystem(File configDirectory) {
+    public YagslSubsystem(File configDirectory, VisionSubsystem visionSubsystem) {
+        super(visionSubsystem);
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
         // objects being created.
         SwerveDriveTelemetry.verbosity = SwerveDriveTelemetry.TelemetryVerbosity.HIGH;
@@ -49,10 +53,15 @@ public class YagslSubsystem extends SwerveSubsystem {
         return swerveDrive.getPose();
     }
 
-//    @Override
-//    public Rotation2d getHeading() {
-//        return swerveDrive.getYaw();
-//    }
+    @Override
+    protected void updateOdometryWithStates() {
+        // noop - done internally inside SwerveDrive
+    }
+
+    @Override
+    protected void addVisionMeasurement(Pose2d robotPose, double timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
+        swerveDrive.addVisionMeasurement(robotPose, timestamp, visionMeasurementStdDevs);
+    }
 
     @Override
     public void zeroGyro() {
