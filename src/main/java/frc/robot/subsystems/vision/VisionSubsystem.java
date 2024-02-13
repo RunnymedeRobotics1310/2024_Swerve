@@ -174,8 +174,11 @@ public class VisionSubsystem extends SubsystemBase {
         int count     = 0;
         int fromIndex = 0;
 
+        if (str == null) {
+            return 0;
+        }
         // Check if the substring is not empty to avoid infinite loop
-        if (subStr == null || subStr.length() == 0) {
+        if (subStr == null || subStr.isEmpty()) {
             return 0;
         }
 
