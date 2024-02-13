@@ -88,7 +88,7 @@ public abstract class SwerveSubsystem extends SubsystemBase {
      * field-oriented inputs into the required robot-oriented {@link ChassisSpeeds} object that can
      * be used by the robot.
      *
-     * @param translation the linear velocity of the robot in metres per second. Positive x is away
+     * @param velocity the linear velocity of the robot in metres per second. Positive x is away
      * from the alliance wall, and positive y is toward the left wall when looking through the
      * driver station glass. Null means no translation.
      * @param omega the rotation rate of the heading of the robot. CCW positive. Null means no
@@ -97,13 +97,13 @@ public abstract class SwerveSubsystem extends SubsystemBase {
      * middle of the robot is desired. 0,0 represents the center of the robot.
      * @see #driveRobotOriented(ChassisSpeeds, Translation2d)
      */
-    public final void driveFieldOriented(Translation2d translation, Rotation2d omega, Translation2d centerOfRotation) {
-        double        x        = translation == null ? 0 : translation.getX();
-        double        y        = translation == null ? 0 : translation.getY();
-        double        w        = omega == null ? 0 : omega.getRadians();
-        Rotation2d    theta    = this.getPose().getRotation();
-        ChassisSpeeds velocity = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, w, theta);
-        this.driveRobotOriented(velocity, centerOfRotation);
+    public final void driveFieldOriented(Translation2d velocity, Rotation2d omega, Translation2d centerOfRotation) {
+        double        x             = velocity == null ? 0 : velocity.getX();
+        double        y             = velocity == null ? 0 : velocity.getY();
+        double        w             = omega == null ? 0 : omega.getRadians();
+        Rotation2d    theta         = this.getPose().getRotation();
+        ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, w, theta);
+        this.driveRobotOriented(chassisSpeeds, centerOfRotation);
     }
 
     /**
@@ -111,15 +111,15 @@ public abstract class SwerveSubsystem extends SubsystemBase {
      * field-oriented inputs into the required robot-oriented {@link ChassisSpeeds} object that can
      * be used by the robot.
      *
-     * @param translation the linear velocity of the robot in metres per second. Positive x is away
+     * @param velocity the linear velocity of the robot in metres per second. Positive x is away
      * from the alliance wall, and positive y is toward the left wall when looking through the
      * driver station glass.
      * @param omega the rotation rate of the heading of the robot, about the center of the robot.
      * CCW positive.
      * @see #driveFieldOriented(Translation2d, Rotation2d, Translation2d)
      */
-    public final void driveFieldOriented(Translation2d translation, Rotation2d omega) {
-        this.driveFieldOriented(translation, omega, new Translation2d());
+    public final void driveFieldOriented(Translation2d velocity, Rotation2d omega) {
+        this.driveFieldOriented(velocity, omega, new Translation2d());
     }
 
     /**
