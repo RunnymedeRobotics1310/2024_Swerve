@@ -31,11 +31,15 @@ public class DriveToPositionCommand extends LoggingCommand {
         Translation2d velocity  = calculateVelocity(transform.getTranslation(), 0);
         Rotation2d    omega     = swerve.computeOmega(desiredPose.getRotation());
 
-        SmartDashboard.putString("DriveToPosition/pose", pose.toString());
-        SmartDashboard.putString("DriveToPosition/desired", desiredPose.toString());
-        SmartDashboard.putString("DriveToPosition/transform", transform.toString());
-        SmartDashboard.putString("DriveToPosition/velocity", velocity.toString());
-        SmartDashboard.putString("DriveToPosition/omega", omega.toString());
+        SmartDashboard.putNumber("DriveToPosition/desired/x", desiredPose.getX());
+        SmartDashboard.putNumber("DriveToPosition/desired/y", desiredPose.getY());
+        SmartDashboard.putNumber("DriveToPosition/desired/omega", desiredPose.getRotation().getDegrees());
+        SmartDashboard.putNumber("DriveToPosition/transform/x", transform.getX());
+        SmartDashboard.putNumber("DriveToPosition/transform/y", transform.getY());
+        SmartDashboard.putNumber("DriveToPosition/transform/omega", transform.getRotation().getDegrees());
+        SmartDashboard.putNumber("DriveToPosition/velocity/x", velocity.getX());
+        SmartDashboard.putNumber("DriveToPosition/velocity/y", velocity.getY());
+        SmartDashboard.putNumber("DriveToPosition/velocity/omega", omega.getDegrees());
 
         swerve.driveFieldOriented(velocity, omega);
     }
