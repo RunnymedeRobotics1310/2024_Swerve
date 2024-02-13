@@ -53,7 +53,7 @@ public final class Constants {
              * consider 1-2 for development and 2-3 for competitions.
              */
             public static final double MAX_TRANSLATION_SPEED_MPS              = 4.42;
-            public static final double MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC    = Rotation2d.fromRotations(2).getRadians();
+            public static final double MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC    = Rotation2d.fromRotations(1).getRadians();
             public static final double ROTATION_TOLERANCE_RADIANS             = Rotation2d.fromDegrees(0.5).getRadians();
             public static final double MAX_ROTATION_ACCELERATION_RAD_PER_SEC2 = Rotation2d.fromRotations(8).getRadians();
             public static final double MAX_TRANSLATION_ACCELERATION_MPS2      = 15;
