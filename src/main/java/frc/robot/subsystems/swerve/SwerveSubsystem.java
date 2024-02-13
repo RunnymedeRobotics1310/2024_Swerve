@@ -165,14 +165,15 @@ public abstract class SwerveSubsystem extends SubsystemBase {
      *
      * @param translationToTravel the desired translation to travel
      * @param absEndSpeed the desired end speed magnitude upon arriving at the destination. Setting
-     * this value to zero will be a common usage.
+     * this value to zero will be a common usage. Negative values are assumed to be zero.
      * @return the velocity vector, in metres per second that the robot can safely travel
      * to traverse the distance specified
      */
     public static Translation2d calculateVelocity(Translation2d translationToTravel, double absEndSpeed) {
 
         if (absEndSpeed < 0) {
-            throw new IllegalArgumentException("Negative absolute end speed is not permitted");
+            System.out.println("Negative end speed " + absEndSpeed + " not allowed - using 0.");
+            absEndSpeed = 0;
         }
 
         double distanceMetres = translationToTravel.getNorm();
