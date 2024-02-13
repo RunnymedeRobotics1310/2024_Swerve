@@ -1,9 +1,8 @@
 package frc.robot.subsystems.swerve;
 
-import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
-import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATION_ACCELERATION_RAD_PER_SEC2;
-import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_ACCELERATION_MPS2;
+import static frc.robot.Constants.Swerve.Chassis.*;
 import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.P;
+import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
 import static frc.robot.Constants.VisionConstants.CAMERA_LOC_REL_TO_ROBOT_CENTER;
 import static frc.robot.Constants.VisionConstants.getVisionStandardDeviation;
 
@@ -158,6 +157,50 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         double omega = (error * P) * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
 
         return Rotation2d.fromRadians(omega);
+    }
+
+    /**
+     * Return a velocity that will traverse the specified translation as fast as possible without
+     * overshooting the location. The final absolute speed value will be the speed specified.
+     *
+     * @param translationToTravel the desired translation to travel
+     * @param absEndSpeed the desired end speed magnitude upon arriving at the destination. Setting
+     * this value to zero will be a common usage.
+     * @return the velocity vector, in metres per second that the robot can safely travel
+     * to traverse the distance specified
+     */
+    public static Translation2d calculateVelocity(Translation2d translationToTravel, double absEndSpeed) {
+
+        if (absEndSpeed < 0) {
+            throw new IllegalArgumentException("Negative absolute end speed is not permitted");
+        }
+
+        double distanceMetres  = translationToTravel.getNorm();
+        double sign            = Math.signum(distanceMetres);
+        double absDistMetres   = Math.abs(distanceMetres);
+
+        double decelDistMetres = ((MAX_TRANSLATION_SPEED_MPS - absEndSpeed) / MAX_TRANSLATION_SPEED_MPS);
+        double decelDistance   = decelDistMetres * DECEL_FROM_MAX_TO_STOP_DIST_METRES;
+
+        double speed;
+
+        if (absDistMetres >= decelDistance) {
+            // cruising
+            speed = sign * MAX_TRANSLATION_SPEED_MPS;
+        }
+        else {
+            // decelerating
+            double pctToGo = absDistMetres / decelDistance;
+            speed = sign * Math.max(absEndSpeed, pctToGo * MAX_TRANSLATION_SPEED_MPS);
+        }
+
+        Rotation2d angle = translationToTravel.getAngle();
+        return new Translation2d(speed * angle.getSin(), speed * angle.getCos());
+    }
+
+    private static double calculateSpeed(double distanceMetres, double absEndSpeed) {
+
+
     }
 
     abstract protected void addVisionMeasurement(Pose2d robotPose, double timestamp, Matrix<N3, N1> visionMeasurementStdDevs);
