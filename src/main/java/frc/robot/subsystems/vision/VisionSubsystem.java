@@ -219,8 +219,15 @@ public class VisionSubsystem extends SubsystemBase {
             return null;
         }
 
-        else
-            return new VisionPositionInfo(pose, latency);
+        else {
+
+            PoseConfidence poseConfidence = PoseConfidence.HIGH;
+            if (numTargets == 1) {
+                poseConfidence = PoseConfidence.MID;
+            }
+            return new VisionPositionInfo(pose, latency, poseConfidence);
+        }
+
     }
 
     public double[] getBotPose() {
