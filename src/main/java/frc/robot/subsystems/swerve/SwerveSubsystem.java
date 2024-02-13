@@ -175,12 +175,12 @@ public abstract class SwerveSubsystem extends SubsystemBase {
             throw new IllegalArgumentException("Negative absolute end speed is not permitted");
         }
 
-        double distanceMetres  = translationToTravel.getNorm();
-        double sign            = Math.signum(distanceMetres);
-        double absDistMetres   = Math.abs(distanceMetres);
+        double distanceMetres = translationToTravel.getNorm();
+        double sign           = Math.signum(distanceMetres);
+        double absDistMetres  = Math.abs(distanceMetres);
 
-        double decelDistMetres = ((MAX_TRANSLATION_SPEED_MPS - absEndSpeed) / MAX_TRANSLATION_SPEED_MPS);
-        double decelDistance   = decelDistMetres * DECEL_FROM_MAX_TO_STOP_DIST_METRES;
+        double decelDistRatio = ((MAX_TRANSLATION_SPEED_MPS - absEndSpeed) / MAX_TRANSLATION_SPEED_MPS);
+        double decelDistance  = decelDistRatio * DECEL_FROM_MAX_TO_STOP_DIST_METRES;
 
         double speed;
 
@@ -196,11 +196,6 @@ public abstract class SwerveSubsystem extends SubsystemBase {
 
         Rotation2d angle = translationToTravel.getAngle();
         return new Translation2d(speed * angle.getSin(), speed * angle.getCos());
-    }
-
-    private static double calculateSpeed(double distanceMetres, double absEndSpeed) {
-
-
     }
 
     abstract protected void addVisionMeasurement(Pose2d robotPose, double timestamp, Matrix<N3, N1> visionMeasurementStdDevs);
