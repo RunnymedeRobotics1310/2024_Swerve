@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.io.File;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -15,10 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OiConstants;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.operator.OperatorInput;
-import frc.robot.commands.swervedrive.DriveDistanceCommand;
-import frc.robot.commands.swervedrive.LockCommand;
-import frc.robot.commands.swervedrive.TeleopDriveCommand;
-import frc.robot.commands.swervedrive.ZeroGyroCommand;
+import frc.robot.commands.swervedrive.*;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.swerve.yagsl.YagslSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -80,6 +78,13 @@ public class RobotContainer {
         Rotation2d           fwdHeading = Rotation2d.fromDegrees(0);
         DriveDistanceCommand ddc        = new DriveDistanceCommand(swerveDriveSubsystem, fwd, fwdHeading, 3);
         new Trigger(operatorInput::isA).onTrue(ddc);
+
+        // drive to position test
+        Translation2d          location    = new Translation2d(2, 2);
+        Rotation2d             heading     = Rotation2d.fromDegrees(-20);
+        Pose2d                 desiredPose = new Pose2d(location, heading);
+        DriveToPositionCommand dtpc        = new DriveToPositionCommand(swerveDriveSubsystem, desiredPose);
+        new Trigger(operatorInput::isY).onTrue(dtpc);
     }
 
     /**
