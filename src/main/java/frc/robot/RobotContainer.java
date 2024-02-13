@@ -80,7 +80,7 @@ public class RobotContainer {
         new Trigger(operatorInput::isA).onTrue(ddc);
 
         // drive to position test
-        Translation2d          location    = new Translation2d(2, 2);
+        Translation2d          location    = new Translation2d(1, 1);
         Rotation2d             heading     = Rotation2d.fromDegrees(-20);
         Pose2d                 desiredPose = new Pose2d(location, heading);
         DriveToPositionCommand dtpc        = new DriveToPositionCommand(swerveDriveSubsystem, desiredPose);

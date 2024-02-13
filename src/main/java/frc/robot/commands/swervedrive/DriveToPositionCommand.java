@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
@@ -24,10 +25,17 @@ public class DriveToPositionCommand extends LoggingCommand {
     @Override
     public void execute() {
 
-        Transform2d   transform = desiredPose.minus(swerve.getPose());
+        Pose2d        pose      = swerve.getPose();
+        Transform2d   transform = desiredPose.minus(pose);
 
         Translation2d velocity  = calculateVelocity(transform.getTranslation(), 0);
         Rotation2d    omega     = swerve.computeOmega(desiredPose.getRotation());
+
+        SmartDashboard.putString("DriveToPosition/pose", pose.toString());
+        SmartDashboard.putString("DriveToPosition/desired", desiredPose.toString());
+        SmartDashboard.putString("DriveToPosition/transform", transform.toString());
+        SmartDashboard.putString("DriveToPosition/velocity", velocity.toString());
+        SmartDashboard.putString("DriveToPosition/omega", omega.toString());
 
         swerve.driveFieldOriented(velocity, omega);
     }
