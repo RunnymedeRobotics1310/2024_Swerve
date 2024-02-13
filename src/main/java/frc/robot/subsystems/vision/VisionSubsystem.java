@@ -1,15 +1,16 @@
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-
-import static frc.robot.Constants.VisionConstants.*;
+import frc.robot.Constants.VisionConstants.VisionTarget;
 
 public class VisionSubsystem extends SubsystemBase {
 
@@ -43,9 +44,18 @@ public class VisionSubsystem extends SubsystemBase {
     NetworkTableEntry                              tx                                   = table.getEntry("tx");
     NetworkTableEntry                              ty                                   = table.getEntry("ty");
     NetworkTableEntry                              ta                                   = table.getEntry("ta");
-    NetworkTableEntry                              tl                                   = table.getEntry("tl");
 
-    private Constants.VisionConstants.VisionTarget currentVisionTarget                  = Constants.VisionConstants.VisionTarget.NONE;
+    NetworkTableEntry                              tl                                   = table.getEntry("tl");
+    NetworkTableEntry                              cl                                   = table.getEntry("cl");
+
+    NetworkTableEntry                              botpose_wpiblue                      = table.getEntry("botpose_wpiblue");
+    NetworkTableEntry                              botpose_wpired                       = table.getEntry("botpose_wpibred");
+
+    NetworkTableEntry                              tid                                  = table.getEntry("tid");
+
+    NetworkTableEntry                              json                                 = table.getEntry("json");
+
+    private Constants.VisionConstants.VisionTarget visionTarget                         = Constants.VisionConstants.VisionTarget.NONE;
 
     public VisionSubsystem() {
         setVisionTarget(VisionTarget.APRILTAGS);
@@ -53,10 +63,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     public double getTargetAreaPercent() {
         return ta.getDouble(-1.0);
-    }
-
-    public VisionTarget getCurrentVisionTarget() {
-        return currentVisionTarget;
     }
 
 
@@ -67,11 +73,6 @@ public class VisionSubsystem extends SubsystemBase {
      */
     public boolean isVisionTargetFound() {
         return tv.getDouble(-1) == 1;
-    }
-
-
-    public double getTargetDistanceCm() {
-        return -1.0; // fixme: calculate distance
     }
 
 
@@ -124,8 +125,8 @@ public class VisionSubsystem extends SubsystemBase {
         // read values periodically and post to smart dashboard periodically
         SmartDashboard.putBoolean("Limelight Target Found", isVisionTargetFound());
         SmartDashboard.putBoolean("Note",
-            (currentVisionTarget == VisionTarget.NOTE) && isVisionTargetFound());
-        SmartDashboard.putBoolean("Tag", currentVisionTarget == VisionTarget.APRILTAGS && isVisionTargetFound());
+            (visionTarget == VisionTarget.NOTE) && isVisionTargetFound());
+        SmartDashboard.putBoolean("Tag", visionTarget == VisionTarget.APRILTAGS && isVisionTargetFound());
         SmartDashboard.putNumber("Limelight tx-value", tx.getDouble(-1.0));
         SmartDashboard.putNumber("Limelight ty-value", ty.getDouble(-1.0));
         SmartDashboard.putNumber("Limelight ta-value", ta.getDouble(-1.0));
@@ -134,6 +135,7 @@ public class VisionSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Limelight LED mode", ledMode.getInteger(-1L));
         SmartDashboard.putNumber("Limelight Pipeline", pipeline.getInteger(-1L));
         SmartDashboard.putBoolean("Note Target Acquired", isNoteTargetAcquired());
+        SmartDashboard.putNumberArray("Botpose", getBotPose());
     }
 
     /**
@@ -154,7 +156,7 @@ public class VisionSubsystem extends SubsystemBase {
      *
      * @return limelight X target coordinates
      */
-    public double getTargetX() {
+    private double getTargetX() {
         return tx.getDouble(-1.0);
     }
 
@@ -168,6 +170,23 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
 
+    private int countOccurrences(String str, String subStr) {
+        int count     = 0;
+        int fromIndex = 0;
+
+        // Check if the substring is not empty to avoid infinite loop
+        if (subStr == null || subStr.length() == 0) {
+            return 0;
+        }
+
+        while ((fromIndex = str.indexOf(subStr, fromIndex)) != -1) {
+            count++;
+            fromIndex += subStr.length(); // Move to the end of the current occurrence to find the
+                                          // next one
+        }
+
+        return count;
+    }
     /*
      *
      * PUBLIC API FROM HERE DOWN
@@ -184,8 +203,64 @@ public class VisionSubsystem extends SubsystemBase {
      * @since 2024-02-10
      */
     public VisionPositionInfo getPositionInfo() {
-        return null;
+        double[] botPose    = getBotPose();
+        String   jsonStr    = json.getString(null);
+        double   latency    = botPose[6];
+
+        int      numTargets = countOccurrences(jsonStr, "fID");
+        Pose2d   pose       = toPose2D(botPose);
+
+        if (numTargets < 1) {
+            return null;
+        }
+
+        // if bot is floating in mid air, return null
+        if (botPose[2] > 1) {
+            return null;
+        }
+
+        else
+            return new VisionPositionInfo(pose, latency);
     }
+
+    public double[] getBotPose() {
+        // Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+
+        // if (alliance.get().equals(DriverStation.Alliance.Red)) {
+        // return botpose_wpired.getDoubleArray(new double[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+        // }
+        // else
+        return botpose_wpiblue.getDoubleArray(new double[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+    }
+
+    // private static Pose3d toPose3D(double[] inData) {
+    // if (inData.length < 6) {
+    // System.err.println("Bad LL 3D Pose Data!");
+    // return new Pose3d();
+    // }
+    // return new Pose3d(
+    // new Translation3d(inData[0], inData[1], inData[2]),
+    // new Rotation3d(Units.degreesToRadians(inData[3]), Units.degreesToRadians(inData[4]),
+    // Units.degreesToRadians(inData[5])));
+    // }
+
+    private static Pose2d toPose2D(double[] inData) {
+        if (inData.length < 6) {
+            System.err.println("Bad LL 2D Pose Data!");
+            return new Pose2d();
+        }
+        Translation2d tran2d = new Translation2d(inData[0], inData[1]);
+        Rotation2d    r2d    = new Rotation2d(Units.degreesToRadians(inData[5]));
+        return new Pose2d(tran2d, r2d);
+    }
+
+    private Pose2d getBotPose2d_wpiBlue() {
+
+        double[] result = getBotPose();
+        return toPose2D(result);
+    }
+
+
 
     /**
      *
@@ -200,7 +275,7 @@ public class VisionSubsystem extends SubsystemBase {
      * @since 2024-02-10
      */
     public VisionTarget getVisionTarget() {
-        return null;
+        return visionTarget;
     }
 
     /**
@@ -209,7 +284,7 @@ public class VisionSubsystem extends SubsystemBase {
      */
     public void setVisionTarget(VisionTarget visionTarget) {
 
-        this.currentVisionTarget = visionTarget;
+        this.visionTarget = visionTarget;
 
         switch (visionTarget) {
         case APRILTAGS:
@@ -231,11 +306,12 @@ public class VisionSubsystem extends SubsystemBase {
         }
     }
 
+
     /**
      *
      * @since 2024-02-10
      */
-    public boolean isTargetVisible() {
+    public boolean isCurrentTargetVisible() {
         return false;
     }
 

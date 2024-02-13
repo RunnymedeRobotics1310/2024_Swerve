@@ -199,8 +199,7 @@ public abstract class SwerveSubsystem extends SubsystemBase {
 
         // todo: determine if these are the right latencies to use
         double timestamp = Timer.getFPGATimestamp()
-            - visPose.captureLatencyMillis()
-            - visPose.targetingLatencyMillis();
+            - visPose.latencyMillis();
 
         this.addVisionMeasurement(visPose.pose(), timestamp, stds);
     }
