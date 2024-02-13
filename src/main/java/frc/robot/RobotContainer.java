@@ -71,7 +71,8 @@ public class RobotContainer {
     private void configureBindings() {
         new Trigger(operatorInput::isZeroGyro).onTrue(new ZeroGyroCommand(swerveDriveSubsystem));
         new Trigger(operatorInput::isCancel).whileTrue(new CancelCommand(swerveDriveSubsystem));
-        new Trigger(operatorInput::isLock).whileTrue(new LockCommand(swerveDriveSubsystem));
+        new Trigger(operatorInput::isX)
+            .whileTrue(new ResetOdometryCommand(swerveDriveSubsystem, new Pose2d(1.83, 0.40, Rotation2d.fromDegrees(0))));
 
         // drive forward
         Translation2d        fwd        = new Translation2d(0, .25);
@@ -80,7 +81,7 @@ public class RobotContainer {
         new Trigger(operatorInput::isA).onTrue(ddc);
 
         // drive to position test
-        Translation2d          location    = new Translation2d(1, 1);
+        Translation2d          location    = new Translation2d(2, 2);
         Rotation2d             heading     = Rotation2d.fromDegrees(-20);
         Pose2d                 desiredPose = new Pose2d(location, heading);
         DriveToPositionCommand dtpc        = new DriveToPositionCommand(swerveDriveSubsystem, desiredPose);

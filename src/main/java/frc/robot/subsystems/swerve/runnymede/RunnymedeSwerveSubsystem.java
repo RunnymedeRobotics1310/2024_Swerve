@@ -127,4 +127,14 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
         kinematics.toSwerveModuleStates(new ChassisSpeeds());
     }
 
+    public void resetOdometry(Pose2d pose) {
+        this.swerveDrivePoseEstimator.resetPosition(gyro.getRotation3d().minus(gyroOffset).toRotation2d(),
+            new SwerveModulePosition[] {
+                    frontLeft.getPosition(),
+                    frontRight.getPosition(),
+                    backLeft.getPosition(),
+                    backRight.getPosition()
+            }, pose);
+    }
+
 }

@@ -73,4 +73,8 @@ public class YagslSubsystem extends SwerveSubsystem {
         swerveDrive.lockPose();
     }
 
+    public void resetOdometry(Pose2d pose) {
+        swerveDrive.resetOdometry(pose);
+    }
+
 }

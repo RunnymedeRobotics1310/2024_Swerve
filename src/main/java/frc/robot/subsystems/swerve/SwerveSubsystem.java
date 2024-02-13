@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionPositionInfo;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -243,10 +244,16 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         this.addVisionMeasurement(visPose.pose(), timestamp, stds);
     }
 
+    public abstract void resetOdometry(Pose2d replacementPose);
+
     @Override
     public void periodic() {
         super.periodic();
         updateOdometryWithStates();
         updateOdometryWithVisionInfo();
+        Pose2d pose = getPose();
+        SmartDashboard.putNumber("SwerveSubsystem/location/x", pose.getTranslation().getX());
+        SmartDashboard.putNumber("SwerveSubsystem/location/y", pose.getTranslation().getY());
+        SmartDashboard.putNumber("SwerveSubsystem/heading", pose.getRotation().getDegrees());
     }
 }
