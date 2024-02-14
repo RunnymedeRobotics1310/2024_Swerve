@@ -167,7 +167,9 @@ public final class Constants {
                 FRONT_LEFT.driveCANID                   = 10;
                 FRONT_LEFT.angleCANID                   = 11;
                 FRONT_LEFT.encoderCANID                 = 12;
-                FRONT_LEFT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.154297).getDegrees();
+//                FRONT_LEFT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.154297).getDegrees();
+                // Updated 2024-02-14
+                FRONT_LEFT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.903076).getDegrees();
             }
 
             public static final Module FRONT_RIGHT = new Module();
