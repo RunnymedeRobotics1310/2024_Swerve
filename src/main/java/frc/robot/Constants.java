@@ -57,7 +57,7 @@ public final class Constants {
             public static final double ROTATION_TOLERANCE_RADIANS             = Rotation2d.fromDegrees(0.5).getRadians();
             public static final double TRANSLATION_TOLERANCE_METRES           = 0.02;
             public static final double DECEL_FROM_MAX_TO_STOP_DIST_METRES     = 1.5;
-            public static final double MAX_ROTATION_ACCELERATION_RAD_PER_SEC2 = Rotation2d.fromRotations(8).getRadians();
+            public static final double MAX_ROTATION_ACCELERATION_RAD_PER_SEC2 = Rotation2d.fromRotations(800).getRadians();
             public static final double MAX_TRANSLATION_ACCELERATION_MPS2      = 15;
 
             /**
@@ -81,7 +81,7 @@ public final class Constants {
             public static final double SLOW_SPEED_FACTOR                      = .1;
 
             public static final class HeadingPIDConfig {
-                public static final double P = 0.3;
+                public static final double P = 0.6;
                 // .002 is too low but stable
                 public static final double I = 0;
                 public static final double D = 0;
