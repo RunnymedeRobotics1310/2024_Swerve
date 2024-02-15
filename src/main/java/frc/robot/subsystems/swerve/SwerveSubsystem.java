@@ -162,42 +162,43 @@ public abstract class SwerveSubsystem extends SubsystemBase {
 
     /**
      * Return a velocity that will traverse the specified translation as fast as possible without
-     * overshooting the location. The final absolute speed value will be the speed specified.
+     * overshooting the location. The initial speed is expected to be 0 and the final speed is
+     * expected to be 0.
      *
      * @param translationToTravel the desired translation to travel
-     * @param absEndSpeed the desired end speed magnitude upon arriving at the destination. Setting
-     * this value to zero will be a common usage. Negative values are assumed to be zero.
      * @return the velocity vector, in metres per second that the robot can safely travel
      * to traverse the distance specified
      */
-    public static Translation2d calculateVelocity(Translation2d translationToTravel, double absEndSpeed) {
-
-        if (absEndSpeed < 0) {
-            System.out.println("Negative end speed " + absEndSpeed + " not allowed - using 0.");
-            absEndSpeed = 0;
-        }
+    public static Translation2d calculateVelocity(Translation2d translationToTravel) {
 
         double distanceMetres = translationToTravel.getNorm();
         double sign           = Math.signum(distanceMetres);
         double absDistMetres  = Math.abs(distanceMetres);
 
-        double decelDistRatio = ((MAX_TRANSLATION_SPEED_MPS - absEndSpeed) / MAX_TRANSLATION_SPEED_MPS);
-        double decelDistance  = decelDistRatio * DECEL_FROM_MAX_TO_STOP_DIST_METRES;
+        double maxSpeed       = MAX_TRANSLATION_SPEED_MPS;
+        double decelDistance  = DECEL_FROM_MAX_TO_STOP_DIST_METRES;
 
-        double speed;
+        double decelDistRatio = absDistMetres / DECEL_FROM_MAX_TO_STOP_DIST_METRES;
+        if (decelDistRatio < 1) {
+            maxSpeed      = maxSpeed * decelDistRatio;
+            decelDistance = decelDistance * decelDistRatio;
+        }
+
+
+        final double speed;
 
         if (absDistMetres >= decelDistance) {
             // cruising
-            speed = sign * MAX_TRANSLATION_SPEED_MPS;
+            speed = sign * maxSpeed;
         }
         else {
             // decelerating
             double pctToGo = absDistMetres / decelDistance;
-            speed = sign * Math.max(absEndSpeed, pctToGo * MAX_TRANSLATION_SPEED_MPS);
+            speed = sign * maxSpeed * pctToGo;
         }
 
         Rotation2d angle = translationToTravel.getAngle();
-        return new Translation2d(speed * angle.getSin(), speed * angle.getCos());
+        return new Translation2d(speed * angle.getCos(), speed * angle.getSin());
     }
 
     abstract protected void addVisionMeasurement(Pose2d robotPose, double timestamp, Matrix<N3, N1> visionMeasurementStdDevs);
@@ -241,6 +242,7 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         double timestamp = Timer.getFPGATimestamp()
             - visPose.latencyMillis();
 
+        System.out.println("Updating pose from vision: " + visPose.pose());
         this.addVisionMeasurement(visPose.pose(), timestamp, stds);
     }
 
