@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.math.util.Units.feetToMeters;
 import static edu.wpi.first.math.util.Units.inchesToMeters;
 
 import edu.wpi.first.math.Matrix;
@@ -39,12 +40,15 @@ public final class Constants {
 
             public static final double SDS_MK4I_WHEEL_RADIUS_METRES           = 0.0051;
             /**
-             * Specify the maximum speed a module can reach in m/s. This should be measured
-             * so that we don't ask the module to do something it's not capable of doing. This
-             * is NOT a value we should use to cap how fast the robot drives on the field. For
-             * that, use {@link #MAX_TRANSLATION_SPEED_MPS}.
+             * Specify the maximum speed a module can physically reach in m/s.
+             * The SDS
+             * <a href="https://www.swervedrivespecialties.com/products/mk4i-swerve-module">MK4i</a>
+             * module with L2 gear ratio supports a maximum drive motor speed of 15.7ft/s (4.79m/s).
+             * 
+             * Do not use this value in software to cap how fast the robot drives on the field.
+             * For that, use {@link #MAX_TRANSLATION_SPEED_MPS}.
              */
-            public static final double MAX_MODULE_SPEED_MPS                   = 5;
+            public static final double MAX_MODULE_SPEED_MPS                   = 4.79;
             /**
              * Set how fast you want the robot to actually translate across the field.
              * This is the "speed limit" of the robot.
