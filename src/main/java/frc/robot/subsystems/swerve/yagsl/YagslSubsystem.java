@@ -44,8 +44,8 @@ public class YagslSubsystem extends SwerveSubsystem {
     }
 
     @Override
-    protected void driveRawRobotOriented(ChassisSpeeds velocity, Translation2d centerOfRotation) {
-        swerveDrive.drive(velocity, false, centerOfRotation);
+    protected void driveRawRobotOriented(ChassisSpeeds velocity) {
+        swerveDrive.drive(velocity, false, new Translation2d());
     }
 
     @Override
