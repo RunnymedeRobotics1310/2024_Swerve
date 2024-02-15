@@ -9,6 +9,7 @@ import java.util.logging.SimpleFormatter;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -229,6 +230,10 @@ public class LoggingCommand extends Command {
 
     protected String format(Translation2d vector) {
         return "(" + String.format("%.2f", vector.getX()) + ", " + String.format("%.2f", vector.getY()) + ")";
+    }
+
+    protected String format(Transform2d transform) {
+        return format(transform.getTranslation()) + " @ " + format(transform.getRotation());
     }
 
 

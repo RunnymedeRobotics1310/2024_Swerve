@@ -21,7 +21,7 @@ public class DriveToPositionCommand extends LoggingCommand {
         this.desiredPose = pose;
         addRequirements(swerve);
         SmartDashboard.putString("DriveToPosition/pose", "");
-        SmartDashboard.putString("DriveToPosition/transform", "");
+        SmartDashboard.putString("DriveToPosition/delta", "");
         SmartDashboard.putString("DriveToPosition/desired", format(desiredPose));
         SmartDashboard.putString("DriveToPosition/velocity", "");
     }
@@ -29,21 +29,20 @@ public class DriveToPositionCommand extends LoggingCommand {
     @Override
     public void execute() {
 
-        Pose2d        pose      = swerve.getPose();
-        Transform2d   transform = desiredPose.minus(pose);
+        Pose2d        pose     = swerve.getPose();
+        Transform2d   delta    = desiredPose.minus(pose);
 
-        Translation2d velocity  = calculateVelocity(transform.getTranslation());
-        Rotation2d    omega     = swerve.computeOmega(desiredPose.getRotation());
+        Translation2d velocity = calculateVelocity(delta.getTranslation());
+        Rotation2d    omega    = swerve.computeOmega(desiredPose.getRotation());
 
-        log("Pose: " + format(pose) + "  Delta: " + format(transform.getTranslation())
-            + "  Velocity: " + format(velocity) + " @ " + format(omega));
+        log("Pose: " + format(pose) + "  Delta: " + format(delta)
+            + "  Velocity: " + format(velocity) + "m/s @ " + format(omega) + "/s");
 
 
         SmartDashboard.putString("DriveToPosition/pose", format(pose));
-        SmartDashboard.putString("DriveToPosition/transform",
-            format(transform.getTranslation()) + " @ " + format(transform.getRotation()));
+        SmartDashboard.putString("DriveToPosition/delta", format(delta));
         SmartDashboard.putString("DriveToPosition/desired", format(desiredPose));
-        SmartDashboard.putString("DriveToPosition/velocity", format(velocity) + " @ " + format(omega));
+        SmartDashboard.putString("DriveToPosition/velocity", format(velocity) + "m/s @ " + format(omega) + "/s");
 
         swerve.driveFieldOriented(velocity, omega);
     }
@@ -58,15 +57,15 @@ public class DriveToPositionCommand extends LoggingCommand {
     @Override
     public boolean isFinished() {
         super.isFinished();
-        Transform2d transform = desiredPose.minus(swerve.getPose());
-        boolean     transDone = Math.abs(transform.getTranslation().getNorm()) < TRANSLATION_TOLERANCE_METRES;
-        boolean     rotatDone = Math.abs(transform.getRotation().getRadians()) < ROTATION_TOLERANCE_RADIANS;
-        if (transDone && !rotatDone) {
+        Transform2d transform  = desiredPose.minus(swerve.getPose());
+        boolean     transDone  = Math.abs(transform.getTranslation().getNorm()) < TRANSLATION_TOLERANCE_METRES;
+        boolean     rotateDone = Math.abs(transform.getRotation().getRadians()) < ROTATION_TOLERANCE_RADIANS;
+        if (transDone && !rotateDone) {
             log("Translation complete");
         }
-        if (rotatDone && !transDone) {
+        if (rotateDone && !transDone) {
             log("Rotation complete");
         }
-        return transDone && rotatDone;
+        return transDone && rotateDone;
     }
 }
