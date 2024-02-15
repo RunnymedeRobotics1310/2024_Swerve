@@ -35,7 +35,7 @@ public class DriveToPositionCommand extends LoggingCommand {
         Translation2d velocity  = calculateVelocity(transform.getTranslation());
         Rotation2d    omega     = swerve.computeOmega(desiredPose.getRotation());
 
-        System.out.println("DriveToPosition Pose: " + format(pose) + "  Delta: " + format(transform.getTranslation())
+        log("Pose: " + format(pose) + "  Delta: " + format(transform.getTranslation())
             + "  Velocity: " + format(velocity) + " @ " + format(omega));
 
 
@@ -61,6 +61,12 @@ public class DriveToPositionCommand extends LoggingCommand {
         Transform2d transform = desiredPose.minus(swerve.getPose());
         boolean     transDone = Math.abs(transform.getTranslation().getNorm()) < TRANSLATION_TOLERANCE_METRES;
         boolean     rotatDone = Math.abs(transform.getRotation().getRadians()) < ROTATION_TOLERANCE_RADIANS;
+        if (transDone && !rotatDone) {
+            log("Translation complete");
+        }
+        if (rotatDone && !transDone) {
+            log("Rotation complete");
+        }
         return transDone && rotatDone;
     }
 }

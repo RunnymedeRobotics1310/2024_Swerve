@@ -198,6 +198,7 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         }
 
         Rotation2d angle = translationToTravel.getAngle();
+        System.out.println("Need to travel " + translationToTravel + " at angle " + angle);
         return new Translation2d(speed * angle.getCos(), speed * angle.getSin());
     }
 
