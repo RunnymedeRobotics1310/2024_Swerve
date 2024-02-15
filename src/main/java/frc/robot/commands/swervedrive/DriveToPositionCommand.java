@@ -20,6 +20,10 @@ public class DriveToPositionCommand extends LoggingCommand {
         this.swerve      = swerve;
         this.desiredPose = pose;
         addRequirements(swerve);
+        SmartDashboard.putString("DriveToPosition/pose", "");
+        SmartDashboard.putString("DriveToPosition/transform", "");
+        SmartDashboard.putString("DriveToPosition/desired", format(desiredPose));
+        SmartDashboard.putString("DriveToPosition/velocity", "");
     }
 
     @Override
@@ -28,18 +32,18 @@ public class DriveToPositionCommand extends LoggingCommand {
         Pose2d        pose      = swerve.getPose();
         Transform2d   transform = desiredPose.minus(pose);
 
-        Translation2d velocity  = calculateVelocity(transform.getTranslation(), 0);
+        Translation2d velocity  = calculateVelocity(transform.getTranslation());
         Rotation2d    omega     = swerve.computeOmega(desiredPose.getRotation());
 
-        SmartDashboard.putNumber("DriveToPosition/desired/x", desiredPose.getX());
-        SmartDashboard.putNumber("DriveToPosition/desired/y", desiredPose.getY());
-        SmartDashboard.putNumber("DriveToPosition/desired/omega", desiredPose.getRotation().getDegrees());
-        SmartDashboard.putNumber("DriveToPosition/transform/x", transform.getX());
-        SmartDashboard.putNumber("DriveToPosition/transform/y", transform.getY());
-        SmartDashboard.putNumber("DriveToPosition/transform/omega", transform.getRotation().getDegrees());
-        SmartDashboard.putNumber("DriveToPosition/velocity/x", velocity.getX());
-        SmartDashboard.putNumber("DriveToPosition/velocity/y", velocity.getY());
-        SmartDashboard.putNumber("DriveToPosition/velocity/omega", omega.getDegrees());
+        System.out.println("DriveToPosition Pose: " + format(pose) + "  Delta: " + format(transform.getTranslation())
+            + "  Velocity: " + format(velocity) + " @ " + format(omega));
+
+
+        SmartDashboard.putString("DriveToPosition/pose", format(pose));
+        SmartDashboard.putString("DriveToPosition/transform",
+            format(transform.getTranslation()) + " @ " + format(transform.getRotation()));
+        SmartDashboard.putString("DriveToPosition/desired", format(desiredPose));
+        SmartDashboard.putString("DriveToPosition/velocity", format(velocity) + " @ " + format(omega));
 
         swerve.driveFieldOriented(velocity, omega);
     }
