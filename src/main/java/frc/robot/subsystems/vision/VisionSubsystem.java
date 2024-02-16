@@ -26,13 +26,13 @@ public class VisionSubsystem extends SubsystemBase {
 
     // configure more pipelines here
     @SuppressWarnings("unused")
-    private static final long                      PIPELINE_RETROREFLECTIVE_NOTE_DETECT = 0;
-    private static final long                      PIPELINE_APRIL_TAG_DETECT            = 1;
+    private static final long                      PIPELINE_RETROREFLECTIVE_NOTE_DETECT = 1;
+    private static final long                      PIPELINE_APRIL_TAG_DETECT            = 0;
     private static final long                      PIPELINE_VISUAL                      = 2;
     private static final long                      PIPELINE_NEURALNET_NOTE_DETECT       = 7;
 
     NetworkTable                                   table                                = NetworkTableInstance.getDefault()
-        .getTable("limelight");
+        .getTable("limelight-hugh");
 
     // inputs/configs
     NetworkTableEntry                              ledMode                              = table.getEntry("ledMode");
