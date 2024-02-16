@@ -1,5 +1,8 @@
 package frc.robot.subsystems.vision;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -32,7 +35,7 @@ public class HughVisionSubsystem extends SubsystemBase {
     private static final long                      PIPELINE_RETROREFLECTIVE_NOTE_DETECT = 1;
     private static final long                      PIPELINE_APRIL_TAG_DETECT            = 0;
     private static final long                      PIPELINE_VISUAL                      = 2;
-    private static final long                      PIPELINE_NEURALNET_NOTE_DETECT       = 7;
+
 
     NetworkTable                                   table                                = NetworkTableInstance.getDefault()
         .getTable("limelight-hugh");
@@ -60,8 +63,24 @@ public class HughVisionSubsystem extends SubsystemBase {
 
     private Constants.VisionConstants.VisionTarget visionTarget                         = Constants.VisionConstants.VisionTarget.NONE;
 
+    private static final List<Integer>             TARGET_BLUE_SPEAKER                  = List.of(7, 8);
+    private static final List<Integer>             TARGET_BLUE_SOURCE                   = List.of(9, 10);
+    private static final List<Integer>             TARGET_BLUE_AMP                      = List.of(6);
+    private static final List<Integer>             TARGET_BLUE_STAGE                    = List.of(14, 15, 16);
+
+    private static final List<Integer>             TARGET_RED_SPEAKER                   = List.of(3, 4);
+    private static final List<Integer>             TARGET_RED_SOURCE                    = List.of(1, 2);
+    private static final List<Integer>             TARGET_RED_AMP                       = List.of(5);
+    private static final List<Integer>             TARGET_RED_STAGE                     = List.of(11, 12, 13);
+
+    private static final List<Integer>             TARGET_NONE                          = List.of();
+    private List<Integer>                          activeAprilTagTargets                = TARGET_NONE;
+
+
     public HughVisionSubsystem() {
-        setVisionTarget(VisionTarget.APRILTAGS);
+        this.pipeline.setNumber(PIPELINE_APRIL_TAG_DETECT);
+        this.camMode.setNumber(CAM_MODE_VISION);
+        this.ledMode.setNumber(LED_MODE_PIPELINE);
     }
 
     public double getTargetAreaPercent() {
@@ -78,33 +97,6 @@ public class HughVisionSubsystem extends SubsystemBase {
         return tv.getDouble(-1) == 1;
     }
 
-
-    public boolean isNoteTargetAcquired() {
-        // FIXME: finish this
-        if (PIPELINE_NEURALNET_NOTE_DETECT != pipeline.getInteger(-1)) {
-            return false;
-        }
-
-        // Check that a target it acquired.
-        if (!isVisionTargetFound()) {
-            return false;
-        }
-
-        // ***NOTE***: This was from 2023 with retroflective model - likely handling false
-        // positives. Try without first.
-        // is the target area larger than minPercentForConeAcquisition of the screen?
-        // long minPercentForNoteAcquisition = 6;
-        // if (getTargetAreaPercent() < minPercentForNoteAcquisition) {
-        // return false;
-        // }
-
-        double[] tgt = getTarget();
-        if (tgt[0] < 0 || tgt[1] < 0)
-            return false;
-
-        // FIXME: more checks
-        return true;
-    }
 
     public boolean isVisionTargetClose() {
         // FIXME: finish this
@@ -126,20 +118,17 @@ public class HughVisionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // read values periodically and post to smart dashboard periodically
-        SmartDashboard.putBoolean("Limelight Target Found", isVisionTargetFound());
-        SmartDashboard.putBoolean("Note",
-            (visionTarget == VisionTarget.NOTE) && isVisionTargetFound());
-        SmartDashboard.putBoolean("Tag", visionTarget == VisionTarget.APRILTAGS && isVisionTargetFound());
-        SmartDashboard.putNumber("Limelight tx-value", tx.getDouble(-1.0));
-        SmartDashboard.putNumber("Limelight ty-value", ty.getDouble(-1.0));
-        SmartDashboard.putNumber("Limelight ta-value", ta.getDouble(-1.0));
-        SmartDashboard.putNumber("Limelight l-value", tl.getDouble(-1.0));
-        SmartDashboard.putNumber("Limelight Cam Mode", camMode.getInteger(-1L));
-        SmartDashboard.putNumber("Limelight LED mode", ledMode.getInteger(-1L));
-        SmartDashboard.putNumber("Limelight Pipeline", pipeline.getInteger(-1L));
-        SmartDashboard.putBoolean("Note Target Acquired", isNoteTargetAcquired());
-        SmartDashboard.putNumberArray("Botpose", getBotPose());
-        SmartDashboard.putNumber("Number of Targets", getNumActiveTargets());
+        SmartDashboard.putBoolean("LimelightHugh/Target Found", isVisionTargetFound());
+        SmartDashboard.putNumber("LimelightHugh/tx-value", tx.getDouble(-1.0));
+        SmartDashboard.putNumber("LimelightHugh/ty-value", ty.getDouble(-1.0));
+        SmartDashboard.putNumber("LimelightHugh/ta-value", ta.getDouble(-1.0));
+        SmartDashboard.putNumber("LimelightHugh/l-value", tl.getDouble(-1.0));
+        SmartDashboard.putNumber("LimelightHugh/Cam Mode", camMode.getInteger(-1L));
+        SmartDashboard.putNumber("LimelightHugh/LED mode", ledMode.getInteger(-1L));
+        SmartDashboard.putNumber("LimelightHugh/Pipeline", pipeline.getInteger(-1L));
+        SmartDashboard.putNumberArray("LimelightHugh/Botpose", getBotPose());
+        SmartDashboard.putNumber("LimelightHugh/Number of Tags", getNumActiveTargets());
+        SmartDashboard.putString("LimelightHugh/AprilTagInfo", aprilTagInfoArrayToString(getVisibleTagInfo()));
     }
 
     /**
@@ -195,12 +184,65 @@ public class HughVisionSubsystem extends SubsystemBase {
         return count;
     }
 
+
+
+    private AprilTagInfo[] getVisibleTagInfo() {
+        String                  jsonStr = json.getString(null);
+        ArrayList<AprilTagInfo> tags    = new ArrayList<AprilTagInfo>();
+
+        int                     index   = 0;
+        while (index != -1) {
+            index = jsonStr.indexOf("\"fID\":", index);
+            if (index == -1)
+                break; // No more fID found
+
+            int    fIDStart = index + 6;                                 // Start of fID value
+            int    fIDEnd   = jsonStr.indexOf(",", fIDStart);
+            String fID      = jsonStr.substring(fIDStart, fIDEnd).trim();
+
+            int    txIndex  = jsonStr.indexOf("\"tx\":", fIDEnd);
+            int    txStart  = txIndex + 5;                               // Start of tx value
+            int    txEnd    = jsonStr.indexOf(",", txStart);
+            if (txEnd == -1) { // Check if tx is the last value before the object ends
+                txEnd = jsonStr.indexOf("}", txStart);
+            }
+            String       tx      = jsonStr.substring(txStart, txEnd).trim();
+
+            int          tid     = Integer.parseInt(fID);
+            double       targetx = Double.parseDouble(tx);
+            AprilTagInfo ati     = new AprilTagInfo(tid, targetx);
+            tags.add(ati);
+
+            index = txEnd; // Move index to end of the current tx to find the next fID
+        }
+
+        AprilTagInfo[] tagRet = new AprilTagInfo[tags.size()];
+        return tags.toArray(tagRet);
+    }
+
+    private String aprilTagInfoArrayToString(AprilTagInfo[] tagArray) {
+        if (tagArray == null || tagArray.length == 0) {
+            return "[]";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < tagArray.length; i++) {
+            sb.append(tagArray[i].toString());
+            if (i < tagArray.length - 1) {
+                sb.append(", ");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
     private int getNumActiveTargets() {
         String jsonStr = json.getString(null);
         return countOccurrences(jsonStr, "fID");
     }
 
-    /*
+    /**
      *
      * PUBLIC API FROM HERE DOWN
      *
@@ -306,21 +348,30 @@ public class HughVisionSubsystem extends SubsystemBase {
         this.visionTarget = visionTarget;
 
         switch (visionTarget) {
-        case APRILTAGS:
-            this.pipeline.setNumber(PIPELINE_APRIL_TAG_DETECT);
-            this.camMode.setNumber(CAM_MODE_VISION);
-            this.ledMode.setNumber(LED_MODE_PIPELINE);
+        case SPEAKER:
+            activeAprilTagTargets = TARGET_BLUE_SPEAKER;
+
             break;
-        case NOTE:
-            this.pipeline.setNumber(PIPELINE_NEURALNET_NOTE_DETECT);
-            this.camMode.setNumber(CAM_MODE_VISION);
-            this.ledMode.setNumber(LED_MODE_PIPELINE);
+
+        case AMP:
+            activeAprilTagTargets = TARGET_BLUE_AMP;
+
             break;
+
+        case SOURCE:
+            activeAprilTagTargets = TARGET_BLUE_SOURCE;
+
+            break;
+
+        case STAGE:
+            activeAprilTagTargets = TARGET_BLUE_STAGE;
+
+            break;
+
         case NONE:
         default:
-            this.pipeline.setNumber(PIPELINE_VISUAL);
-            this.camMode.setNumber(CAM_MODE_DRIVER);
-            this.ledMode.setInteger(LED_MODE_OFF);
+            activeAprilTagTargets = TARGET_NONE;
+
             break;
         }
     }
@@ -331,8 +382,10 @@ public class HughVisionSubsystem extends SubsystemBase {
      * @since 2024-02-10
      */
     public boolean isCurrentTargetVisible() {
+
         return false;
     }
+
 
     /**
      *

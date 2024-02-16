@@ -5,7 +5,9 @@
 package frc.robot;
 
 import static edu.wpi.first.math.util.Units.inchesToMeters;
-import static frc.robot.subsystems.vision.PoseConfidence.*;
+import static frc.robot.subsystems.vision.PoseConfidence.HIGH;
+import static frc.robot.subsystems.vision.PoseConfidence.LOW;
+import static frc.robot.subsystems.vision.PoseConfidence.MID;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -199,7 +201,6 @@ public final class Constants {
             SOURCE,
             STAGE,
             ROBOT,
-            APRILTAGS,
             NOTE,
             NONE;
 
