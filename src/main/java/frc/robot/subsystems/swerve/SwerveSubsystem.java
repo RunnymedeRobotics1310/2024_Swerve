@@ -210,7 +210,6 @@ public abstract class SwerveSubsystem extends SubsystemBase {
 
         double timestamp = Timer.getFPGATimestamp() - visPose.latencyMillis();
 
-        System.out.println("Updating pose from vision: " + visPose.pose());
         this.addVisionMeasurement(visPose.pose(), timestamp, stds);
     }
 
