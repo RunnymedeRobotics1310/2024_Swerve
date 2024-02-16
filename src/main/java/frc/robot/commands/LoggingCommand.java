@@ -220,6 +220,10 @@ public class LoggingCommand extends Command {
         System.out.println(sb.toString());
     }
 
+    protected String format(double d) {
+        return String.format("%.2f", d);
+    }
+
     protected String format(Pose2d pose) {
         return format(pose.getTranslation()) + " @ " + format(pose.getRotation());
     }
