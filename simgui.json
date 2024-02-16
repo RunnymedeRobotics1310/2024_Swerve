@@ -39,6 +39,12 @@
     },
     "windows": {
       "/SmartDashboard/Field": {
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
+        "width": 16.541748046875,
         "window": {
           "visible": true
         }
@@ -55,11 +61,32 @@
       "FMSInfo": {
         "open": true
       },
+      "LiveWindow": {
+        "open": true
+      },
       "SmartDashboard": {
-        "open": true,
-        "swerve": {
+        "Drive": {
+          "Swerve": {
+            "location": {
+              "open": true
+            },
+            "open": true
+          },
+          "Teleop": {
+            "open": true
+          },
+          "ToPosition": {
+            "open": true
+          },
           "open": true
-        }
+        },
+        "DriveTo": {
+          "Position": {
+            "open": true
+          },
+          "open": true
+        },
+        "open": true
       }
     }
   },
@@ -75,8 +102,7 @@
         "open": true
       },
       "open": true
-    },
-    "visible": true
+    }
   },
   "Plot": {
     "Plot <0>": {

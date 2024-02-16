@@ -1,4 +1,9 @@
 {
+  "Joysticks": {
+    "window": {
+      "visible": false
+    }
+  },
   "System Joysticks": {
     "window": {
       "visible": false
@@ -55,12 +60,12 @@
     {
       "axisConfig": [
         {
-          "decKey": 263,
-          "incKey": 262
+          "decKey": 264,
+          "incKey": 265
         },
         {
-          "decKey": 265,
-          "incKey": 264
+          "decKey": 263,
+          "incKey": 262
         },
         {},
         {},
@@ -70,14 +75,16 @@
         }
       ],
       "axisCount": 6,
-      "buttonCount": 6,
+      "buttonCount": 8,
       "buttonKeys": [
         65,
         66,
         88,
         89,
-        -1,
-        -1
+        53,
+        54,
+        55,
+        56
       ],
       "povConfig": [
         {
