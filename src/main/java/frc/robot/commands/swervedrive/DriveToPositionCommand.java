@@ -11,12 +11,14 @@ import static frc.robot.Constants.Swerve.Chassis.*;
 
 public class DriveToPositionCommand extends BaseDriveCommand {
 
-    private final Pose2d desiredPose;
+    private final Pose2d     desiredPose;
+    private final Rotation2d headingSetpoint;
+
 
     public DriveToPositionCommand(SwerveSubsystem swerve, Pose2d pose) {
         super(swerve);
         this.desiredPose = pose;
-        setHeadingSetpoint(desiredPose.getRotation());
+        headingSetpoint  = desiredPose.getRotation();
         SmartDashboard.putString("Drive/ToPosition/pose", "");
         SmartDashboard.putString("Drive/ToPosition/delta", "");
         SmartDashboard.putString("Drive/ToPosition/desired", format(desiredPose));
@@ -31,7 +33,7 @@ public class DriveToPositionCommand extends BaseDriveCommand {
         Transform2d   delta    = desiredPose.minus(pose);
 
         Translation2d velocity = computeVelocity(delta.getTranslation());
-        Rotation2d    omega    = computeOmega(getHeadingSetpoint());
+        Rotation2d    omega    = computeOmega(headingSetpoint);
 
         log("Pose: " + format(pose) + "  Delta: " + format(delta)
             + "  Velocity: " + format(velocity) + "m/s @ " + format(omega) + "/s");

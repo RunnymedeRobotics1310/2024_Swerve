@@ -17,13 +17,14 @@ public class DriveDistanceCommand extends BaseDriveCommand {
     private Pose2d                     startingPose = null;
     private double                     travelled;
     private Rotation2d                 currentHeading;
+    private final Rotation2d           headingSetpoint;
 
     public DriveDistanceCommand(SwerveSubsystem swerve, Translation2d velocityVectorMps,
         Rotation2d heading, double distanceMetres) {
         super(swerve);
         this.velocityVectorMps = velocityVectorMps;
-        setHeadingSetpoint(heading);
-        this.distanceMetres = distanceMetres;
+        headingSetpoint        = heading;
+        this.distanceMetres    = distanceMetres;
     }
 
     @Override
@@ -46,7 +47,7 @@ public class DriveDistanceCommand extends BaseDriveCommand {
 
         currentHeading = swerve.getPose().getRotation();
 
-        Rotation2d omega = computeOmega(getHeadingSetpoint());
+        Rotation2d omega = computeOmega(headingSetpoint);
 
         if (wentTheDistance()) {
             swerve.driveFieldOriented(DONT_MOVE, omega);
@@ -66,7 +67,7 @@ public class DriveDistanceCommand extends BaseDriveCommand {
 
     private boolean lookingStraightAhead() {
 
-        double headingErr = getHeadingSetpoint().getRadians() - currentHeading.getRadians();
+        double headingErr = headingSetpoint.getRadians() - currentHeading.getRadians();
 
         return Math.abs(headingErr) <= ROTATION_TOLERANCE_RADIANS;
     }
@@ -83,7 +84,7 @@ public class DriveDistanceCommand extends BaseDriveCommand {
 
         boolean isFinished = wentTheDistance() && lookingStraightAhead();
 
-        System.out.println("isFinished goal: " + distanceMetres + "m at " + getHeadingSetpoint().getDegrees() + " actual "
+        System.out.println("isFinished goal: " + distanceMetres + "m at " + headingSetpoint.getDegrees() + " actual "
             + travelled + "m at " + currentHeading + ". done? " + isFinished);
         return isFinished;
     }

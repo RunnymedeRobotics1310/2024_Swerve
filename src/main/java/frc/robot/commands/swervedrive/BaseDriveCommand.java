@@ -2,7 +2,6 @@ package frc.robot.commands.swervedrive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
@@ -12,26 +11,10 @@ import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.P;
 public abstract class BaseDriveCommand extends LoggingCommand {
     protected final SwerveSubsystem swerve;
 
-    private Rotation2d              headingSetpoint = Rotation2d.fromDegrees(0);
 
     public BaseDriveCommand(SwerveSubsystem swerve) {
         this.swerve = swerve;
         addRequirements(swerve);
-    }
-
-    protected final void setHeadingSetpoint(Rotation2d theta) {
-        headingSetpoint = theta;
-    }
-
-    protected final Rotation2d getHeadingSetpoint() {
-        return headingSetpoint;
-    }
-
-
-    @Override
-    public void execute() {
-        super.execute();
-        SmartDashboard.putNumber("Drive/HeadingSetpoint", headingSetpoint.getDegrees());
     }
 
     /**

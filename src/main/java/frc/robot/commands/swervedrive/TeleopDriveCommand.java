@@ -23,7 +23,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
 
     private final OperatorInput   oi;
     private final SlewRateLimiter inputOmegaLimiter = new SlewRateLimiter(4.42);
-
+    private Rotation2d            headingSetpoint   = Rotation2d.fromDegrees(0);
 
     /**
      * Used to drive a swerve robot in full field-centric mode.
@@ -94,9 +94,9 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         if (correctedCcwRotAngularVelPct != 0) {
             // Compute omega
             double w = Math.pow(correctedCcwRotAngularVelPct, 3) * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
-            omega = Rotation2d.fromRadians(w);
+            omega           = Rotation2d.fromRadians(w);
             // Save previous heading for when we are finished steering.
-            setHeadingSetpoint(swerve.getPose().getRotation());
+            headingSetpoint = swerve.getPose().getRotation();
         }
         else if (rawDesiredHeadingDeg > -1) {
             // User wants to jump to POV
@@ -108,13 +108,16 @@ public class TeleopDriveCommand extends BaseDriveCommand {
             double correctedHeadingDeg = ((rawDesiredHeadingDeg * -1) + (invert ? 180 : 0) + 360) % 360;
             SmartDashboard.putNumber("Drive/Teleop/correctedHeadingDeg", correctedHeadingDeg);
             Rotation2d desiredHeading = Rotation2d.fromDegrees(correctedHeadingDeg);
-            omega = computeOmega(desiredHeading);
+            omega           = computeOmega(desiredHeading);
             // Save the previous heading for when the jump is done
-            setHeadingSetpoint(desiredHeading);
+            headingSetpoint = desiredHeading;
         }
         else {
             // Translating only. Just drive on the last heading we knew.
-            omega = computeOmega(getHeadingSetpoint());
+            if (headingSetpoint == null) {
+                headingSetpoint = swerve.getPose().getRotation();
+            }
+            omega = computeOmega(headingSetpoint);
         }
 
         // write to dashboard
@@ -126,7 +129,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         SmartDashboard.putNumber("Drive/Teleop/boostFactor", boostFactor);
 
         SmartDashboard.putString("Drive/Teleop/Translation", translation.getNorm() + "m/s at " + translation.getAngle());
-        SmartDashboard.putString("Drive/Teleop/Theta ", getHeadingSetpoint() + " deg");
+        SmartDashboard.putString("Drive/Teleop/Theta ", headingSetpoint + " deg");
         SmartDashboard.putString("Drive/Teleop/Omega", omega.getDegrees() + " deg/sec");
         swerve.driveFieldOriented(translation, omega);
 
@@ -136,6 +139,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
     @Override
     public void end(boolean interrupted) {
         super.end(interrupted);
+        headingSetpoint = null;
     }
 
     // Returns true when the command should end.
