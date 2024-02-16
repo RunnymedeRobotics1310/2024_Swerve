@@ -3,13 +3,10 @@ package frc.robot.commands.swervedrive;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
-public class LockCommand extends LoggingCommand {
-    private final SwerveSubsystem swerve;
+public class LockCommand extends BaseDriveCommand {
 
     public LockCommand(SwerveSubsystem swerve) {
-        this.swerve = swerve;
-
-        addRequirements(swerve);
+        super(swerve);
     }
 
     @Override

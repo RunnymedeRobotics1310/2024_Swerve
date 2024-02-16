@@ -5,21 +5,18 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 import static frc.robot.Constants.Swerve.Chassis.*;
 import static frc.robot.subsystems.swerve.SwerveSubsystem.calculateVelocity;
 
-public class DriveToPositionCommand extends LoggingCommand {
+public class DriveToPositionCommand extends BaseDriveCommand {
 
-    private final SwerveSubsystem swerve;
-    private final Pose2d          desiredPose;
+    private final Pose2d desiredPose;
 
     public DriveToPositionCommand(SwerveSubsystem swerve, Pose2d pose) {
-        this.swerve      = swerve;
+        super(swerve);
         this.desiredPose = pose;
-        addRequirements(swerve);
         SmartDashboard.putString("DriveToPosition/pose", "");
         SmartDashboard.putString("DriveToPosition/delta", "");
         SmartDashboard.putString("DriveToPosition/desired", format(desiredPose));

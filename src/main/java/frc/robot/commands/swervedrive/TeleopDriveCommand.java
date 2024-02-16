@@ -16,15 +16,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.LoggingCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
-public class TeleopDriveCommand extends LoggingCommand {
+public class TeleopDriveCommand extends BaseDriveCommand {
 
-    private final SwerveSubsystem swerve;
     private final OperatorInput   oi;
-    private Rotation2d            prevTheta         = Rotation2d.fromDegrees(0);
     private final SlewRateLimiter inputOmegaLimiter = new SlewRateLimiter(4.42);
 
 
@@ -32,10 +29,8 @@ public class TeleopDriveCommand extends LoggingCommand {
      * Used to drive a swerve robot in full field-centric mode.
      */
     public TeleopDriveCommand(SwerveSubsystem swerve, OperatorInput operatorInput) {
-        this.swerve = swerve;
-        this.oi     = operatorInput;
-
-        addRequirements(swerve);
+        super(swerve);
+        this.oi = operatorInput;
     }
 
     @Override
@@ -98,9 +93,9 @@ public class TeleopDriveCommand extends LoggingCommand {
         if (correctedCcwRotAngularVelPct != 0) {
             // Compute omega
             double w = Math.pow(correctedCcwRotAngularVelPct, 3) * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
-            omega     = Rotation2d.fromRadians(w);
+            omega = Rotation2d.fromRadians(w);
             // Save previous heading for when we are finished steering.
-            prevTheta = swerve.getPose().getRotation();
+            setTheta(swerve.getPose().getRotation());
         }
         else if (rawDesiredHeadingDeg > -1) {
             // User wants to jump to POV
@@ -112,13 +107,13 @@ public class TeleopDriveCommand extends LoggingCommand {
             double correctedHeadingDeg = ((rawDesiredHeadingDeg * -1) + (invert ? 180 : 0) + 360) % 360;
             SmartDashboard.putNumber("Teleop/correctedHeadingDeg", correctedHeadingDeg);
             Rotation2d desiredHeading = Rotation2d.fromDegrees(correctedHeadingDeg);
-            omega     = swerve.computeOmega(desiredHeading);
+            omega = swerve.computeOmega(desiredHeading);
             // Save the previous heading for when the jump is done
-            prevTheta = desiredHeading;
+            setTheta(desiredHeading);
         }
         else {
             // Translating only. Just drive on the last heading we knew.
-            omega = swerve.computeOmega(prevTheta);
+            omega = swerve.computeOmega(getLastSetTheta());
         }
 
         // write to dashboard
@@ -130,7 +125,7 @@ public class TeleopDriveCommand extends LoggingCommand {
         SmartDashboard.putNumber("Teleop/boostFactor", boostFactor);
 
         SmartDashboard.putString("Teleop/Translation", translation.getNorm() + "m/s at " + translation.getAngle());
-        SmartDashboard.putString("Teleop/Theta ", prevTheta.getDegrees() + " deg");
+        SmartDashboard.putString("Teleop/Theta ", getLastSetTheta() + " deg");
         SmartDashboard.putString("Teleop/Omega", omega.getDegrees() + " deg/sec");
         swerve.driveFieldOriented(translation, omega);
 

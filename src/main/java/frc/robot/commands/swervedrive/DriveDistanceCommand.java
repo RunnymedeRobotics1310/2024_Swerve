@@ -5,14 +5,12 @@ import static frc.robot.Constants.Swerve.Chassis.ROTATION_TOLERANCE_RADIANS;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
-public class DriveDistanceCommand extends LoggingCommand {
+public class DriveDistanceCommand extends BaseDriveCommand {
 
     private static final Translation2d DONT_MOVE    = new Translation2d(0, 0);
 
-    private final SwerveSubsystem      swerve;
     private final Translation2d        velocityVectorMps;
     private final Rotation2d           heading;
     private final Double               distanceMetres;
@@ -23,13 +21,10 @@ public class DriveDistanceCommand extends LoggingCommand {
 
     public DriveDistanceCommand(SwerveSubsystem swerve, Translation2d velocityVectorMps,
         Rotation2d heading, double distanceMetres) {
-
-        this.swerve            = swerve;
+        super(swerve);
         this.velocityVectorMps = velocityVectorMps;
         this.heading           = heading;
         this.distanceMetres    = distanceMetres;
-        addRequirements(swerve);
-
     }
 
     @Override
