@@ -16,6 +16,7 @@ public class DriveToPositionCommand extends BaseDriveCommand {
     public DriveToPositionCommand(SwerveSubsystem swerve, Pose2d pose) {
         super(swerve);
         this.desiredPose = pose;
+        setHeadingSetpoint(desiredPose.getRotation());
         SmartDashboard.putString("DriveToPosition/pose", "");
         SmartDashboard.putString("DriveToPosition/delta", "");
         SmartDashboard.putString("DriveToPosition/desired", format(desiredPose));
@@ -29,7 +30,7 @@ public class DriveToPositionCommand extends BaseDriveCommand {
         Transform2d   delta    = desiredPose.minus(pose);
 
         Translation2d velocity = computeVelocity(delta.getTranslation());
-        Rotation2d    omega    = computeOmega(desiredPose.getRotation());
+        Rotation2d    omega    = computeOmega(getHeadingSetpoint());
 
         log("Pose: " + format(pose) + "  Delta: " + format(delta)
             + "  Velocity: " + format(velocity) + "m/s @ " + format(omega) + "/s");
