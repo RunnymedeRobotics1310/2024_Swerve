@@ -1,8 +1,11 @@
 package frc.robot.subsystems.swerve;
 
-import static frc.robot.Constants.Swerve.Chassis.*;
-import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.P;
+import static frc.robot.Constants.Swerve.Chassis.DECEL_FROM_MAX_TO_STOP_DIST_METRES;
+import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
+import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATION_ACCELERATION_RAD_PER_SEC2;
+import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_ACCELERATION_MPS2;
 import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
+import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.P;
 import static frc.robot.Constants.VisionConstants.CAMERA_LOC_REL_TO_ROBOT_CENTER;
 import static frc.robot.Constants.VisionConstants.getVisionStandardDeviation;
 
@@ -151,9 +154,9 @@ public abstract class SwerveSubsystem extends SubsystemBase {
      */
     public final Rotation2d computeOmega(Rotation2d heading) {
 
-        double error = (heading.getRadians() - getPose().getRotation().getRadians()) % 6;
-        if (error > 3) {
-            error -= 6;
+        double error = (heading.getRadians() - getPose().getRotation().getRadians()) % (2 * Math.PI);
+        if (error > Math.PI) {
+            error -= (2 * Math.PI);
         }
         double omega = (error * P) * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
 
