@@ -1,11 +1,7 @@
 package frc.robot.subsystems.swerve;
 
-import static frc.robot.Constants.Swerve.Chassis.DECEL_FROM_MAX_TO_STOP_DIST_METRES;
-import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
 import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATION_ACCELERATION_RAD_PER_SEC2;
 import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_ACCELERATION_MPS2;
-import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
-import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.P;
 import static frc.robot.Constants.VisionConstants.CAMERA_LOC_REL_TO_ROBOT_CENTER;
 import static frc.robot.Constants.VisionConstants.getVisionStandardDeviation;
 
@@ -110,66 +106,6 @@ public abstract class SwerveSubsystem extends SubsystemBase {
      * Lock the swerve drive to prevent it from moving.
      */
     public abstract void lock();
-
-    /**
-     * Utility function to compute the required rotation speed of the robot given its current
-     * heading. Uses a PID controller to compute the offset.
-     *
-     * @param heading the desired heading of the robot
-     * @return The required rotation speed of the robot
-     * @see frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig
-     */
-    public final Rotation2d computeOmega(Rotation2d heading) {
-
-        double error = (heading.getRadians() - getPose().getRotation().getRadians()) % (2 * Math.PI);
-        if (error > Math.PI) {
-            error -= (2 * Math.PI);
-        }
-        double omega = (error * P) * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
-
-        return Rotation2d.fromRadians(omega);
-    }
-
-    /**
-     * Return a velocity that will traverse the specified translation as fast as possible without
-     * overshooting the location. The initial speed is expected to be 0 and the final speed is
-     * expected to be 0.
-     *
-     * @param translationToTravel the desired translation to travel
-     * @return the velocity vector, in metres per second that the robot can safely travel
-     * to traverse the distance specified
-     */
-    public static Translation2d calculateVelocity(Translation2d translationToTravel) {
-
-        double distanceMetres = translationToTravel.getNorm();
-        double sign           = Math.signum(distanceMetres);
-        double absDistMetres  = Math.abs(distanceMetres);
-
-        double maxSpeed       = MAX_TRANSLATION_SPEED_MPS;
-        double decelDistance  = DECEL_FROM_MAX_TO_STOP_DIST_METRES;
-
-        double decelDistRatio = absDistMetres / DECEL_FROM_MAX_TO_STOP_DIST_METRES;
-        if (decelDistRatio < 1) {
-            maxSpeed      = maxSpeed * decelDistRatio;
-            decelDistance = decelDistance * decelDistRatio;
-        }
-
-
-        final double speed;
-
-        if (absDistMetres >= decelDistance) {
-            // cruising
-            speed = sign * maxSpeed;
-        }
-        else {
-            // decelerating
-            double pctToGo = absDistMetres / decelDistance;
-            speed = sign * maxSpeed * pctToGo;
-        }
-
-        Rotation2d angle = translationToTravel.getAngle();
-        return new Translation2d(speed * angle.getCos(), speed * angle.getSin());
-    }
 
     abstract protected void addVisionMeasurement(Pose2d robotPose, double timestamp, Matrix<N3, N1> visionMeasurementStdDevs);
 

@@ -107,13 +107,13 @@ public class TeleopDriveCommand extends BaseDriveCommand {
             double correctedHeadingDeg = ((rawDesiredHeadingDeg * -1) + (invert ? 180 : 0) + 360) % 360;
             SmartDashboard.putNumber("Teleop/correctedHeadingDeg", correctedHeadingDeg);
             Rotation2d desiredHeading = Rotation2d.fromDegrees(correctedHeadingDeg);
-            omega = swerve.computeOmega(desiredHeading);
+            omega = computeOmega(desiredHeading);
             // Save the previous heading for when the jump is done
             setTheta(desiredHeading);
         }
         else {
             // Translating only. Just drive on the last heading we knew.
-            omega = swerve.computeOmega(getLastSetTheta());
+            omega = computeOmega(getLastSetTheta());
         }
 
         // write to dashboard

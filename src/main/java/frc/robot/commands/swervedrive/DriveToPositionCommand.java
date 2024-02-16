@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 import static frc.robot.Constants.Swerve.Chassis.*;
-import static frc.robot.subsystems.swerve.SwerveSubsystem.calculateVelocity;
 
 public class DriveToPositionCommand extends BaseDriveCommand {
 
@@ -30,7 +29,7 @@ public class DriveToPositionCommand extends BaseDriveCommand {
         Transform2d   delta    = desiredPose.minus(pose);
 
         Translation2d velocity = calculateVelocity(delta.getTranslation());
-        Rotation2d    omega    = swerve.computeOmega(desiredPose.getRotation());
+        Rotation2d    omega    = computeOmega(desiredPose.getRotation());
 
         log("Pose: " + format(pose) + "  Delta: " + format(delta)
             + "  Velocity: " + format(velocity) + "m/s @ " + format(omega) + "/s");

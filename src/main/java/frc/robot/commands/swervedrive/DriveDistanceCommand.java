@@ -47,7 +47,7 @@ public class DriveDistanceCommand extends BaseDriveCommand {
 
         currentHeading = swerve.getPose().getRotation();
 
-        Rotation2d omega = swerve.computeOmega(heading);
+        Rotation2d omega = computeOmega(heading);
 
         if (wentTheDistance()) {
             swerve.driveFieldOriented(DONT_MOVE, omega);
