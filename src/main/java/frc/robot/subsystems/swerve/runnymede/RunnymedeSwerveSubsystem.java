@@ -78,7 +78,6 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
     @Override
     protected void driveRawRobotOriented(ChassisSpeeds desiredChassisSpeeds) {
 
-        System.out.println("User requested drive at " + desiredChassisSpeeds);
 
         // calculate desired states
         ChassisSpeeds       discretized        = ChassisSpeeds.discretize(desiredChassisSpeeds, Robot.kDefaultPeriod);
