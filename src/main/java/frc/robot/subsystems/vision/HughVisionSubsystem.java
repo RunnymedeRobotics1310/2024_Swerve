@@ -190,31 +190,34 @@ public class HughVisionSubsystem extends SubsystemBase {
         String                  jsonStr = json.getString(null);
         ArrayList<AprilTagInfo> tags    = new ArrayList<AprilTagInfo>();
 
-        int                     index   = 0;
-        while (index != -1) {
-            index = jsonStr.indexOf("\"fID\":", index);
-            if (index == -1)
-                break; // No more fID found
+        if (jsonStr != null) {
+            int index = 0;
+            while (index != -1) {
+                index = jsonStr.indexOf("\"fID\":", index);
+                if (index == -1)
+                    break; // No more fID found
 
-            int    fIDStart = index + 6;                                 // Start of fID value
-            int    fIDEnd   = jsonStr.indexOf(",", fIDStart);
-            String fID      = jsonStr.substring(fIDStart, fIDEnd).trim();
+                int    fIDStart = index + 6;                                 // Start of fID value
+                int    fIDEnd   = jsonStr.indexOf(",", fIDStart);
+                String fID      = jsonStr.substring(fIDStart, fIDEnd).trim();
 
-            int    txIndex  = jsonStr.indexOf("\"tx\":", fIDEnd);
-            int    txStart  = txIndex + 5;                               // Start of tx value
-            int    txEnd    = jsonStr.indexOf(",", txStart);
-            if (txEnd == -1) { // Check if tx is the last value before the object ends
-                txEnd = jsonStr.indexOf("}", txStart);
+                int    txIndex  = jsonStr.indexOf("\"tx\":", fIDEnd);
+                int    txStart  = txIndex + 5;                               // Start of tx value
+                int    txEnd    = jsonStr.indexOf(",", txStart);
+                if (txEnd == -1) { // Check if tx is the last value before the object ends
+                    txEnd = jsonStr.indexOf("}", txStart);
+                }
+                String       tx      = jsonStr.substring(txStart, txEnd).trim();
+
+                int          tid     = Integer.parseInt(fID);
+                double       targetx = Double.parseDouble(tx);
+                AprilTagInfo ati     = new AprilTagInfo(tid, targetx);
+                tags.add(ati);
+
+                index = txEnd; // Move index to end of the current tx to find the next fID
             }
-            String       tx      = jsonStr.substring(txStart, txEnd).trim();
-
-            int          tid     = Integer.parseInt(fID);
-            double       targetx = Double.parseDouble(tx);
-            AprilTagInfo ati     = new AprilTagInfo(tid, targetx);
-            tags.add(ati);
-
-            index = txEnd; // Move index to end of the current tx to find the next fID
         }
+
 
         AprilTagInfo[] tagRet = new AprilTagInfo[tags.size()];
         return tags.toArray(tagRet);
