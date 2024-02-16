@@ -128,9 +128,10 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         SmartDashboard.putNumber("Drive/Teleop/rawDesiredHeadingDeg", rawDesiredHeadingDeg);
         SmartDashboard.putNumber("Drive/Teleop/boostFactor", boostFactor);
 
-        SmartDashboard.putString("Drive/Teleop/Translation", translation.getNorm() + "m/s at " + translation.getAngle());
-        SmartDashboard.putString("Drive/Teleop/Theta ", headingSetpoint + " deg");
-        SmartDashboard.putString("Drive/Teleop/Omega", omega.getDegrees() + " deg/sec");
+        SmartDashboard.putString("Drive/Teleop/Translation",
+            format(translation.getNorm()) + "m/s at " + format(translation.getAngle()));
+        SmartDashboard.putString("Drive/Teleop/Theta ", format(headingSetpoint));
+        SmartDashboard.putString("Drive/Teleop/Omega", format(omega) + "/s");
         swerve.driveFieldOriented(translation, omega);
 
     }
