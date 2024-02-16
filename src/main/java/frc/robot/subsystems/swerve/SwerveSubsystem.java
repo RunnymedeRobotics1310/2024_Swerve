@@ -156,8 +156,8 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         updateOdometryWithStates();
         updateOdometryWithVisionInfo();
         Pose2d pose = getPose();
-        SmartDashboard.putNumber("Drive/Swerve/location/x", pose.getTranslation().getX());
-        SmartDashboard.putNumber("Drive/Swerve/location/y", pose.getTranslation().getY());
+        SmartDashboard.putString("Drive/Swerve/location",
+            String.format("%.2f,%.2f", pose.getTranslation().getX(), pose.getTranslation().getY()));
         SmartDashboard.putNumber("Drive/Swerve/heading", pose.getRotation().getDegrees());
     }
 }
