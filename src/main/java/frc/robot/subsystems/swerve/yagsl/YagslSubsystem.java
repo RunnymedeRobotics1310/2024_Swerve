@@ -1,5 +1,7 @@
 package frc.robot.subsystems.swerve.yagsl;
 
+import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
+
 import java.io.File;
 
 import edu.wpi.first.math.Matrix;
@@ -9,12 +11,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
-import frc.robot.subsystems.vision.VisionSubsystem;
+import frc.robot.subsystems.vision.HughVisionSubsystem;
 import swervelib.SwerveDrive;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
-
-import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
 
 public class YagslSubsystem extends SwerveSubsystem {
 
@@ -28,7 +28,7 @@ public class YagslSubsystem extends SwerveSubsystem {
      *
      * @param configDirectory Directory of swerve drive config files.
      */
-    public YagslSubsystem(File configDirectory, VisionSubsystem visionSubsystem) {
+    public YagslSubsystem(File configDirectory, HughVisionSubsystem visionSubsystem) {
         super(visionSubsystem);
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
         // objects being created.
@@ -73,6 +73,7 @@ public class YagslSubsystem extends SwerveSubsystem {
         swerveDrive.lockPose();
     }
 
+    @Override
     public void resetOdometry(Pose2d pose) {
         swerveDrive.resetOdometry(pose);
     }

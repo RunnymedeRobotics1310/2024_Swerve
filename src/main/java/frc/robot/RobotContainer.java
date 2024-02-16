@@ -16,10 +16,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OiConstants;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.operator.OperatorInput;
-import frc.robot.commands.swervedrive.*;
+import frc.robot.commands.swervedrive.DriveDistanceCommand;
+import frc.robot.commands.swervedrive.DriveToPositionCommand;
+import frc.robot.commands.swervedrive.ResetOdometryCommand;
+import frc.robot.commands.swervedrive.TeleopDriveCommand;
+import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.swerve.yagsl.YagslSubsystem;
-import frc.robot.subsystems.vision.VisionSubsystem;
+import frc.robot.subsystems.vision.HughVisionSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -32,15 +36,15 @@ import frc.robot.subsystems.vision.VisionSubsystem;
  */
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    private final File            yagslConfig          = new File(Filesystem.getDeployDirectory(), "swerve/neo");
+    private final File                yagslConfig          = new File(Filesystem.getDeployDirectory(), "swerve/neo");
 
-    private final VisionSubsystem visionSubsystem      = new VisionSubsystem();
+    private final HughVisionSubsystem visionSubsystem      = new HughVisionSubsystem();
 
-    private final SwerveSubsystem swerveDriveSubsystem = new YagslSubsystem(yagslConfig, visionSubsystem);
+    private final SwerveSubsystem     swerveDriveSubsystem = new YagslSubsystem(yagslConfig, visionSubsystem);
     // private final SwerveSubsystem swerveDriveSubsystem = new
     // RunnymedeSwerveSubsystem(visionSubsystem);
 
-    private final OperatorInput   operatorInput        = new OperatorInput(
+    private final OperatorInput       operatorInput        = new OperatorInput(
         OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
 
     /**

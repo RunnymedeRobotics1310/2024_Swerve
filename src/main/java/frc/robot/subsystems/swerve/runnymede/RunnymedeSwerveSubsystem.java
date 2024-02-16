@@ -1,8 +1,13 @@
 package frc.robot.subsystems.swerve.runnymede;
 
 
-import static frc.robot.Constants.Swerve.Chassis.*;
-import static frc.robot.Constants.Swerve.Module.*;
+import static frc.robot.Constants.Swerve.Chassis.MAX_MODULE_SPEED_MPS;
+import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
+import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
+import static frc.robot.Constants.Swerve.Module.BACK_LEFT;
+import static frc.robot.Constants.Swerve.Module.BACK_RIGHT;
+import static frc.robot.Constants.Swerve.Module.FRONT_LEFT;
+import static frc.robot.Constants.Swerve.Module.FRONT_RIGHT;
 import static frc.robot.Constants.Swerve.Motor.ANGLE;
 import static frc.robot.Constants.Swerve.Motor.DRIVE;
 
@@ -14,13 +19,16 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.SerialPort;
 import frc.robot.Robot;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
-import frc.robot.subsystems.vision.VisionSubsystem;
+import frc.robot.subsystems.vision.HughVisionSubsystem;
 
 /**
  * Represents a swerve drive style drivetrain.
@@ -37,7 +45,7 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
     private final SwerveDriveKinematics   kinematics;
     public final SwerveDrivePoseEstimator swerveDrivePoseEstimator;
 
-    public RunnymedeSwerveSubsystem(VisionSubsystem visionSubsystem) {
+    public RunnymedeSwerveSubsystem(HughVisionSubsystem visionSubsystem) {
         super(visionSubsystem);
 
         kinematics                    = new SwerveDriveKinematics(
@@ -128,6 +136,7 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
         kinematics.toSwerveModuleStates(new ChassisSpeeds());
     }
 
+    @Override
     public void resetOdometry(Pose2d pose) {
         this.swerveDrivePoseEstimator.resetPosition(gyro.getRotation3d().minus(gyroOffset).toRotation2d(),
             new SwerveModulePosition[] {
