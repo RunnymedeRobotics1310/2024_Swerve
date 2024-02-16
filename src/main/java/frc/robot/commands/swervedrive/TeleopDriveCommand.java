@@ -95,7 +95,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
             double w = Math.pow(correctedCcwRotAngularVelPct, 3) * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
             omega = Rotation2d.fromRadians(w);
             // Save previous heading for when we are finished steering.
-            setTheta(swerve.getPose().getRotation());
+            setHeadingSetpoint(swerve.getPose().getRotation());
         }
         else if (rawDesiredHeadingDeg > -1) {
             // User wants to jump to POV
@@ -109,11 +109,11 @@ public class TeleopDriveCommand extends BaseDriveCommand {
             Rotation2d desiredHeading = Rotation2d.fromDegrees(correctedHeadingDeg);
             omega = computeOmega(desiredHeading);
             // Save the previous heading for when the jump is done
-            setTheta(desiredHeading);
+            setHeadingSetpoint(desiredHeading);
         }
         else {
             // Translating only. Just drive on the last heading we knew.
-            omega = computeOmega(getLastSetTheta());
+            omega = computeOmega(getHeadingSetpoint());
         }
 
         // write to dashboard
@@ -125,7 +125,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         SmartDashboard.putNumber("Teleop/boostFactor", boostFactor);
 
         SmartDashboard.putString("Teleop/Translation", translation.getNorm() + "m/s at " + translation.getAngle());
-        SmartDashboard.putString("Teleop/Theta ", getLastSetTheta() + " deg");
+        SmartDashboard.putString("Teleop/Theta ", getHeadingSetpoint() + " deg");
         SmartDashboard.putString("Teleop/Omega", omega.getDegrees() + " deg/sec");
         swerve.driveFieldOriented(translation, omega);
 
