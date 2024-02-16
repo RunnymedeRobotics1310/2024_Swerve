@@ -37,54 +37,39 @@ public abstract class SwerveSubsystem extends SubsystemBase {
 
     /**
      * The primary method for controlling the drivebase. The provided {@link ChassisSpeeds}
-     * specifies
-     * the robot-relative chassis speeds of the robot. The provided {@link Translation2d} specifies
-     * the center of rotation of the robot.
+     * specifies the robot-relative chassis speeds of the robot.
      * <p>
      * This method is responsible for applying safety code to prevent the robot from attempting to
      * exceed its physical limits both in terms of speed and acceleration.
      *
      * @param velocity The intended velocity of the robot chassis relative to itself.
-     * @param centerOfRotation The center of rotation of the robot's rotation, in metres. 0,0 is the
-     * center of the robot.
      * @see ChassisSpeeds for how to construct a ChassisSpeeds object including
      * {@link ChassisSpeeds#fromFieldRelativeSpeeds(double, double, double, Rotation2d)}
      */
-    public final void driveRobotOriented(ChassisSpeeds velocity, Translation2d centerOfRotation) {
-        ChassisSpeeds safeVelocity = getSafeChassisSpeeds(velocity);
-        driveRawRobotOriented(safeVelocity, centerOfRotation);
-    }
+    public final void driveRobotOriented(ChassisSpeeds velocity) {
 
-    /**
-     * Safety code - make sure that the input chassis speeds aren't too different from the
-     * last measured chassis speeds.
-     *
-     * @param desiredVelocity desired velocity
-     * @return safe velocity
-     */
-    private ChassisSpeeds getSafeChassisSpeeds(ChassisSpeeds desiredVelocity) {
+        double x = velocity.vxMetersPerSecond;
+        double y = velocity.vyMetersPerSecond;
+        double w = velocity.omegaRadiansPerSecond;
+
         // Limit change in values. Note this may not scale evenly - one may reach desired
         // speed before another. This will be corrected the next time drive() is called.
-        double limitedX     = xLimiter.calculate(desiredVelocity.vxMetersPerSecond);
-        double limitedY     = yLimiter.calculate(desiredVelocity.vyMetersPerSecond);
-        double limitedOmega = omegaLimiter.calculate(desiredVelocity.omegaRadiansPerSecond);
+        x = xLimiter.calculate(x);
+        y = yLimiter.calculate(y);
+        w = omegaLimiter.calculate(w);
 
-        return new ChassisSpeeds(limitedX, limitedY, limitedOmega);
+        driveRawRobotOriented(new ChassisSpeeds(x, y, w));
     }
 
     /**
      * The primary method for controlling the drivebase. The provided {@link ChassisSpeeds}
-     * specifies
-     * the robot-relative chassis speeds of the robot. The provided {@link Translation2d} specifies
-     * the center of rotation of the robot.
+     * specifies the robot-relative chassis speeds of the robot.
      *
      * @param velocity The intended velocity of the robot chassis relative to itself.
-     * @param centerOfRotation The center of rotation of the robot's rotation, in metres. 0,0 is the
-     * center of the robot.
      * @see ChassisSpeeds for how to construct a ChassisSpeeds object including
      * {@link ChassisSpeeds#fromFieldRelativeSpeeds(double, double, double, Rotation2d)}
      */
-    protected abstract void driveRawRobotOriented(ChassisSpeeds velocity, Translation2d centerOfRotation);
+    protected abstract void driveRawRobotOriented(ChassisSpeeds velocity);
 
     /**
      * Convenience method for controlling the robot in field-oriented drive mode. Transforms the
@@ -96,33 +81,15 @@ public abstract class SwerveSubsystem extends SubsystemBase {
      * driver station glass. Null means no translation.
      * @param omega the rotation rate of the heading of the robot. CCW positive. Null means no
      * rotation.
-     * @param centerOfRotation the center of rotation of the robot, in case a center besides the
-     * middle of the robot is desired. 0,0 represents the center of the robot.
-     * @see #driveRobotOriented(ChassisSpeeds, Translation2d)
+     * @see #driveRobotOriented(ChassisSpeeds)
      */
-    public final void driveFieldOriented(Translation2d velocity, Rotation2d omega, Translation2d centerOfRotation) {
+    public final void driveFieldOriented(Translation2d velocity, Rotation2d omega) {
         double        x             = velocity == null ? 0 : velocity.getX();
         double        y             = velocity == null ? 0 : velocity.getY();
         double        w             = omega == null ? 0 : omega.getRadians();
         Rotation2d    theta         = this.getPose().getRotation();
         ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, w, theta);
-        this.driveRobotOriented(chassisSpeeds, centerOfRotation);
-    }
-
-    /**
-     * Convenience method for controlling the robot in field-oriented drive mode. Transforms the
-     * field-oriented inputs into the required robot-oriented {@link ChassisSpeeds} object that can
-     * be used by the robot.
-     *
-     * @param velocity the linear velocity of the robot in metres per second. Positive x is away
-     * from the alliance wall, and positive y is toward the left wall when looking through the
-     * driver station glass.
-     * @param omega the rotation rate of the heading of the robot, about the center of the robot.
-     * CCW positive.
-     * @see #driveFieldOriented(Translation2d, Rotation2d, Translation2d)
-     */
-    public final void driveFieldOriented(Translation2d velocity, Rotation2d omega) {
-        this.driveFieldOriented(velocity, omega, new Translation2d());
+        this.driveRobotOriented(chassisSpeeds);
     }
 
     /**
@@ -217,10 +184,10 @@ public abstract class SwerveSubsystem extends SubsystemBase {
      * Update the field relative position of the robot using vision
      * position data returned from the vision subsystem.
      *
-     * @see frc.robot.Constants.VisionConstants#getVisionStandardDeviation(double, double) for
-     * tuning info
+     * @see frc.robot.Constants.VisionConstants#getVisionStandardDeviation(frc.robot.subsystems.vision.PoseConfidence,
+     * double) fortuning info
      */
-    protected void updateOdometryWithVisionInfo() {
+    private void updateOdometryWithVisionInfo() {
         VisionPositionInfo visPose = visionSubsystem.getPositionInfo();
 
         // ignore unreliable info from vision subsystem
@@ -229,22 +196,19 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         }
 
         // convert camera pose to robot pose
-        Pose2d         robotPose            = new Pose2d(visPose.pose().getTranslation().minus(CAMERA_LOC_REL_TO_ROBOT_CENTER),
+        Pose2d         robotPose = new Pose2d(visPose.pose().getTranslation().minus(CAMERA_LOC_REL_TO_ROBOT_CENTER),
             visPose.pose().getRotation());
 
         // how different is vision data from estimated data?
-        double         poseDifferenceMetres = getPose().getTranslation().getDistance(robotPose.getTranslation());
+        double         delta_m   = getPose().getTranslation().getDistance(robotPose.getTranslation());
 
-        // todo: get confidence from VisionPositionInfo
-        Matrix<N3, N1> stds                 = getVisionStandardDeviation(1.0, poseDifferenceMetres);
+        Matrix<N3, N1> stds      = getVisionStandardDeviation(visPose.poseConfidence(), delta_m);
 
         // ignore drastically different data
         if (stds == null)
             return;
 
-        // todo: determine if these are the right latencies to use
-        double timestamp = Timer.getFPGATimestamp()
-            - visPose.latencyMillis();
+        double timestamp = Timer.getFPGATimestamp() - visPose.latencyMillis();
 
         System.out.println("Updating pose from vision: " + visPose.pose());
         this.addVisionMeasurement(visPose.pose(), timestamp, stds);

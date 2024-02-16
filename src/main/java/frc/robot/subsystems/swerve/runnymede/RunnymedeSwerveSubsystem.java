@@ -68,12 +68,13 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
 
 
     @Override
-    protected void driveRawRobotOriented(ChassisSpeeds desiredChassisSpeeds, Translation2d centerOfRotation) {
+    protected void driveRawRobotOriented(ChassisSpeeds desiredChassisSpeeds) {
 
         System.out.println("User requested drive at " + desiredChassisSpeeds);
 
         // calculate desired states
         ChassisSpeeds       discretized        = ChassisSpeeds.discretize(desiredChassisSpeeds, Robot.kDefaultPeriod);
+        Translation2d       centerOfRotation   = new Translation2d();
         SwerveModuleState[] swerveModuleStates = kinematics.toSwerveModuleStates(discretized, centerOfRotation);
         SwerveDriveKinematics.desaturateWheelSpeeds(
             swerveModuleStates, desiredChassisSpeeds,

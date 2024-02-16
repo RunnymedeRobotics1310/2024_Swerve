@@ -4,8 +4,8 @@
 
 package frc.robot;
 
-import static edu.wpi.first.math.util.Units.feetToMeters;
 import static edu.wpi.first.math.util.Units.inchesToMeters;
+import static frc.robot.subsystems.vision.PoseConfidence.*;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.vision.PoseConfidence;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -222,20 +223,20 @@ public final class Constants {
          * @param poseDifferenceMetres difference between estimated pose and pose from vision
          * @return matrix of standard deviations, or null if values are too far out of bounds
          */
-        public static Matrix<N3, N1> getVisionStandardDeviation(double confidence, double poseDifferenceMetres) {
+        public static Matrix<N3, N1> getVisionStandardDeviation(PoseConfidence confidence, double poseDifferenceMetres) {
             double xyMetresStds;
             double degreesStds;
 
             // todo: measure / tune these values
-            if (confidence > 0.8) {
+            if (confidence == HIGH) {
                 xyMetresStds = 0.5;
                 degreesStds  = 6;
             }
-            else if (poseDifferenceMetres < 0.5) {
+            else if (confidence == MID || poseDifferenceMetres < 0.5) {
                 xyMetresStds = 1.0;
                 degreesStds  = 12;
             }
-            else if (poseDifferenceMetres < 0.8) {
+            else if (confidence == LOW || poseDifferenceMetres < 0.8) {
                 xyMetresStds = 2.0;
                 degreesStds  = 24;
             }
