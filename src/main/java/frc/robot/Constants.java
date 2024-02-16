@@ -150,7 +150,7 @@ public final class Constants {
                 BACK_LEFT.driveCANID                   = 35;
                 BACK_LEFT.angleCANID                   = 36;
                 BACK_LEFT.encoderCANID                 = 37;
-                BACK_LEFT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.503174).getDegrees();
+                BACK_LEFT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.507080).getDegrees();
             }
 
             public static final Module BACK_RIGHT = new Module();
@@ -161,7 +161,7 @@ public final class Constants {
                 BACK_RIGHT.driveCANID                   = 30;
                 BACK_RIGHT.angleCANID                   = 31;
                 BACK_RIGHT.encoderCANID                 = 32;
-                BACK_RIGHT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.359131).getDegrees();
+                BACK_RIGHT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.354980).getDegrees();
             }
 
             public static final Module FRONT_LEFT = new Module();
@@ -172,7 +172,7 @@ public final class Constants {
                 FRONT_LEFT.driveCANID                   = 10;
                 FRONT_LEFT.angleCANID                   = 11;
                 FRONT_LEFT.encoderCANID                 = 12;
-                FRONT_LEFT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.325439).getDegrees();
+                FRONT_LEFT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.319580).getDegrees();
             }
 
             public static final Module FRONT_RIGHT = new Module();
@@ -183,7 +183,7 @@ public final class Constants {
                 FRONT_RIGHT.driveCANID                   = 20;
                 FRONT_RIGHT.angleCANID                   = 21;
                 FRONT_RIGHT.encoderCANID                 = 22;
-                FRONT_RIGHT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.407959).getDegrees();
+                FRONT_RIGHT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.363037).getDegrees();
             }
         }
     }
