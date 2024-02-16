@@ -54,7 +54,7 @@ public abstract class BaseDriveCommand extends LoggingCommand {
      * @return the velocity vector, in metres per second that the robot can safely travel
      * to traverse the distance specified
      */
-    public static Translation2d calculateVelocity(Translation2d translationToTravel) {
+    public static Translation2d computeVelocity(Translation2d translationToTravel) {
 
         double distanceMetres = translationToTravel.getNorm();
         double sign           = Math.signum(distanceMetres);

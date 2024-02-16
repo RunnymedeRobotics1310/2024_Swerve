@@ -28,7 +28,7 @@ public class DriveToPositionCommand extends BaseDriveCommand {
         Pose2d        pose     = swerve.getPose();
         Transform2d   delta    = desiredPose.minus(pose);
 
-        Translation2d velocity = calculateVelocity(delta.getTranslation());
+        Translation2d velocity = computeVelocity(delta.getTranslation());
         Rotation2d    omega    = computeOmega(desiredPose.getRotation());
 
         log("Pose: " + format(pose) + "  Delta: " + format(delta)
