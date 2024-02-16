@@ -139,6 +139,7 @@ public class HughVisionSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Limelight Pipeline", pipeline.getInteger(-1L));
         SmartDashboard.putBoolean("Note Target Acquired", isNoteTargetAcquired());
         SmartDashboard.putNumberArray("Botpose", getBotPose());
+        SmartDashboard.putNumber("Number of Targets", getNumActiveTargets());
     }
 
     /**
@@ -193,6 +194,12 @@ public class HughVisionSubsystem extends SubsystemBase {
 
         return count;
     }
+
+    private int getNumActiveTargets() {
+        String jsonStr = json.getString(null);
+        return countOccurrences(jsonStr, "fID");
+    }
+
     /*
      *
      * PUBLIC API FROM HERE DOWN
@@ -210,10 +217,9 @@ public class HughVisionSubsystem extends SubsystemBase {
      */
     public VisionPositionInfo getPositionInfo() {
         double[] botPose    = getBotPose();
-        String   jsonStr    = json.getString(null);
-        double   latency    = botPose[6];
+        int      numTargets = getNumActiveTargets();
 
-        int      numTargets = countOccurrences(jsonStr, "fID");
+        double   latency    = botPose[6];
         Pose2d   pose       = toPose2D(botPose);
 
         if (numTargets < 1) {
