@@ -41,6 +41,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        super.execute();
 
         // The FRC field-oriented ccoordinate system
         // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
@@ -105,7 +106,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
             // BLUE field = MOD(-POV + 360, 360)
             // RED field = MOD(-POV + 180 + 360, 360)
             double correctedHeadingDeg = ((rawDesiredHeadingDeg * -1) + (invert ? 180 : 0) + 360) % 360;
-            SmartDashboard.putNumber("Teleop/correctedHeadingDeg", correctedHeadingDeg);
+            SmartDashboard.putNumber("Drive/Teleop/correctedHeadingDeg", correctedHeadingDeg);
             Rotation2d desiredHeading = Rotation2d.fromDegrees(correctedHeadingDeg);
             omega = computeOmega(desiredHeading);
             // Save the previous heading for when the jump is done
@@ -117,16 +118,16 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         }
 
         // write to dashboard
-        SmartDashboard.putString("Teleop/Alliance", alliance.name());
-        SmartDashboard.putNumber("Teleop/vX", vX);
-        SmartDashboard.putNumber("Teleop/vY", vY);
-        SmartDashboard.putNumber("Teleop/ccwRotAngularVelPct", ccwRotAngularVelPct);
-        SmartDashboard.putNumber("Teleop/rawDesiredHeadingDeg", rawDesiredHeadingDeg);
-        SmartDashboard.putNumber("Teleop/boostFactor", boostFactor);
+        SmartDashboard.putString("Drive/Teleop/Alliance", alliance.name());
+        SmartDashboard.putNumber("Drive/Teleop/vX", vX);
+        SmartDashboard.putNumber("Drive/Teleop/vY", vY);
+        SmartDashboard.putNumber("Drive/Teleop/ccwRotAngularVelPct", ccwRotAngularVelPct);
+        SmartDashboard.putNumber("Drive/Teleop/rawDesiredHeadingDeg", rawDesiredHeadingDeg);
+        SmartDashboard.putNumber("Drive/Teleop/boostFactor", boostFactor);
 
-        SmartDashboard.putString("Teleop/Translation", translation.getNorm() + "m/s at " + translation.getAngle());
-        SmartDashboard.putString("Teleop/Theta ", getHeadingSetpoint() + " deg");
-        SmartDashboard.putString("Teleop/Omega", omega.getDegrees() + " deg/sec");
+        SmartDashboard.putString("Drive/Teleop/Translation", translation.getNorm() + "m/s at " + translation.getAngle());
+        SmartDashboard.putString("Drive/Teleop/Theta ", getHeadingSetpoint() + " deg");
+        SmartDashboard.putString("Drive/Teleop/Omega", omega.getDegrees() + " deg/sec");
         swerve.driveFieldOriented(translation, omega);
 
     }

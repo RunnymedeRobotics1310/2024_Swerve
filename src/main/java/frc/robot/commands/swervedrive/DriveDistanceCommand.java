@@ -34,13 +34,13 @@ public class DriveDistanceCommand extends BaseDriveCommand {
         currentHeading = new Rotation2d();
 
         startingPose   = swerve.getPose();
-        System.out.println("DriveDistanceCommand Initialized at " + startingPose);
+        System.out.println("Drive/DistanceCommand Initialized at " + startingPose);
 
     }
 
     @Override
     public void execute() {
-
+        super.execute();
         Translation2d currentLocation = swerve.getPose().getTranslation();
         travelled      = startingPose.getTranslation().getDistance(currentLocation);
 

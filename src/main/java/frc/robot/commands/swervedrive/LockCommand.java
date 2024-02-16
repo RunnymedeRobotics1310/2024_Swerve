@@ -16,6 +16,7 @@ public class LockCommand extends BaseDriveCommand {
 
     @Override
     public void execute() {
+        super.execute();
 
         swerve.lock();
     }

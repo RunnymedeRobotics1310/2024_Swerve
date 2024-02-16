@@ -17,14 +17,15 @@ public class DriveToPositionCommand extends BaseDriveCommand {
         super(swerve);
         this.desiredPose = pose;
         setHeadingSetpoint(desiredPose.getRotation());
-        SmartDashboard.putString("DriveToPosition/pose", "");
-        SmartDashboard.putString("DriveToPosition/delta", "");
-        SmartDashboard.putString("DriveToPosition/desired", format(desiredPose));
-        SmartDashboard.putString("DriveToPosition/velocity", "");
+        SmartDashboard.putString("Drive/ToPosition/pose", "");
+        SmartDashboard.putString("Drive/ToPosition/delta", "");
+        SmartDashboard.putString("Drive/ToPosition/desired", format(desiredPose));
+        SmartDashboard.putString("Drive/ToPosition/velocity", "");
     }
 
     @Override
     public void execute() {
+        super.execute();
 
         Pose2d        pose     = swerve.getPose();
         Transform2d   delta    = desiredPose.minus(pose);
@@ -36,10 +37,10 @@ public class DriveToPositionCommand extends BaseDriveCommand {
             + "  Velocity: " + format(velocity) + "m/s @ " + format(omega) + "/s");
 
 
-        SmartDashboard.putString("DriveToPosition/pose", format(pose));
-        SmartDashboard.putString("DriveToPosition/delta", format(delta));
-        SmartDashboard.putString("DriveToPosition/desired", format(desiredPose));
-        SmartDashboard.putString("DriveToPosition/velocity", format(velocity) + "m/s @ " + format(omega) + "/s");
+        SmartDashboard.putString("DriveTo/Position/pose", format(pose));
+        SmartDashboard.putString("DriveTo/Position/delta", format(delta));
+        SmartDashboard.putString("DriveTo/Position/desired", format(desiredPose));
+        SmartDashboard.putString("DriveTo/Position/velocity", format(velocity) + "m/s @ " + format(omega) + "/s");
 
         swerve.driveFieldOriented(velocity, omega);
     }
