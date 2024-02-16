@@ -12,7 +12,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants.VisionTarget;
 
-public class VisionSubsystem extends SubsystemBase {
+/**
+ * Handles the April Tag Limelight On Shooter Side
+ */
+public class HughVisionSubsystem extends SubsystemBase {
 
     private static final long                      LED_MODE_PIPELINE                    = 0;
     private static final long                      LED_MODE_OFF                         = 1;
@@ -26,13 +29,13 @@ public class VisionSubsystem extends SubsystemBase {
 
     // configure more pipelines here
     @SuppressWarnings("unused")
-    private static final long                      PIPELINE_RETROREFLECTIVE_NOTE_DETECT = 0;
-    private static final long                      PIPELINE_APRIL_TAG_DETECT            = 1;
+    private static final long                      PIPELINE_RETROREFLECTIVE_NOTE_DETECT = 1;
+    private static final long                      PIPELINE_APRIL_TAG_DETECT            = 0;
     private static final long                      PIPELINE_VISUAL                      = 2;
     private static final long                      PIPELINE_NEURALNET_NOTE_DETECT       = 7;
 
     NetworkTable                                   table                                = NetworkTableInstance.getDefault()
-        .getTable("limelight");
+        .getTable("limelight-hugh");
 
     // inputs/configs
     NetworkTableEntry                              ledMode                              = table.getEntry("ledMode");
@@ -57,7 +60,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     private Constants.VisionConstants.VisionTarget visionTarget                         = Constants.VisionConstants.VisionTarget.NONE;
 
-    public VisionSubsystem() {
+    public HughVisionSubsystem() {
         setVisionTarget(VisionTarget.APRILTAGS);
     }
 
