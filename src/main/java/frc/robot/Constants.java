@@ -220,7 +220,10 @@ public final class Constants {
         CENTRE_NOTE_2(new Translation3d(8.16, 2.43, 0)),
         CENTRE_NOTE_3(new Translation3d(8.16, 4.11, 0)),
         CENTRE_NOTE_4(new Translation3d(8.16, 5.79, 0)),
-        CENTRE_NOTE_5(new Translation3d(8.16, 7.47, 0));
+        CENTRE_NOTE_5(new Translation3d(8.16, 7.47, 0)),
+
+        // When No Target is Set
+        NONE(new Translation3d(0, 0, 0));
 
         private final Translation3d location;
 

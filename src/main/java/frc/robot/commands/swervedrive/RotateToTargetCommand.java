@@ -24,7 +24,7 @@ public class RotateToTargetCommand extends BaseDriveCommand {
     @Override
     public void initialize() {
         super.initialize();
-        hugh.setVisionTarget(target);
+        hugh.setBotTarget(target);
     }
 
     @Override
