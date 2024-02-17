@@ -13,6 +13,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -190,26 +191,35 @@ public final class Constants {
         }
     }
 
-    public final class VisionConstants {
+    public enum BotTarget {
+        BLUE_SPEAKER(new Translation3d(0.0381, 5.547868, 2.124202)),
+        BLUE_AMP(new Translation3d(1.8415, 8.2042, 0.873252)),
+        RED_SOURCE(new Translation3d(0.908812, 0.564769, 0)),
+        BLUE_STAGE(new Translation3d(4.86791, 4.105656, 1.6764)),
+        RED_SPEAKER(new Translation3d(16.579342, 5.547868, 2.124202)),
+        RED_AMP(new Translation3d(14.700758, 8.2042, 0.873252)),
+        BLUE_SOURCE(new Translation3d(15.632176, 0.564896, 0)),
+        RED_STAGE(new Translation3d(11.676634, 4.105656, 1.6764));
 
-        /** Time to switch pipelines and acquire a new vision target */
-        public static final double VISION_SWITCH_TIME_SEC = .25;
+        private final Translation3d location;
 
-        public enum VisionTarget {
-            SPEAKER,
-            AMP,
-            SOURCE,
-            STAGE,
-            ROBOT,
-            NOTE,
-            NONE;
-
-            @Override
-            public String toString() {
-                return "VisionTarget: " + name();
-            }
-
+        BotTarget(Translation3d location) {
+            this.location = location;
         }
+
+        public Translation3d getLocation() {
+            return location;
+        }
+
+        @Override
+        public String toString() {
+            return "BotTarget: " + name() + " at " + location;
+        }
+    }
+
+    public final class VisionConstants {
+        /** Time to switch pipelines and acquire a new vision target */
+        public static final double  VISION_SWITCH_TIME_SEC         = .25;
 
         // todo: correct this
         public static Translation2d CAMERA_LOC_REL_TO_ROBOT_CENTER = new Translation2d(0, 30);
