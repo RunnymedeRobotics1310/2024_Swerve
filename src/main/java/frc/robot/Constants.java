@@ -199,7 +199,16 @@ public final class Constants {
         RED_SPEAKER(new Translation3d(16.579342, 5.547868, 2.124202)),
         RED_AMP(new Translation3d(14.700758, 8.2042, 0.873252)),
         BLUE_SOURCE(new Translation3d(15.632176, 0.564896, 0)),
-        RED_STAGE(new Translation3d(11.676634, 4.105656, 1.6764));
+        RED_STAGE(new Translation3d(11.676634, 4.105656, 1.6764)),
+
+        // Temporary
+        BLUE_WOLVERINE(new Translation3d(2.85, 4.1, 0)),
+        BLUE_BARNUM(new Translation3d(2.85, 5.6, 0)),
+        BLUE_VALJEAN(new Translation3d(2.85, 7.1, 0)),
+
+        RED_WOLVERINE(new Translation3d(2.85, 4.1, 0)),
+        RED_BARNUM(new Translation3d(2.85, 5.6, 0)),
+        RED_VALJEAN(new Translation3d(2.85, 7.1, 0));
 
         private final Translation3d location;
 
