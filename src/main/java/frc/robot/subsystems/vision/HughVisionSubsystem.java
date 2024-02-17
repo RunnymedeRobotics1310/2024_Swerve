@@ -57,6 +57,8 @@ public class HughVisionSubsystem extends SubsystemBase {
     NetworkTableEntry                  botpose_wpiblue                      = table.getEntry("botpose_wpiblue");
     NetworkTableEntry                  botpose_wpired                       = table.getEntry("botpose_wpibred");
 
+    NetworkTableEntry                  targetpose_robotspace                = table.getEntry("targetpose_robotspace");
+
     NetworkTableEntry                  tid                                  = table.getEntry("tid");
 
     NetworkTableEntry                  json                                 = table.getEntry("json");
@@ -417,7 +419,15 @@ public class HughVisionSubsystem extends SubsystemBase {
      * @since 2024-02-10
      */
     public Rotation2d getTargetOffset() {
-        return null;
+        int    currentTagId  = (int) tid.getInteger(-1);
+        double angleToTarget = tx.getDouble(Double.MIN_VALUE);
+
+        if (!activeAprilTagTargets.contains(currentTagId) || angleToTarget == Double.MIN_VALUE) {
+            return null;
+        }
+
+        // Hugh is on the rear of the bot, so add 180 to values given to translate to front
+        return new Rotation2d(angleToTarget + 180);
     }
 
     /**
@@ -425,6 +435,17 @@ public class HughVisionSubsystem extends SubsystemBase {
      * @since 2024-02-10
      */
     public Translation2d getRobotTranslationToTarget() {
-        return null;
+        int      currentTagId         = (int) tid.getInteger(-1);
+        double[] targetPoseInBotSpace = targetpose_robotspace.getDoubleArray(new double[] { Double.MIN_VALUE, Double.MIN_VALUE,
+                Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE });
+
+        if (!activeAprilTagTargets.contains(currentTagId) || targetPoseInBotSpace[0] == Double.MIN_VALUE) {
+            return null;
+        }
+
+        // Limelight is returning X = Height, Y = Left/Right, Z = Forward/Back.
+        // We need to return X = Forward/Back, and Y = Left/Right
+        // Because Hugh is on the back of the Bot, X needs to have its sign reversed.
+        return new Translation2d(targetPoseInBotSpace[2] * -1, targetPoseInBotSpace[1]);
     }
 }
