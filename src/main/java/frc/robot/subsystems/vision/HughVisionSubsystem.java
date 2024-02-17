@@ -385,14 +385,22 @@ public class HughVisionSubsystem extends SubsystemBase {
 
 
     /**
+     * If any April tag in the actively set bot target is visible, return true.
      *
+     * @return true if any April tag in the actively set bot target is visible
      * @since 2024-02-10
      */
     public boolean isCurrentTargetVisible() {
-
+        AprilTagInfo[] visibleTags = getVisibleTagInfo();
+        for (AprilTagInfo tag : visibleTags) {
+            for (Integer targetTagId : activeAprilTagTargets) {
+                if (targetTagId == tag.tid()) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
-
 
     /**
      *
