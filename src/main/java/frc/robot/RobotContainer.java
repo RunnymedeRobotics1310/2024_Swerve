@@ -91,6 +91,7 @@ public class RobotContainer {
         Pose2d                 desiredPose = new Pose2d(location, heading);
         DriveToPositionCommand dtpc        = new DriveToPositionCommand(swerveDriveSubsystem, desiredPose);
         new Trigger(operatorInput::isY).onTrue(dtpc);
+        new Trigger(operatorInput::isB).onTrue(new Score4SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem));
     }
 
     /**
@@ -99,7 +100,8 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new Score4SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem);
+        // return new Score4SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem);
         // todo: implement
+        return null;
     }
 }

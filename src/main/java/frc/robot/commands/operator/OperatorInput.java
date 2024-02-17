@@ -53,6 +53,10 @@ public class OperatorInput {
         return driverController.getXButton();
     }
 
+    public boolean isB() {
+        return driverController.getBButton();
+    }
+
     public boolean isLock() {
         return driverController.getXButton();
     }
