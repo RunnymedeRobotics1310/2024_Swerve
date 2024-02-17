@@ -90,7 +90,8 @@ public class HughVisionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // read values periodically and post to smart dashboard periodically
-        SmartDashboard.putString("LimelightHugh/BotTarget", getBotTarget().toString());
+        final BotTarget bt = getBotTarget();
+        SmartDashboard.putString("LimelightHugh/BotTarget", bt == null ? "" : bt.toString());
         SmartDashboard.putBoolean("LimelightHugh/Target Found", isCurrentTargetVisible());
         SmartDashboard.putNumber("LimelightHugh/tx-value", tx.getDouble(-1.0));
         SmartDashboard.putNumber("LimelightHugh/ty-value", ty.getDouble(-1.0));
