@@ -17,7 +17,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
-import frc.robot.geometry.AllianceTranslation3d;
 import frc.robot.subsystems.vision.PoseConfidence;
 
 /**
