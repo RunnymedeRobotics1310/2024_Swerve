@@ -37,6 +37,8 @@ public class HughVisionSubsystem extends SubsystemBase {
     private static final long          PIPELINE_VISUAL                      = 2;
 
 
+    private static final double        TARGET_ALIGNMENT_THRESHOLD           = 5;
+
     NetworkTable                       table                                = NetworkTableInstance.getDefault()
         .getTable("limelight-hugh");
 
@@ -403,6 +405,11 @@ public class HughVisionSubsystem extends SubsystemBase {
      * @since 2024-02-10
      */
     public boolean isAlignedWithTarget() {
+        Rotation2d targetOffset = getTargetOffset();
+        if (targetOffset.getDegrees() > 180 - TARGET_ALIGNMENT_THRESHOLD
+            && targetOffset.getDegrees() < 180 + TARGET_ALIGNMENT_THRESHOLD) {
+            return true;
+        }
         return false;
     }
 
@@ -411,7 +418,11 @@ public class HughVisionSubsystem extends SubsystemBase {
      * @since 2024-02-10
      */
     public double getDistanceToTargetMetres() {
-        return -1;
+        Translation2d robotPosition = getRobotTranslationToTarget();
+        if (robotPosition == null) {
+            return -1;
+        }
+        return Math.hypot(robotPosition.getX(), robotPosition.getY());
     }
 
     /**
