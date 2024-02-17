@@ -194,11 +194,11 @@ public final class Constants {
     public enum BotTarget {
         BLUE_SPEAKER(new Translation3d(0.0381, 5.547868, 2.124202)),
         BLUE_AMP(new Translation3d(1.8415, 8.2042, 0.873252)),
-        BLUE_SOURCE(new Translation3d(0.908812, 0.564769, 0)),
+        RED_SOURCE(new Translation3d(0.908812, 0.564769, 0)),
         BLUE_STAGE(new Translation3d(4.86791, 4.105656, 1.6764)),
         RED_SPEAKER(new Translation3d(16.579342, 5.547868, 2.124202)),
         RED_AMP(new Translation3d(14.700758, 8.2042, 0.873252)),
-        RED_SOURCE(new Translation3d(15.632176, 0.564896, 0)),
+        BLUE_SOURCE(new Translation3d(15.632176, 0.564896, 0)),
         RED_STAGE(new Translation3d(11.676634, 4.105656, 1.6764));
 
         private final Translation3d location;
