@@ -208,7 +208,7 @@ public final class Constants {
 
         @Override
         public String toString() {
-            return "VisionTarget: " + name();
+            return "BotTarget: " + name() + " at " + location;
         }
     }
 
