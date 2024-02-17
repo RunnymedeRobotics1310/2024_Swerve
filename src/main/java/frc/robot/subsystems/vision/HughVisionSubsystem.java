@@ -87,52 +87,20 @@ public class HughVisionSubsystem extends SubsystemBase {
         this.ledMode.setNumber(LED_MODE_PIPELINE);
     }
 
-    public double getTargetAreaPercent() {
-        return ta.getDouble(-1.0);
-    }
-
-
-    /**
-     * Determine if a vision target of the current type is found.
-     * <p>
-     * Use {@link #setVisionTarget(BotTarget)} to set the vision target type
-     */
-    public boolean isVisionTargetFound() {
-        return tv.getDouble(-1) == 1;
-    }
-
-
-    public boolean isVisionTargetClose() {
-        // FIXME: finish this
-        if (PIPELINE_APRIL_TAG_DETECT != pipeline.getInteger(-1)) {
-            return false;
-        }
-
-        // FIXME: Check 10% - it's based on 2023 robot.
-        double pct = getTargetAreaPercent();
-        if (isVisionTargetFound() && pct > 10) {
-            System.out.println("Vision target found and target area is " + pct + " which tells us we are close to the target");
-            return true;
-        }
-        return false;
-
-    }
-
-
     @Override
     public void periodic() {
         // read values periodically and post to smart dashboard periodically
-        SmartDashboard.putBoolean("LimelightHugh/Target Found", isVisionTargetFound());
+        SmartDashboard.putString("LimelightHugh/BotTarget", getBotTarget().toString());
+        SmartDashboard.putBoolean("LimelightHugh/Target Found", isCurrentTargetVisible());
         SmartDashboard.putNumber("LimelightHugh/tx-value", tx.getDouble(-1.0));
         SmartDashboard.putNumber("LimelightHugh/ty-value", ty.getDouble(-1.0));
         SmartDashboard.putNumber("LimelightHugh/ta-value", ta.getDouble(-1.0));
         SmartDashboard.putNumber("LimelightHugh/l-value", tl.getDouble(-1.0));
-        SmartDashboard.putNumber("LimelightHugh/Cam Mode", camMode.getInteger(-1L));
-        SmartDashboard.putNumber("LimelightHugh/LED mode", ledMode.getInteger(-1L));
-        SmartDashboard.putNumber("LimelightHugh/Pipeline", pipeline.getInteger(-1L));
         SmartDashboard.putNumberArray("LimelightHugh/Botpose", getBotPose());
         SmartDashboard.putNumber("LimelightHugh/Number of Tags", getNumActiveTargets());
         SmartDashboard.putString("LimelightHugh/AprilTagInfo", aprilTagInfoArrayToString(getVisibleTagInfo()));
+        SmartDashboard.putNumber("LimelightHugh/DistanceToTarget", getDistanceToTargetMetres());
+        SmartDashboard.putBoolean("LimelightHugh/AlignedWithTarget", isAlignedWithTarget());
     }
 
     /**
@@ -143,8 +111,8 @@ public class HughVisionSubsystem extends SubsystemBase {
      */
     private double[] getTarget() {
         double[] d = new double[2];
-        d[0] = tx.getDouble(-1.0);
-        d[1] = ty.getDouble(-1.0);
+        d[0] = tx.getDouble(Double.MIN_VALUE);
+        d[1] = ty.getDouble(Double.MIN_VALUE);
         return d;
     }
 
@@ -154,7 +122,7 @@ public class HughVisionSubsystem extends SubsystemBase {
      * @return limelight X target coordinates
      */
     private double getTargetX() {
-        return tx.getDouble(-1.0);
+        return tx.getDouble(Double.MIN_VALUE);
     }
 
     /**
@@ -163,7 +131,7 @@ public class HughVisionSubsystem extends SubsystemBase {
      * @return limelight Y target coordinates
      */
     private double getTargetY() {
-        return ty.getDouble(-1.0);
+        return ty.getDouble(Double.MIN_VALUE);
     }
 
 
@@ -291,25 +259,14 @@ public class HughVisionSubsystem extends SubsystemBase {
     }
 
     public double[] getBotPose() {
-        // Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+        double[] botpose = botpose_wpiblue.getDoubleArray(new double[] { Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE,
+                Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE });
+        if (botpose[0] == Double.MIN_VALUE) {
+            return null;
+        }
 
-        // if (alliance.get().equals(DriverStation.Alliance.Red)) {
-        // return botpose_wpired.getDoubleArray(new double[] { 0, 0, 0, 0, 0, 0, 0, 0 });
-        // }
-        // else
-        return botpose_wpiblue.getDoubleArray(new double[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+        return botpose;
     }
-
-    // private static Pose3d toPose3D(double[] inData) {
-    // if (inData.length < 6) {
-    // System.err.println("Bad LL 3D Pose Data!");
-    // return new Pose3d();
-    // }
-    // return new Pose3d(
-    // new Translation3d(inData[0], inData[1], inData[2]),
-    // new Rotation3d(Units.degreesToRadians(inData[3]), Units.degreesToRadians(inData[4]),
-    // Units.degreesToRadians(inData[5])));
-    // }
 
     private static Pose2d toPose2D(double[] inData) {
         if (inData.length < 6) {
@@ -321,27 +278,11 @@ public class HughVisionSubsystem extends SubsystemBase {
         return new Pose2d(tran2d, r2d);
     }
 
-    private Pose2d getBotPose2d_wpiBlue() {
-
-        double[] result = getBotPose();
-        return toPose2D(result);
-    }
-
-
-
     /**
      *
      * @since 2024-02-10
      */
-    public Rotation2d getNoteOffset() {
-        return null;
-    }
-
-    /**
-     *
-     * @since 2024-02-10
-     */
-    public BotTarget getVisionTarget() {
+    public BotTarget getBotTarget() {
         return botTarget;
     }
 
@@ -354,40 +295,16 @@ public class HughVisionSubsystem extends SubsystemBase {
         this.botTarget = botTarget;
 
         switch (botTarget) {
-        case BLUE_SPEAKER:
-            activeAprilTagTargets = TARGET_BLUE_SPEAKER;
-            break;
-
-        case BLUE_AMP:
-            activeAprilTagTargets = TARGET_BLUE_AMP;
-            break;
-
-        case BLUE_SOURCE:
-            activeAprilTagTargets = TARGET_BLUE_SOURCE;
-            break;
-
-        case BLUE_STAGE:
-            activeAprilTagTargets = TARGET_BLUE_STAGE;
-            break;
-
-        case RED_SPEAKER:
-            activeAprilTagTargets = TARGET_RED_SPEAKER;
-            break;
-
-        case RED_AMP:
-            activeAprilTagTargets = TARGET_RED_AMP;
-            break;
-
-        case RED_SOURCE:
-            activeAprilTagTargets = TARGET_RED_SOURCE;
-            break;
-
-        case RED_STAGE:
-            activeAprilTagTargets = TARGET_RED_STAGE;
-            break;
+        case BLUE_SPEAKER -> activeAprilTagTargets = TARGET_BLUE_SPEAKER;
+        case BLUE_AMP -> activeAprilTagTargets = TARGET_BLUE_AMP;
+        case BLUE_SOURCE -> activeAprilTagTargets = TARGET_BLUE_SOURCE;
+        case BLUE_STAGE -> activeAprilTagTargets = TARGET_BLUE_STAGE;
+        case RED_SPEAKER -> activeAprilTagTargets = TARGET_RED_SPEAKER;
+        case RED_AMP -> activeAprilTagTargets = TARGET_RED_AMP;
+        case RED_SOURCE -> activeAprilTagTargets = TARGET_RED_SOURCE;
+        case RED_STAGE -> activeAprilTagTargets = TARGET_RED_STAGE;
         }
     }
-
 
     /**
      * If any April tag in the actively set bot target is visible, return true.
@@ -431,7 +348,7 @@ public class HughVisionSubsystem extends SubsystemBase {
      */
     public Rotation2d getTargetOffset() {
         int    currentTagId  = (int) tid.getInteger(-1);
-        double angleToTarget = tx.getDouble(Double.MIN_VALUE);
+        double angleToTarget = getTargetX();
 
         if (!activeAprilTagTargets.contains(currentTagId) || angleToTarget == Double.MIN_VALUE) {
             return null;
