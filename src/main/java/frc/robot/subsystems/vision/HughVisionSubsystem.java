@@ -1,6 +1,7 @@
 package frc.robot.subsystems.vision;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -392,14 +393,7 @@ public class HughVisionSubsystem extends SubsystemBase {
      */
     public boolean isCurrentTargetVisible() {
         AprilTagInfo[] visibleTags = getVisibleTagInfo();
-        for (AprilTagInfo tag : visibleTags) {
-            for (Integer targetTagId : activeAprilTagTargets) {
-                if (targetTagId == tag.tid()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return Arrays.stream(visibleTags).anyMatch(tag -> activeAprilTagTargets.contains(tag.tid()));
     }
 
     /**
