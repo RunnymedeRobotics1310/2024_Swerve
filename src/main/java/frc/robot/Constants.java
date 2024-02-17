@@ -196,7 +196,7 @@ public final class Constants {
         SOURCE(new Translation2d(0, 0)),
         STAGE(new Translation2d(0, 0));
 
-        private Translation2d location;
+        private final Translation2d location;
 
         BotTarget(Translation2d location) {
             this.location = location;
