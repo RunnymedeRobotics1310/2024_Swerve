@@ -349,20 +349,36 @@ public class HughVisionSubsystem extends SubsystemBase {
         this.botTarget = botTarget;
 
         switch (botTarget) {
-        case SPEAKER:
+        case BLUE_SPEAKER:
             activeAprilTagTargets = TARGET_BLUE_SPEAKER;
             break;
 
-        case AMP:
+        case BLUE_AMP:
             activeAprilTagTargets = TARGET_BLUE_AMP;
             break;
 
-        case SOURCE:
+        case BLUE_SOURCE:
             activeAprilTagTargets = TARGET_BLUE_SOURCE;
             break;
 
-        case STAGE:
+        case BLUE_STAGE:
             activeAprilTagTargets = TARGET_BLUE_STAGE;
+            break;
+
+        case RED_SPEAKER:
+            activeAprilTagTargets = TARGET_RED_SPEAKER;
+            break;
+
+        case RED_AMP:
+            activeAprilTagTargets = TARGET_RED_AMP;
+            break;
+
+        case RED_SOURCE:
+            activeAprilTagTargets = TARGET_RED_SOURCE;
+            break;
+
+        case RED_STAGE:
+            activeAprilTagTargets = TARGET_RED_STAGE;
             break;
         }
     }
