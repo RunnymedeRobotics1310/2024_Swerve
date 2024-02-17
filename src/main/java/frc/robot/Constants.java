@@ -13,6 +13,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -191,18 +192,18 @@ public final class Constants {
     }
 
     public enum BotTarget {
-        SPEAKER(new Translation2d(0, 0)),
-        AMP(new Translation2d(0, 0)),
-        SOURCE(new Translation2d(0, 0)),
-        STAGE(new Translation2d(0, 0));
+        SPEAKER(new Translation3d(0.0381, 5.547868, 2.124202)),
+        AMP(new Translation3d(1.8415, 8.2042, 0.873252)),
+        SOURCE(new Translation3d(0.908812, 0.564769, 0)),
+        STAGE(new Translation3d(4.86791, 4.105656, 1.6764));
 
-        private Translation2d location;
+        private Translation3d location;
 
-        BotTarget(Translation2d location) {
+        BotTarget(Translation3d location) {
             this.location = location;
         }
 
-        public Translation2d getLocation() {
+        public Translation3d getLocation() {
             return location;
         }
 
