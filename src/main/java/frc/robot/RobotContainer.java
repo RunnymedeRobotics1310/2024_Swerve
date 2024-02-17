@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OiConstants;
 import frc.robot.commands.CancelCommand;
+import frc.robot.commands.auto.Score4SpeakerAutoCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.DriveDistanceCommand;
 import frc.robot.commands.swervedrive.DriveToPositionCommand;
@@ -38,9 +39,9 @@ public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     private final File                yagslConfig          = new File(Filesystem.getDeployDirectory(), "swerve/neo");
 
-    private final HughVisionSubsystem visionSubsystem      = new HughVisionSubsystem();
+    private final HughVisionSubsystem hughVisionSubsystem  = new HughVisionSubsystem();
 
-    private final SwerveSubsystem     swerveDriveSubsystem = new YagslSubsystem(yagslConfig, visionSubsystem);
+    private final SwerveSubsystem     swerveDriveSubsystem = new YagslSubsystem(yagslConfig, hughVisionSubsystem);
     // private final SwerveSubsystem swerveDriveSubsystem = new
     // RunnymedeSwerveSubsystem(visionSubsystem);
 
@@ -98,6 +99,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return Score4SpeakerAutoCommand(swerveDriveSubsystem, visionSubsystem); // todo: implement
+        return new Score4SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem);
+        // todo: implement
     }
 }
