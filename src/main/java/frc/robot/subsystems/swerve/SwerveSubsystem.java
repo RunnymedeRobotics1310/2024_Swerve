@@ -127,6 +127,7 @@ public abstract class SwerveSubsystem extends SubsystemBase {
 
         // ignore unreliable info from vision subsystem
         if (visPose == null) {
+            SmartDashboard.putString("Drive/Swerve/vispose", "");
             return;
         }
 
@@ -140,11 +141,14 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         Matrix<N3, N1> stds      = getVisionStandardDeviation(visPose.poseConfidence(), delta_m);
 
         // ignore drastically different data
-        if (stds == null)
+        if (stds == null) {
+            SmartDashboard.putString("Drive/Swerve/vispose", "");
             return;
+        }
 
         double timestamp = Timer.getFPGATimestamp() - visPose.latencyMillis();
 
+        SmartDashboard.putString("Drive/Swerve/vispose", visPose.toString());
         this.addVisionMeasurement(visPose.pose(), timestamp, stds);
     }
 
@@ -157,7 +161,7 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         updateOdometryWithVisionInfo();
         Pose2d pose = getPose();
         SmartDashboard.putString("Drive/Swerve/location",
-            String.format("%.2f,%.2f", pose.getTranslation().getX(), pose.getTranslation().getY()));
-        SmartDashboard.putNumber("Drive/Swerve/heading", pose.getRotation().getDegrees());
+            String.format("%.2f,%.2f m", pose.getTranslation().getX(), pose.getTranslation().getY()));
+        SmartDashboard.putString("Drive/Swerve/heading", String.format("%.0f deg", pose.getRotation().getDegrees()));
     }
 }

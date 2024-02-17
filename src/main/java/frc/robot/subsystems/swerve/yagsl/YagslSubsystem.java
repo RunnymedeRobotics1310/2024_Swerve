@@ -6,6 +6,7 @@ import java.io.File;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
@@ -46,8 +47,9 @@ public class YagslSubsystem extends SwerveSubsystem {
 
     @Override
     protected void driveRawRobotOriented(ChassisSpeeds velocity) {
-        SmartDashboard.putString("Drive/Swerve/velocity", String.format("%.2f,%.2f m/s, Omega: %.2f rad/s)",
-            velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, velocity.omegaRadiansPerSecond));
+        SmartDashboard.putString("Drive/Swerve/velocity", String.format("%.2f,%.2f m/s %.0f deg/s)",
+            velocity.vxMetersPerSecond, velocity.vyMetersPerSecond,
+            Rotation2d.fromRadians(velocity.omegaRadiansPerSecond).getDegrees()));
         swerveDrive.drive(velocity, false, new Translation2d());
     }
 
