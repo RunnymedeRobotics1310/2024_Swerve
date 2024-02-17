@@ -39,6 +39,13 @@
     },
     "windows": {
       "/SmartDashboard/Field": {
+        "Robot": {
+          "arrowSize": 25
+        },
+        "XModules": {
+          "arrowSize": 19,
+          "style": "Hidden"
+        },
         "bottom": 1476,
         "height": 8.210550308227539,
         "left": 150,
