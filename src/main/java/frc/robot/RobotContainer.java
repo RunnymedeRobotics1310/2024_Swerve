@@ -98,6 +98,6 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return null; // todo: implement
+        return Score4SpeakerAutoCommand(swerveDriveSubsystem, visionSubsystem); // todo: implement
     }
 }
