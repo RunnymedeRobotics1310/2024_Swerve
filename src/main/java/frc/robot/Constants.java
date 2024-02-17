@@ -190,26 +190,31 @@ public final class Constants {
         }
     }
 
-    public final class VisionConstants {
+    public enum BotTarget {
+        SPEAKER(new Translation2d(0, 0)),
+        AMP(new Translation2d(0, 0)),
+        SOURCE(new Translation2d(0, 0)),
+        STAGE(new Translation2d(0, 0));
 
-        /** Time to switch pipelines and acquire a new vision target */
-        public static final double VISION_SWITCH_TIME_SEC = .25;
+        private Translation2d location;
 
-        public enum VisionTarget {
-            SPEAKER,
-            AMP,
-            SOURCE,
-            STAGE,
-            ROBOT,
-            NOTE,
-            NONE;
-
-            @Override
-            public String toString() {
-                return "VisionTarget: " + name();
-            }
-
+        BotTarget(Translation2d location) {
+            this.location = location;
         }
+
+        public Translation2d getLocation() {
+            return location;
+        }
+
+        @Override
+        public String toString() {
+            return "VisionTarget: " + name();
+        }
+    }
+
+    public final class VisionConstants {
+        /** Time to switch pipelines and acquire a new vision target */
+        public static final double  VISION_SWITCH_TIME_SEC         = .25;
 
         // todo: correct this
         public static Translation2d CAMERA_LOC_REL_TO_ROBOT_CENTER = new Translation2d(0, 30);

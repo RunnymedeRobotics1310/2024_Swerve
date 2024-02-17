@@ -1,8 +1,6 @@
 package frc.robot.subsystems.vision;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -14,69 +12,68 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.VisionConstants.VisionTarget;
+import frc.robot.Constants.BotTarget;
 
 /**
  * Handles the April Tag Limelight On Shooter Side
  */
 public class HughVisionSubsystem extends SubsystemBase {
 
-    private static final long                      LED_MODE_PIPELINE                    = 0;
-    private static final long                      LED_MODE_OFF                         = 1;
+    private static final long          LED_MODE_PIPELINE                    = 0;
+    private static final long          LED_MODE_OFF                         = 1;
     @SuppressWarnings("unused")
-    private static final long                      LED_MODE_BLINK                       = 2;
+    private static final long          LED_MODE_BLINK                       = 2;
     @SuppressWarnings("unused")
-    private static final long                      LED_MODE_ON                          = 3;
+    private static final long          LED_MODE_ON                          = 3;
 
-    private static final long                      CAM_MODE_VISION                      = 0;
-    private static final long                      CAM_MODE_DRIVER                      = 1;
+    private static final long          CAM_MODE_VISION                      = 0;
+    private static final long          CAM_MODE_DRIVER                      = 1;
 
     // configure more pipelines here
     @SuppressWarnings("unused")
-    private static final long                      PIPELINE_RETROREFLECTIVE_NOTE_DETECT = 1;
-    private static final long                      PIPELINE_APRIL_TAG_DETECT            = 0;
-    private static final long                      PIPELINE_VISUAL                      = 2;
+    private static final long          PIPELINE_RETROREFLECTIVE_NOTE_DETECT = 1;
+    private static final long          PIPELINE_APRIL_TAG_DETECT            = 0;
+    private static final long          PIPELINE_VISUAL                      = 2;
 
 
-    NetworkTable                                   table                                = NetworkTableInstance.getDefault()
+    NetworkTable                       table                                = NetworkTableInstance.getDefault()
         .getTable("limelight-hugh");
 
     // inputs/configs
-    NetworkTableEntry                              ledMode                              = table.getEntry("ledMode");
-    NetworkTableEntry                              camMode                              = table.getEntry("camMode");
-    NetworkTableEntry                              pipeline                             = table.getEntry("pipeline");
+    NetworkTableEntry                  ledMode                              = table.getEntry("ledMode");
+    NetworkTableEntry                  camMode                              = table.getEntry("camMode");
+    NetworkTableEntry                  pipeline                             = table.getEntry("pipeline");
 
     // output
-    NetworkTableEntry                              tv                                   = table.getEntry("tv");
-    NetworkTableEntry                              tx                                   = table.getEntry("tx");
-    NetworkTableEntry                              ty                                   = table.getEntry("ty");
-    NetworkTableEntry                              ta                                   = table.getEntry("ta");
+    NetworkTableEntry                  tv                                   = table.getEntry("tv");
+    NetworkTableEntry                  tx                                   = table.getEntry("tx");
+    NetworkTableEntry                  ty                                   = table.getEntry("ty");
+    NetworkTableEntry                  ta                                   = table.getEntry("ta");
 
-    NetworkTableEntry                              tl                                   = table.getEntry("tl");
-    NetworkTableEntry                              cl                                   = table.getEntry("cl");
+    NetworkTableEntry                  tl                                   = table.getEntry("tl");
+    NetworkTableEntry                  cl                                   = table.getEntry("cl");
 
-    NetworkTableEntry                              botpose_wpiblue                      = table.getEntry("botpose_wpiblue");
-    NetworkTableEntry                              botpose_wpired                       = table.getEntry("botpose_wpibred");
+    NetworkTableEntry                  botpose_wpiblue                      = table.getEntry("botpose_wpiblue");
+    NetworkTableEntry                  botpose_wpired                       = table.getEntry("botpose_wpibred");
 
-    NetworkTableEntry                              tid                                  = table.getEntry("tid");
+    NetworkTableEntry                  tid                                  = table.getEntry("tid");
 
-    NetworkTableEntry                              json                                 = table.getEntry("json");
+    NetworkTableEntry                  json                                 = table.getEntry("json");
 
-    private Constants.VisionConstants.VisionTarget visionTarget                         = Constants.VisionConstants.VisionTarget.NONE;
+    private BotTarget                  botTarget                            = null;
 
-    private static final List<Integer>             TARGET_BLUE_SPEAKER                  = List.of(7, 8);
-    private static final List<Integer>             TARGET_BLUE_SOURCE                   = List.of(9, 10);
-    private static final List<Integer>             TARGET_BLUE_AMP                      = List.of(6);
-    private static final List<Integer>             TARGET_BLUE_STAGE                    = List.of(14, 15, 16);
+    private static final List<Integer> TARGET_BLUE_SPEAKER                  = List.of(7, 8);
+    private static final List<Integer> TARGET_BLUE_SOURCE                   = List.of(9, 10);
+    private static final List<Integer> TARGET_BLUE_AMP                      = List.of(6);
+    private static final List<Integer> TARGET_BLUE_STAGE                    = List.of(14, 15, 16);
 
-    private static final List<Integer>             TARGET_RED_SPEAKER                   = List.of(3, 4);
-    private static final List<Integer>             TARGET_RED_SOURCE                    = List.of(1, 2);
-    private static final List<Integer>             TARGET_RED_AMP                       = List.of(5);
-    private static final List<Integer>             TARGET_RED_STAGE                     = List.of(11, 12, 13);
+    private static final List<Integer> TARGET_RED_SPEAKER                   = List.of(3, 4);
+    private static final List<Integer> TARGET_RED_SOURCE                    = List.of(1, 2);
+    private static final List<Integer> TARGET_RED_AMP                       = List.of(5);
+    private static final List<Integer> TARGET_RED_STAGE                     = List.of(11, 12, 13);
 
-    private static final List<Integer>             TARGET_NONE                          = List.of();
-    private List<Integer>                          activeAprilTagTargets                = TARGET_NONE;
+    private static final List<Integer> TARGET_NONE                          = List.of();
+    private List<Integer>              activeAprilTagTargets                = TARGET_NONE;
 
 
     public HughVisionSubsystem() {
@@ -93,7 +90,7 @@ public class HughVisionSubsystem extends SubsystemBase {
     /**
      * Determine if a vision target of the current type is found.
      * <p>
-     * Use {@link #setVisionTarget(VisionTarget)} to set the vision target type
+     * Use {@link #setVisionTarget(BotTarget)} to set the vision target type
      */
     public boolean isVisionTargetFound() {
         return tv.getDouble(-1) == 1;
@@ -339,43 +336,33 @@ public class HughVisionSubsystem extends SubsystemBase {
      *
      * @since 2024-02-10
      */
-    public VisionTarget getVisionTarget() {
-        return visionTarget;
+    public BotTarget getVisionTarget() {
+        return botTarget;
     }
 
     /**
      *
      * @since 2024-02-10
      */
-    public void setVisionTarget(VisionTarget visionTarget) {
+    public void setVisionTarget(BotTarget botTarget) {
 
-        this.visionTarget = visionTarget;
+        this.botTarget = botTarget;
 
-        switch (visionTarget) {
+        switch (botTarget) {
         case SPEAKER:
             activeAprilTagTargets = TARGET_BLUE_SPEAKER;
-
             break;
 
         case AMP:
             activeAprilTagTargets = TARGET_BLUE_AMP;
-
             break;
 
         case SOURCE:
             activeAprilTagTargets = TARGET_BLUE_SOURCE;
-
             break;
 
         case STAGE:
             activeAprilTagTargets = TARGET_BLUE_STAGE;
-
-            break;
-
-        case NONE:
-        default:
-            activeAprilTagTargets = TARGET_NONE;
-
             break;
         }
     }
