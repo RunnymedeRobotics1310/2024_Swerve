@@ -88,4 +88,8 @@ public class YagslSubsystem extends SwerveSubsystem {
         swerveDrive.resetOdometry(pose);
     }
 
+    @Override
+    public String toString() {
+        return "YAGSL Swerve Drive Subsystem";
+    }
 }

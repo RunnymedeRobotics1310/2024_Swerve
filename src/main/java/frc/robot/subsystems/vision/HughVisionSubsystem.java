@@ -393,4 +393,9 @@ public class HughVisionSubsystem extends SubsystemBase {
         // Because Hugh is on the back of the Bot, X needs to have its sign reversed.
         return new Translation2d(targetPoseInBotSpace[2] * -1, targetPoseInBotSpace[1]);
     }
+
+    @Override
+    public String toString() {
+        return "Hugh Vision Subsystem";
+    }
 }
