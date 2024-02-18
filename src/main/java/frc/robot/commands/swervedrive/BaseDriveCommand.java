@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.RunnymedeUtils;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
@@ -18,7 +19,7 @@ public abstract class BaseDriveCommand extends LoggingCommand {
         this.swerve = swerve;
         addRequirements(swerve);
 
-        SmartDashboard.putString("Drive/ToFieldPosition/pose", "");
+        SmartDashboard.putString("Drive/ToFieldPosition/current", "");
         SmartDashboard.putString("Drive/ToFieldPosition/delta", "");
         SmartDashboard.putString("Drive/ToFieldPosition/desired", "");
         SmartDashboard.putString("Drive/ToFieldPosition/velocity", "");
@@ -38,10 +39,17 @@ public abstract class BaseDriveCommand extends LoggingCommand {
         if (error > Math.PI) {
             error -= (2 * Math.PI);
         }
+
+        // don't worry about minuscule errors
+        if (Math.abs(error) < ROTATION_TOLERANCE_RADIANS) {
+            error = 0;
+        }
+
         double omega = (error * P) * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
 
         return Rotation2d.fromRadians(omega);
     }
+
 
     /**
      * Return a velocity that will traverse the specified translation as fast as possible without
@@ -49,21 +57,32 @@ public abstract class BaseDriveCommand extends LoggingCommand {
      * expected to be 0.
      *
      * @param translationToTravel the desired translation to travel
+     * @param maxSpeed the maximum speed to travel in Metres per Second
      * @return the velocity vector, in metres per second that the robot can safely travel
      * to traverse the distance specified
      */
-    public static Translation2d computeVelocity(Translation2d translationToTravel) {
+    private static Translation2d computeVelocity(Translation2d translationToTravel, double maxSpeed) {
 
         double distanceMetres = translationToTravel.getNorm();
-        double sign           = Math.signum(distanceMetres);
         double absDistMetres  = Math.abs(distanceMetres);
 
-        double maxSpeed       = MAX_TRANSLATION_SPEED_MPS;
-        double decelDistance  = DECEL_FROM_MAX_TO_STOP_DIST_METRES;
+        // don't worry about tiny translations
+        if (absDistMetres < TRANSLATION_TOLERANCE_METRES) {
+            return new Translation2d();
+        }
+
+        // safety code
+        if (maxSpeed > MAX_TRANSLATION_SPEED_MPS) {
+            maxSpeed = MAX_TRANSLATION_SPEED_MPS;
+        }
+
+        double xSign          = Math.signum(translationToTravel.getX());
+        double ySign          = Math.signum(translationToTravel.getY());
+
+        double decelDistance  = Math.abs(DECEL_FROM_MAX_TO_STOP_DIST_METRES);
 
         double decelDistRatio = absDistMetres / DECEL_FROM_MAX_TO_STOP_DIST_METRES;
         if (decelDistRatio < 1) {
-            maxSpeed      = maxSpeed * decelDistRatio;
             decelDistance = decelDistance * decelDistRatio;
         }
 
@@ -72,16 +91,18 @@ public abstract class BaseDriveCommand extends LoggingCommand {
 
         if (absDistMetres >= decelDistance) {
             // cruising
-            speed = sign * maxSpeed;
+            speed = maxSpeed;
         }
         else {
             // decelerating
             double pctToGo = absDistMetres / decelDistance;
-            speed = sign * maxSpeed * pctToGo;
+            speed = maxSpeed * pctToGo * VelocityPIDConfig.P;
         }
 
+
         Rotation2d angle = translationToTravel.getAngle();
-        return new Translation2d(speed * angle.getCos(), speed * angle.getSin());
+
+        return new Translation2d(xSign * speed * Math.abs(angle.getCos()), ySign * speed * Math.abs(angle.getSin()));
     }
 
     /**
@@ -90,17 +111,29 @@ public abstract class BaseDriveCommand extends LoggingCommand {
      * @param desiredPose the desired location on the field
      */
     protected final void driveToFieldPose(Pose2d desiredPose) {
-        Pose2d        pose     = swerve.getPose();
-        Transform2d   delta    = desiredPose.minus(pose);
+        driveToFieldPose(desiredPose, MAX_TRANSLATION_SPEED_MPS);
+    }
 
-        Translation2d velocity = computeVelocity(delta.getTranslation());
+    /**
+     * Drive as fast as safely possible to the specified pose, up ot the max speed specified.
+     *
+     * @param desiredPose the desired location on the field
+     */
+    protected final void driveToFieldPose(Pose2d desiredPose, double maxSpeedMPS) {
+        Pose2d        current  = swerve.getPose();
+        Transform2d   delta    = RunnymedeUtils.difference(desiredPose, current);
+
+        Translation2d velocity = computeVelocity(delta.getTranslation(), maxSpeedMPS);
         Rotation2d    omega    = computeOmega(desiredPose.getRotation());
 
-        log("Pose: " + format(pose) + "  Target: " + format(desiredPose) + "  Delta: " + format(delta)
+        log("Current: " + format(current)
+            + "  Delta: " + format(delta.getTranslation()) + " m @ " + format(delta.getRotation())
+            + "  Target: " + format(desiredPose)
             + "  Velocity: " + format(velocity) + "m/s @ " + format(omega) + "/s");
 
-        SmartDashboard.putString("Drive/ToFieldPosition/pose", format(pose));
-        SmartDashboard.putString("Drive/ToFieldPosition/delta", format(delta));
+        SmartDashboard.putString("Drive/ToFieldPosition/current", format(current));
+        SmartDashboard.putString("Drive/ToFieldPosition/delta", format(delta.getTranslation()) + " m @ "
+            + format(delta.getRotation()));
         SmartDashboard.putString("Drive/ToFieldPosition/desired", format(desiredPose));
         SmartDashboard.putString("Drive/ToFieldPosition/velocity", format(velocity) + "m/s @ " + format(omega) + "/s");
 
