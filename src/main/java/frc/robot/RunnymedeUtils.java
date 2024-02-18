@@ -156,7 +156,7 @@ public class RunnymedeUtils {
      * @return the difference between the two poses.
      */
     public static Transform2d difference(Pose2d target, Pose2d current) {
-        Translation2d dx = target.getTranslation().minus(current.getTranslation());
+        Translation2d dx = new Translation2d(target.getX() - current.getX(), target.getY() - current.getY());
         Rotation2d    dw = target.getRotation().minus(current.getRotation());
         return new Transform2d(dx, dw);
     }
