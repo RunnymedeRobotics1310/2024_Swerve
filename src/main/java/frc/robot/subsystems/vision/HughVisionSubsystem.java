@@ -97,7 +97,8 @@ public class HughVisionSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("LimelightHugh/ty-value", ty.getDouble(-1.0));
         SmartDashboard.putNumber("LimelightHugh/ta-value", ta.getDouble(-1.0));
         SmartDashboard.putNumber("LimelightHugh/l-value", tl.getDouble(-1.0));
-        SmartDashboard.putNumberArray("LimelightHugh/Botpose", getBotPose());
+        double[] bp = getBotPose();
+        SmartDashboard.putNumberArray("LimelightHugh/Botpose", bp == null ? new double[0] : bp);
         SmartDashboard.putNumber("LimelightHugh/Number of Tags", getNumActiveTargets());
         SmartDashboard.putString("LimelightHugh/AprilTagInfo", aprilTagInfoArrayToString(getVisibleTagInfo()));
         SmartDashboard.putNumber("LimelightHugh/DistanceToTarget", getDistanceToTargetMetres());
@@ -233,11 +234,14 @@ public class HughVisionSubsystem extends SubsystemBase {
      * @since 2024-02-10
      */
     public VisionPositionInfo getPositionInfo() {
-        double[] botPose    = getBotPose();
-        int      numTargets = getNumActiveTargets();
+        double[] botPose = getBotPose();
+        if (botPose == null) {
+            return null;
+        }
+        int    numTargets = getNumActiveTargets();
 
-        double   latency    = botPose[6];
-        Pose2d   pose       = toPose2D(botPose);
+        double latency    = botPose[6];
+        Pose2d pose       = toPose2D(botPose);
 
         if (numTargets < 1) {
             return null;
@@ -324,7 +328,7 @@ public class HughVisionSubsystem extends SubsystemBase {
      */
     public boolean isAlignedWithTarget() {
         Rotation2d targetOffset = getTargetOffset();
-        if (targetOffset.getDegrees() > 180 - TARGET_ALIGNMENT_THRESHOLD
+        if (targetOffset != null && targetOffset.getDegrees() > 180 - TARGET_ALIGNMENT_THRESHOLD
             && targetOffset.getDegrees() < 180 + TARGET_ALIGNMENT_THRESHOLD) {
             return true;
         }
