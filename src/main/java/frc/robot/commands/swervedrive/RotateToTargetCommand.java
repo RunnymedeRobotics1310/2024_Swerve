@@ -7,11 +7,20 @@ import frc.robot.Constants.BotTarget;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
 
+import static frc.robot.Constants.Swerve.Chassis.ROTATION_TOLERANCE_RADIANS;
+
 public class RotateToTargetCommand extends BaseDriveCommand {
 
     private final HughVisionSubsystem hugh;
     private final BotTarget           target;
 
+    /**
+     * Turn the robot to face the vision target specified
+     * 
+     * @param swerve the swerve drive subsystem
+     * @param hugh the vision subsystem capable of seeing the target
+     * @param target the target
+     */
     public RotateToTargetCommand(SwerveSubsystem swerve, HughVisionSubsystem hugh, BotTarget target) {
         super(swerve);
         this.hugh   = hugh;
@@ -48,13 +57,10 @@ public class RotateToTargetCommand extends BaseDriveCommand {
 
         Translation2d robotRelativeTranslation = hugh.getRobotTranslationToTarget();
         if (robotRelativeTranslation == null) {
-            Rotation2d delta   = swerve.getPose().getRotation().minus(target.getLocation().toTranslation2d().getAngle());
-            double     degrees = Math.abs(delta.getDegrees());
-            return degrees > 5.0;
+            return isCloseEnough(target.getLocation().toTranslation2d().getAngle());
         }
         else {
-            double degrees = Math.abs(target.getLocation().toTranslation2d().getAngle().getDegrees());
-            return degrees > 5.0;
+            return Math.abs(robotRelativeTranslation.getAngle().getRadians()) <= ROTATION_TOLERANCE_RADIANS;
         }
 
     }

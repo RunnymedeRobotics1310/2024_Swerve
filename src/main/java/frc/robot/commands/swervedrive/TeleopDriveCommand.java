@@ -82,9 +82,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
             : (isFast ? MAX_SPEED_FACTOR : GENERAL_SPEED_FACTOR);
 
 
-        Translation2d  translation                  = new Translation2d(
-            Math.pow(vX, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS * (invert ? -1 : 1),
-            Math.pow(vY, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS * (invert ? -1 : 1));
+        Translation2d  velocity                     = calculateTeleopVelocity(vX, vY, boostFactor, invert);
 
         Rotation2d     omega;
 
@@ -128,11 +126,11 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         SmartDashboard.putNumber("Drive/Teleop/rawDesiredHeadingDeg", rawDesiredHeadingDeg);
         SmartDashboard.putNumber("Drive/Teleop/boostFactor", boostFactor);
 
-        SmartDashboard.putString("Drive/Teleop/Translation",
-            format(translation.getNorm()) + "m/s at " + format(translation.getAngle()));
-        SmartDashboard.putString("Drive/Teleop/Theta ", format(headingSetpoint));
-        SmartDashboard.putString("Drive/Teleop/Omega", format(omega) + "/s");
-        swerve.driveFieldOriented(translation, omega);
+        SmartDashboard.putString("Drive/Teleop/velocity",
+            format(velocity.getNorm()) + "m/s at " + format(velocity.getAngle()));
+        SmartDashboard.putString("Drive/Teleop/theta ", format(headingSetpoint));
+        SmartDashboard.putString("Drive/Teleop/omega", format(omega) + "/s");
+        swerve.driveFieldOriented(velocity, omega);
 
     }
 
@@ -148,5 +146,20 @@ public class TeleopDriveCommand extends BaseDriveCommand {
     public boolean isFinished() {
         super.isFinished();
         return false;
+
     }
+
+    private static Translation2d calculateTeleopVelocity(double vX, double vY, double boostFactor, boolean invert) {
+        // plan:
+        // compute linear velocity
+        // boost it
+        // clamp it (in case of simulation where x=1,y=1 is possible
+        //
+        // todo: fix (again) since i deleted the fix last time.
+        Translation2d velocity = new Translation2d(
+            Math.pow(vX, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS * (invert ? -1 : 1),
+            Math.pow(vY, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS * (invert ? -1 : 1));
+        return velocity;
+    }
+
 }

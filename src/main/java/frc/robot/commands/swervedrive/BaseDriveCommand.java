@@ -1,7 +1,10 @@
 package frc.robot.commands.swervedrive;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
@@ -11,10 +14,14 @@ import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.P;
 public abstract class BaseDriveCommand extends LoggingCommand {
     protected final SwerveSubsystem swerve;
 
-
     public BaseDriveCommand(SwerveSubsystem swerve) {
         this.swerve = swerve;
         addRequirements(swerve);
+
+        SmartDashboard.putString("Drive/ToFieldPosition/pose", "");
+        SmartDashboard.putString("Drive/ToFieldPosition/delta", "");
+        SmartDashboard.putString("Drive/ToFieldPosition/desired", "");
+        SmartDashboard.putString("Drive/ToFieldPosition/velocity", "");
     }
 
     /**
@@ -75,5 +82,46 @@ public abstract class BaseDriveCommand extends LoggingCommand {
 
         Rotation2d angle = translationToTravel.getAngle();
         return new Translation2d(speed * angle.getCos(), speed * angle.getSin());
+    }
+
+    /**
+     * Drive as fast as safely possible to the specified pose.
+     * 
+     * @param desiredPose the desired location on the field
+     */
+    protected final void driveToFieldPose(Pose2d desiredPose) {
+        Pose2d        pose     = swerve.getPose();
+        Transform2d   delta    = desiredPose.minus(pose);
+
+        Translation2d velocity = computeVelocity(delta.getTranslation());
+        Rotation2d    omega    = computeOmega(desiredPose.getRotation());
+
+        log("Pose: " + format(pose) + "  Target: " + format(desiredPose) + "  Delta: " + format(delta)
+            + "  Velocity: " + format(velocity) + "m/s @ " + format(omega) + "/s");
+
+        SmartDashboard.putString("Drive/ToFieldPosition/pose", format(pose));
+        SmartDashboard.putString("Drive/ToFieldPosition/delta", format(delta));
+        SmartDashboard.putString("Drive/ToFieldPosition/desired", format(desiredPose));
+        SmartDashboard.putString("Drive/ToFieldPosition/velocity", format(velocity) + "m/s @ " + format(omega) + "/s");
+
+        swerve.driveFieldOriented(velocity, omega);
+    }
+
+    /**
+     * Returns true when the robot is located within TRANSLATION_TOLERANCE_METRES of the desired
+     * location
+     */
+    protected final boolean isCloseEnough(Translation2d desiredLocation) {
+        Translation2d delta = desiredLocation.minus(swerve.getPose().getTranslation());
+        return Math.abs(delta.getNorm()) <= TRANSLATION_TOLERANCE_METRES;
+    }
+
+    /**
+     * Returns true when the robot heading is within ROTATION_TOLERANCE_RADIANS of the desired
+     * location
+     */
+    protected final boolean isCloseEnough(Rotation2d desiredHeading) {
+        Rotation2d delta = desiredHeading.minus(swerve.getPose().getRotation());
+        return Math.abs(delta.getRadians()) <= ROTATION_TOLERANCE_RADIANS;
     }
 }
