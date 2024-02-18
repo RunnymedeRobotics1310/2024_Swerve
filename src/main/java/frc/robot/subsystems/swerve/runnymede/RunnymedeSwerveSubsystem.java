@@ -1,9 +1,7 @@
 package frc.robot.subsystems.swerve.runnymede;
 
 
-import static frc.robot.Constants.Swerve.Chassis.MAX_MODULE_SPEED_MPS;
-import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
-import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
+import static frc.robot.Constants.Swerve.Chassis.*;
 import static frc.robot.Constants.Swerve.Module.BACK_LEFT;
 import static frc.robot.Constants.Swerve.Module.BACK_RIGHT;
 import static frc.robot.Constants.Swerve.Module.FRONT_LEFT;
@@ -89,7 +87,7 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
         SwerveModuleState[] swerveModuleStates = kinematics.toSwerveModuleStates(discretized, centerOfRotation);
         SwerveDriveKinematics.desaturateWheelSpeeds(
             swerveModuleStates, desiredChassisSpeeds,
-            MAX_MODULE_SPEED_MPS, MAX_TRANSLATION_SPEED_MPS, MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC);
+            MAX_MODULE_SPEED_MPS, MAX_TRANSLATION_SPEED_MPS, MAX_ROTATIONAL_VELOCITY_PER_SEC.getRadians());
 
         // set states
         frontLeft.setDesiredState(swerveModuleStates[0]);
@@ -150,4 +148,8 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
             }, pose);
     }
 
+    @Override
+    public String toString() {
+        return "Runnymede Swerve Drive Subsystem";
+    }
 }
