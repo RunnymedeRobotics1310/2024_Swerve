@@ -233,7 +233,8 @@ public class LoggingCommand extends Command {
     }
 
     protected String format(Translation2d vector) {
-        return "(" + String.format("%.2f", vector.getX()) + ", " + String.format("%.2f", vector.getY()) + ")";
+        return String.format("%.2f", vector.getNorm())
+            + " (" + String.format("%.2f", vector.getX()) + "," + String.format("%.2f", vector.getY()) + ")";
     }
 
     protected String format(Transform2d transform) {
