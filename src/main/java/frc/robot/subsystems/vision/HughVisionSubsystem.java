@@ -97,7 +97,8 @@ public class HughVisionSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("LimelightHugh/ty", ty.getDouble(-1.0));
         SmartDashboard.putNumber("LimelightHugh/ta", ta.getDouble(-1.0));
         SmartDashboard.putNumber("LimelightHugh/tl", tl.getDouble(-1.0));
-        SmartDashboard.putNumberArray("LimelightHugh/Botpose", getBotPose());
+        double[] bp = getBotPose();
+        SmartDashboard.putNumberArray("LimelightHugh/Botpose", bp == null ? new double[0] : bp);
         SmartDashboard.putNumber("LimelightHugh/Number of Tags", getNumActiveTargets());
         SmartDashboard.putString("LimelightHugh/AprilTagInfo", aprilTagInfoArrayToString(getVisibleTagInfo()));
         SmartDashboard.putNumber("LimelightHugh/DistanceToTarget", getDistanceToTargetMetres());
