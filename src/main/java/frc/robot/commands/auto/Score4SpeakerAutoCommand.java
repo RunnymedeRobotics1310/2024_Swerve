@@ -85,5 +85,7 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
         /* Exit Zone */
         addCommands(new DriveDistanceCommand(swerve, new Translation2d(invert * 1, 0), Rotation2d.fromDegrees(0), 1));
 
+        // tell people we're done
+        addCommands(new LogAutoCompleteCommand());
     }
 }
