@@ -1,5 +1,10 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+
 public class RunnymedeUtils {
 
     /**
@@ -91,7 +96,8 @@ public class RunnymedeUtils {
             return 0;
         }
 
-        // ensure that we have enough space to accelerate all the way to max and then slow down safely
+        // ensure that we have enough space to accelerate all the way to max and then slow down
+        // safely
         double ratio = distanceToTravel / (accelerationDistance + decelerationDistance);
         if (ratio < 1) {
 
@@ -139,5 +145,19 @@ public class RunnymedeUtils {
         }
 
         return speed;
+    }
+
+    /**
+     * Compute the difference between two poses. Note, as of 2024-02-18, Pose2d.minus(Pose2d) does
+     * this incorrectly.
+     * 
+     * @param target the desired pose
+     * @param current the curren tpose
+     * @return the difference between the two poses.
+     */
+    public static Transform2d difference(Pose2d target, Pose2d current) {
+        Translation2d dx = target.getTranslation().minus(current.getTranslation());
+        Rotation2d    dw = target.getRotation().minus(current.getRotation());
+        return new Transform2d(dx, dw);
     }
 }
