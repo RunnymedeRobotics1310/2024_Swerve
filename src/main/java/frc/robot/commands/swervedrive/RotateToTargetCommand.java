@@ -8,7 +8,8 @@ import frc.robot.Constants.BotTarget;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
 
-import static frc.robot.Constants.Swerve.Chassis.ROTATION_TOLERANCE_RADIANS;
+import static frc.robot.Constants.Swerve.Chassis.ROTATION_TOLERANCE;
+
 
 public class RotateToTargetCommand extends BaseDriveCommand {
 
@@ -47,7 +48,8 @@ public class RotateToTargetCommand extends BaseDriveCommand {
         Translation2d robotRelativeTranslation = hugh.getRobotTranslationToTarget();
 
         if (robotRelativeTranslation == null) {
-            swerve.driveFieldOriented(new Translation2d(), target.getLocation().toTranslation2d().getAngle());
+            Rotation2d omega = computeOmega(target.getLocation().toTranslation2d().getAngle());
+            swerve.driveFieldOriented(new Translation2d(), omega);
         }
         else {
             Rotation2d omega = computeOmega(robotRelativeTranslation.getAngle());
@@ -64,7 +66,7 @@ public class RotateToTargetCommand extends BaseDriveCommand {
             return isCloseEnough(target.getLocation().toTranslation2d().getAngle());
         }
         else {
-            return Math.abs(robotRelativeTranslation.getAngle().getRadians()) <= ROTATION_TOLERANCE_RADIANS;
+            return Math.abs(robotRelativeTranslation.getAngle().getRadians()) <= ROTATION_TOLERANCE.getRadians();
         }
 
     }
