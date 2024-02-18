@@ -65,7 +65,7 @@ public class HughVisionSubsystem extends SubsystemBase {
 
     NetworkTableEntry                  json                                 = table.getEntry("json");
 
-    private BotTarget                  botTarget                            = null;
+    private BotTarget                  botTarget                            = BotTarget.NONE;
 
     private static final List<Integer> TARGET_BLUE_SPEAKER                  = List.of(7, 8);
     private static final List<Integer> TARGET_BLUE_SOURCE                   = List.of(9, 10);
@@ -76,8 +76,8 @@ public class HughVisionSubsystem extends SubsystemBase {
     private static final List<Integer> TARGET_RED_SOURCE                    = List.of(1, 2);
     private static final List<Integer> TARGET_RED_AMP                       = List.of(5);
     private static final List<Integer> TARGET_RED_STAGE                     = List.of(11, 12, 13);
-
     private static final List<Integer> TARGET_NONE                          = List.of();
+
     private List<Integer>              activeAprilTagTargets                = TARGET_NONE;
 
 
@@ -90,15 +90,14 @@ public class HughVisionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // read values periodically and post to smart dashboard periodically
-        final BotTarget bt = getBotTarget();
-        SmartDashboard.putString("LimelightHugh/BotTarget", bt == null ? "" : bt.toString());
+        SmartDashboard.putString("LimelightHugh/BotTarget", getBotTarget().toString());
         SmartDashboard.putBoolean("LimelightHugh/Target Found", isCurrentTargetVisible());
-        SmartDashboard.putNumber("LimelightHugh/tx-value", tx.getDouble(-1.0));
-        SmartDashboard.putNumber("LimelightHugh/ty-value", ty.getDouble(-1.0));
-        SmartDashboard.putNumber("LimelightHugh/ta-value", ta.getDouble(-1.0));
-        SmartDashboard.putNumber("LimelightHugh/l-value", tl.getDouble(-1.0));
-        double[] bp = getBotPose();
-        SmartDashboard.putNumberArray("LimelightHugh/Botpose", bp == null ? new double[0] : bp);
+        SmartDashboard.putNumber("LimelightHugh/tid", tid.getDouble(-1.0));
+        SmartDashboard.putNumber("LimelightHugh/tx", tx.getDouble(-1.0));
+        SmartDashboard.putNumber("LimelightHugh/ty", ty.getDouble(-1.0));
+        SmartDashboard.putNumber("LimelightHugh/ta", ta.getDouble(-1.0));
+        SmartDashboard.putNumber("LimelightHugh/tl", tl.getDouble(-1.0));
+        SmartDashboard.putNumberArray("LimelightHugh/Botpose", getBotPose());
         SmartDashboard.putNumber("LimelightHugh/Number of Tags", getNumActiveTargets());
         SmartDashboard.putString("LimelightHugh/AprilTagInfo", aprilTagInfoArrayToString(getVisibleTagInfo()));
         SmartDashboard.putNumber("LimelightHugh/DistanceToTarget", getDistanceToTargetMetres());
@@ -158,8 +157,13 @@ public class HughVisionSubsystem extends SubsystemBase {
         return count;
     }
 
-
-
+    /**
+     * Performs a String based parsing of limelight's json blob in order to obtain information on
+     * multiple targets when they are in view, since limelight only gives easy access to the
+     * closest/largest one. Not using JSON parsers libs due to up to 2.5ms parsing time.
+     *
+     * @return An array of AprilTagInfo objects, each representing a visible target.
+     */
     private AprilTagInfo[] getVisibleTagInfo() {
         String                  jsonStr = json.getString(null);
         ArrayList<AprilTagInfo> tags    = new ArrayList<AprilTagInfo>();
@@ -218,52 +222,7 @@ public class HughVisionSubsystem extends SubsystemBase {
         return countOccurrences(jsonStr, "fID");
     }
 
-    /**
-     *
-     * PUBLIC API FROM HERE DOWN
-     *
-     */
-
-    /**
-     * Get the position of the robot as computed by the Vision Subsystem. Includes latency data.
-     * 
-     * If no valid position can be returned (due to bad or erratic data, blocked view, etc.),
-     * returns null
-     * 
-     * @return position info or null
-     * @since 2024-02-10
-     */
-    public VisionPositionInfo getPositionInfo() {
-        double[] botPose = getBotPose();
-        if (botPose == null) {
-            return null;
-        }
-        int    numTargets = getNumActiveTargets();
-
-        double latency    = botPose[6];
-        Pose2d pose       = toPose2D(botPose);
-
-        if (numTargets < 1) {
-            return null;
-        }
-
-        // if bot is floating in mid air, return null
-        if (botPose[2] > 1) {
-            return null;
-        }
-
-        else {
-
-            PoseConfidence poseConfidence = PoseConfidence.HIGH;
-            if (numTargets == 1) {
-                poseConfidence = PoseConfidence.MID;
-            }
-            return new VisionPositionInfo(pose, latency, poseConfidence);
-        }
-
-    }
-
-    public double[] getBotPose() {
+    private double[] getBotPose() {
         double[] botpose = botpose_wpiblue.getDoubleArray(new double[] { Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE,
                 Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE });
         if (botpose[0] == Double.MIN_VALUE) {
@@ -285,17 +244,62 @@ public class HughVisionSubsystem extends SubsystemBase {
 
     /**
      *
+     * PUBLIC API FROM HERE DOWN
+     *
+     */
+
+    /**
+     * Get the position of the robot as computed by the Vision Subsystem. Includes latency data.
+     * 
+     * If no valid position can be returned (due to bad or erratic data, blocked view, etc.),
+     * returns null
+     * 
+     * @return position info or null
      * @since 2024-02-10
+     */
+    public VisionPositionInfo getPositionInfo() {
+        double[] botPose    = getBotPose();
+        int      numTargets = getNumActiveTargets();
+
+        if (botPose == null) {
+            return null;
+        }
+
+        double latency = botPose[6];
+        Pose2d pose    = toPose2D(botPose);
+
+        if (numTargets < 1) {
+            return null;
+        }
+
+        // if bot is floating in mid air, return null
+        if (botPose[2] > 1) {
+            return null;
+        }
+
+        PoseConfidence poseConfidence = PoseConfidence.HIGH;
+        if (numTargets == 1) {
+            poseConfidence = PoseConfidence.MID;
+        }
+
+        return new VisionPositionInfo(pose, latency, poseConfidence);
+    }
+
+    /**
+     * Return the current BotTarget
+     *
+     * @return the current BotTarget
      */
     public BotTarget getBotTarget() {
         return botTarget;
     }
 
     /**
+     * Sets the subsystem up to be ready to target a specific field element.
      *
-     * @since 2024-02-10
+     * @param botTarget the field element to target
      */
-    public void setVisionTarget(BotTarget botTarget) {
+    public void setBotTarget(BotTarget botTarget) {
 
         this.botTarget = botTarget;
 
@@ -308,6 +312,7 @@ public class HughVisionSubsystem extends SubsystemBase {
         case RED_AMP -> activeAprilTagTargets = TARGET_RED_AMP;
         case RED_SOURCE -> activeAprilTagTargets = TARGET_RED_SOURCE;
         case RED_STAGE -> activeAprilTagTargets = TARGET_RED_STAGE;
+        default -> activeAprilTagTargets = TARGET_NONE;
         }
     }
 
@@ -323,33 +328,36 @@ public class HughVisionSubsystem extends SubsystemBase {
     }
 
     /**
+     * Check if the robot is aligned to the target, within a certain threshold. Threshold is defined
+     * in TARGET_ALIGNMENT_THRESHOLD constant.
      *
-     * @since 2024-02-10
+     * @return true if the robot is aligned to the target, and a target tag is visible.
      */
     public boolean isAlignedWithTarget() {
         Rotation2d targetOffset = getTargetOffset();
-        if (targetOffset != null && targetOffset.getDegrees() > 180 - TARGET_ALIGNMENT_THRESHOLD
-            && targetOffset.getDegrees() < 180 + TARGET_ALIGNMENT_THRESHOLD) {
-            return true;
-        }
-        return false;
+        return targetOffset != null
+            && targetOffset.getDegrees() > 180 - TARGET_ALIGNMENT_THRESHOLD
+            && targetOffset.getDegrees() < 180 + TARGET_ALIGNMENT_THRESHOLD;
     }
 
     /**
+     * Obtain the straight line distance to target, if any of the target's tags are in sight.
      *
-     * @since 2024-02-10
+     * @return distance to target in meters, or Double.MIN_VALUE if no targets are visible.
      */
     public double getDistanceToTargetMetres() {
         Translation2d robotPosition = getRobotTranslationToTarget();
         if (robotPosition == null) {
-            return -1;
+            return Double.MIN_VALUE;
         }
         return Math.hypot(robotPosition.getX(), robotPosition.getY());
     }
 
     /**
+     * Obtains the relative heading to the target, if any of the target's tags are in sight.
      *
-     * @since 2024-02-10
+     * @return Rotation2d with the angle to target from center of bot (0,0). null if no targets are
+     * visible.
      */
     public Rotation2d getTargetOffset() {
         int    currentTagId  = (int) tid.getInteger(-1);
@@ -364,8 +372,11 @@ public class HughVisionSubsystem extends SubsystemBase {
     }
 
     /**
+     * Obtains the x & y translation of the robot to the target, if any of the target's tags are in
+     * sight.
      *
-     * @since 2024-02-10
+     * @return Translation2d with the x&y to target from center of bot (0,0). null if no targets are
+     * visible.
      */
     public Translation2d getRobotTranslationToTarget() {
         int      currentTagId         = (int) tid.getInteger(-1);
@@ -376,7 +387,7 @@ public class HughVisionSubsystem extends SubsystemBase {
             return null;
         }
 
-        // Limelight is returning X = Height, Y = Left/Right, Z = Forward/Back.
+        // Limelight is returning [0] = X = Height, [1] = Y = Left/Right, [2] = Z = Forward/Back.
         // We need to return X = Forward/Back, and Y = Left/Right
         // Because Hugh is on the back of the Bot, X needs to have its sign reversed.
         return new Translation2d(targetPoseInBotSpace[2] * -1, targetPoseInBotSpace[1]);

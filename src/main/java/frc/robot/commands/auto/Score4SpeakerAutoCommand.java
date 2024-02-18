@@ -27,17 +27,17 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
         final BotTarget speaker;
 
         if (alliance == Alliance.Blue) {
-            wolverine = BotTarget.BLUE_WOLVERINE;
-            barnum    = BotTarget.BLUE_BARNUM;
-            valjean   = BotTarget.BLUE_VALJEAN;
+            wolverine = BotTarget.BLUE_NOTE_WOLVERINE;
+            barnum    = BotTarget.BLUE_NOTE_BARNUM;
+            valjean   = BotTarget.BLUE_NOTE_VALJEAN;
             speaker   = BotTarget.BLUE_SPEAKER;
             invert    = 1;
         }
         // Red Alliance
         else {
-            wolverine = BotTarget.RED_WOLVERINE;
-            barnum    = BotTarget.RED_BARNUM;
-            valjean   = BotTarget.RED_VALJEAN;
+            wolverine = BotTarget.RED_NOTE_WOLVERINE;
+            barnum    = BotTarget.RED_NOTE_BARNUM;
+            valjean   = BotTarget.RED_NOTE_VALJEAN;
             speaker   = BotTarget.RED_SPEAKER;
             invert    = -1;
         }

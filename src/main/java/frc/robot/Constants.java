@@ -192,23 +192,38 @@ public final class Constants {
     }
 
     public enum BotTarget {
-        BLUE_SPEAKER(new Translation3d(0.0381, 5.547868, 2.124202)),
+
+        // Blue Field Targets
         BLUE_AMP(new Translation3d(1.8415, 8.2042, 0.873252)),
-        RED_SOURCE(new Translation3d(0.908812, 0.564769, 0)),
-        BLUE_STAGE(new Translation3d(4.86791, 4.105656, 1.6764)),
-        RED_SPEAKER(new Translation3d(16.579342, 5.547868, 2.124202)),
-        RED_AMP(new Translation3d(14.700758, 8.2042, 0.873252)),
         BLUE_SOURCE(new Translation3d(15.632176, 0.564896, 0)),
+        BLUE_SPEAKER(new Translation3d(0.0381, 5.547868, 2.124202)),
+        BLUE_STAGE(new Translation3d(4.86791, 4.105656, 1.6764)),
+
+        // Red Field Targets
+        RED_AMP(new Translation3d(14.700758, 8.2042, 0.873252)),
+        RED_SOURCE(new Translation3d(0.908812, 0.564769, 0)),
+        RED_SPEAKER(new Translation3d(16.579342, 5.547868, 2.124202)),
         RED_STAGE(new Translation3d(11.676634, 4.105656, 1.6764)),
 
-        // Temporary
-        BLUE_WOLVERINE(new Translation3d(2.85, 4.1, 0)),
-        BLUE_BARNUM(new Translation3d(2.85, 5.6, 0)),
-        BLUE_VALJEAN(new Translation3d(2.85, 7.1, 0)),
+        // Blue Side Notes
+        BLUE_NOTE_WOLVERINE(new Translation3d(2.9, 4.11, 0)),
+        BLUE_NOTE_BARNUM(new Translation3d(2.9, 5.5, 0)),
+        BLUE_NOTE_VALJEAN(new Translation3d(2.9, 7, 0)),
 
-        RED_WOLVERINE(new Translation3d(2.85, 4.1, 0)),
-        RED_BARNUM(new Translation3d(2.85, 5.6, 0)),
-        RED_VALJEAN(new Translation3d(2.85, 7.1, 0));
+        // Red Side Notes
+        RED_NOTE_WOLVERINE(new Translation3d(13.53, 4.11, 0)),
+        RED_NOTE_BARNUM(new Translation3d(13.53, 5.5, 0)),
+        RED_NOTE_VALJEAN(new Translation3d(13.53, 7, 0)),
+
+        // Centre Field Notes
+        CENTRE_NOTE_1(new Translation3d(8.16, 0.75, 0)),
+        CENTRE_NOTE_2(new Translation3d(8.16, 2.43, 0)),
+        CENTRE_NOTE_3(new Translation3d(8.16, 4.11, 0)),
+        CENTRE_NOTE_4(new Translation3d(8.16, 5.79, 0)),
+        CENTRE_NOTE_5(new Translation3d(8.16, 7.47, 0)),
+
+        // When No Target is Set
+        NONE(new Translation3d(0, 0, 0));
 
         private final Translation3d location;
 
@@ -226,7 +241,7 @@ public final class Constants {
         }
     }
 
-    public final class VisionConstants {
+    public static final class VisionConstants {
         /** Time to switch pipelines and acquire a new vision target */
         public static final double  VISION_SWITCH_TIME_SEC         = .25;
 
