@@ -1,5 +1,6 @@
 package frc.robot.commands.swervedrive;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -13,6 +14,7 @@ public class RotateToTargetCommand extends BaseDriveCommand {
 
     private final HughVisionSubsystem hugh;
     private final BotTarget           target;
+    private Pose2d                    initialPose;
 
     /**
      * Turn the robot to face the vision target specified
@@ -23,8 +25,9 @@ public class RotateToTargetCommand extends BaseDriveCommand {
      */
     public RotateToTargetCommand(SwerveSubsystem swerve, HughVisionSubsystem hugh, BotTarget target) {
         super(swerve);
-        this.hugh   = hugh;
-        this.target = target;
+        this.hugh        = hugh;
+        this.target      = target;
+        this.initialPose = null;
 
         addRequirements(hugh);
 
@@ -34,6 +37,7 @@ public class RotateToTargetCommand extends BaseDriveCommand {
     public void initialize() {
         super.initialize();
         hugh.setBotTarget(target);
+        this.initialPose = swerve.getPose();
     }
 
     @Override
@@ -43,7 +47,7 @@ public class RotateToTargetCommand extends BaseDriveCommand {
         Translation2d robotRelativeTranslation = hugh.getRobotTranslationToTarget();
 
         if (robotRelativeTranslation == null) {
-            swerve.driveFieldOriented(swerve.getPose().getTranslation(), target.getLocation().toTranslation2d().getAngle());
+            swerve.driveFieldOriented(new Translation2d(), target.getLocation().toTranslation2d().getAngle());
         }
         else {
             Rotation2d omega = computeOmega(robotRelativeTranslation.getAngle());
