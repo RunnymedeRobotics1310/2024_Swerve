@@ -11,6 +11,7 @@ import static frc.robot.commands.operator.OperatorInput.Axis.Y;
 import static frc.robot.commands.operator.OperatorInput.Stick.LEFT;
 import static frc.robot.commands.operator.OperatorInput.Stick.RIGHT;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -150,16 +151,28 @@ public class TeleopDriveCommand extends BaseDriveCommand {
     }
 
     private static Translation2d calculateTeleopVelocity(double vX, double vY, double boostFactor, boolean invert) {
-        // plan:
-        // compute linear velocity
-        // boost it
-        // clamp it (in case of simulation where x=1,y=1 is possible
-        //
-        // todo: fix (again) since i deleted the fix last time.
-        Translation2d velocity = new Translation2d(
-            Math.pow(vX, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS * (invert ? -1 : 1),
-            Math.pow(vY, 3) * boostFactor * MAX_TRANSLATION_SPEED_MPS * (invert ? -1 : 1));
-        return velocity;
-    }
+        // invert
+        if (invert) {
+            vX = -vX;
+            vY = -vY;
+        }
 
+        // handy utilities
+        Translation2d input     = new Translation2d(vX, vY);
+        double        magnitude = input.getNorm();
+        Rotation2d    angle     = input.getAngle();
+
+        // handle case where in simulator, a value of 1,1 is possible whereas normally the
+        // controller magnitude never exceeds 1
+        magnitude = MathUtil.clamp(magnitude, -1, 1);
+
+        // cube to allow more fine-grained control for user at low values
+        magnitude = Math.pow(magnitude, 3);
+
+        // convert from % to mps
+        magnitude = magnitude * boostFactor * MAX_TRANSLATION_SPEED_MPS;
+
+        // convert to vector
+        return new Translation2d(magnitude, angle);
+    }
 }
