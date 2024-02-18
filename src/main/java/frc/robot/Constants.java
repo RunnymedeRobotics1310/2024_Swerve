@@ -64,7 +64,7 @@ public final class Constants {
             public static final double MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC    = Rotation2d.fromRotations(1).getRadians();
             public static final double ROTATION_TOLERANCE_RADIANS             = Rotation2d.fromDegrees(1).getRadians();
             public static final double TRANSLATION_TOLERANCE_METRES           = 0.02;
-            public static final double DECEL_FROM_MAX_TO_STOP_DIST_METRES     = 1.0;
+            public static final double DECEL_FROM_MAX_TO_STOP_DIST_METRES     = 0.75;
             public static final double MAX_ROTATION_ACCELERATION_RAD_PER_SEC2 = Rotation2d.fromRotations(800).getRadians();
             public static final double MAX_TRANSLATION_ACCELERATION_MPS2      = 1500;
 
@@ -96,7 +96,7 @@ public final class Constants {
             }
 
             public static final class VelocityPIDConfig {
-                public static final double P = 10;
+                public static final double P = 1;
                 // .002 is too low but stable
                 public static final double I = 0;
                 public static final double D = 0;
