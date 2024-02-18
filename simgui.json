@@ -55,11 +55,6 @@
         "window": {
           "visible": true
         }
-      },
-      "/SmartDashboard/navX-Sensor[4]": {
-        "window": {
-          "visible": true
-        }
       }
     }
   },
@@ -79,7 +74,7 @@
             },
             "open": true
           },
-          "ToFieldPosition": {
+          "Teleop": {
             "open": true
           },
           "ToPosition": {
@@ -93,7 +88,16 @@
           },
           "open": true
         },
-        "open": true
+        "Swerve Drive": {
+          "open": true
+        },
+        "open": true,
+        "swerve": {
+          "double[]##v_/SmartDashboard/swerve/desiredChassisSpeeds": {
+            "open": true
+          },
+          "open": true
+        }
       }
     }
   },
