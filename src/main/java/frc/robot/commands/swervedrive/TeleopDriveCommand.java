@@ -1,11 +1,7 @@
 package frc.robot.commands.swervedrive;
 
 import static edu.wpi.first.wpilibj.DriverStation.getAlliance;
-import static frc.robot.Constants.Swerve.Chassis.GENERAL_SPEED_FACTOR;
-import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
-import static frc.robot.Constants.Swerve.Chassis.MAX_SPEED_FACTOR;
-import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
-import static frc.robot.Constants.Swerve.Chassis.SLOW_SPEED_FACTOR;
+import static frc.robot.Constants.Swerve.Chassis.*;
 import static frc.robot.commands.operator.OperatorInput.Axis.X;
 import static frc.robot.commands.operator.OperatorInput.Axis.Y;
 import static frc.robot.commands.operator.OperatorInput.Stick.LEFT;
@@ -92,7 +88,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         // User is steering!
         if (correctedCcwRotAngularVelPct != 0) {
             // Compute omega
-            double w = Math.pow(correctedCcwRotAngularVelPct, 3) * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
+            double w = Math.pow(correctedCcwRotAngularVelPct, 3) * MAX_ROTATIONAL_VELOCITY_PER_SEC.getRadians();
             omega           = Rotation2d.fromRadians(w);
             // Save previous heading for when we are finished steering.
             headingSetpoint = swerve.getPose().getRotation();
