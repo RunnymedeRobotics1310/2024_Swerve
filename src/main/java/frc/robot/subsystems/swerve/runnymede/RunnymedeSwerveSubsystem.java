@@ -150,6 +150,6 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
 
     @Override
     public String toString() {
-        return "Runnymede Swerve Drive Subsystem";
+        return "YAGSL " + super.toString();
     }
 }

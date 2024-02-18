@@ -8,10 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.BotTarget;
-import frc.robot.commands.swervedrive.DriveDistanceCommand;
-import frc.robot.commands.swervedrive.DriveRobotOrientedCommand;
-import frc.robot.commands.swervedrive.ResetOdometryCommand;
-import frc.robot.commands.swervedrive.RotateToTargetCommand;
+import frc.robot.commands.swervedrive.*;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
 
@@ -48,6 +45,8 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
         Rotation2d startingRotation = Rotation2d.fromDegrees(0);
         Pose2d     startingPose     = new Pose2d(1.37, 5.55, startingRotation);
         // Configure
+        addCommands(new LogMessageCommand("Starting Auto"));
+
         addCommands(new ResetOdometryCommand(swerve, startingPose));
 
         /* ***AUTO PATTERN*** */
@@ -83,9 +82,10 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
         // addCommands(new ScoreSpeakerCommand());
 
         /* Exit Zone */
-        addCommands(new DriveDistanceCommand(swerve, new Translation2d(invert * 1, 0), Rotation2d.fromDegrees(0), 1));
+        addCommands(new DriveToPositionCommand(swerve, new Pose2d(new Translation2d(7, 6.5), new Rotation2d())));
+//        addCommands(new DriveDistanceCommand(swerve, new Translation2d(invert * 1, 0), Rotation2d.fromDegrees(0), 1));
 
         // tell people we're done
-        addCommands(new LogAutoCompleteCommand());
+        addCommands(new LogMessageCommand("Auto Complete"));
     }
 }

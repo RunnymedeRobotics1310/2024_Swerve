@@ -220,24 +220,24 @@ public class LoggingCommand extends Command {
         System.out.println(sb.toString());
     }
 
-    protected String format(double d) {
+    public static String format(double d) {
         return String.format("%.2f", d);
     }
 
-    protected String format(Pose2d pose) {
-        return format(pose.getTranslation()) + " @ " + format(pose.getRotation());
+    public static String format(Pose2d pose) {
+        return String.format("%.2f", pose.getX()) + "," + String.format("%.2f", pose.getY()) + " @ " + format(pose.getRotation());
     }
 
-    protected String format(Rotation2d rotation) {
+    public static String format(Rotation2d rotation) {
         return String.format("%.1f", rotation.getDegrees()) + " deg";
     }
 
-    protected String format(Translation2d vector) {
+    public static String format(Translation2d vector) {
         return String.format("%.2f", vector.getNorm())
             + " (" + String.format("%.2f", vector.getX()) + "," + String.format("%.2f", vector.getY()) + ")";
     }
 
-    protected String format(Transform2d transform) {
+    public static String format(Transform2d transform) {
         return format(transform.getTranslation()) + " @ " + format(transform.getRotation());
     }
 

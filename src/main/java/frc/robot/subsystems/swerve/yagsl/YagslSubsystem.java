@@ -90,6 +90,6 @@ public class YagslSubsystem extends SwerveSubsystem {
 
     @Override
     public String toString() {
-        return "YAGSL Swerve Drive Subsystem";
+        return "YAGSL " + super.toString();
     }
 }

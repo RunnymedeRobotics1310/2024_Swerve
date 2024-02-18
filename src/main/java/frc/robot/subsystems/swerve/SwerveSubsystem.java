@@ -16,6 +16,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
 import frc.robot.subsystems.vision.VisionPositionInfo;
 
@@ -163,5 +164,10 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         SmartDashboard.putString("Drive/Swerve/location",
             String.format("%.2f,%.2f m", pose.getTranslation().getX(), pose.getTranslation().getY()));
         SmartDashboard.putString("Drive/Swerve/heading", String.format("%.0f deg", pose.getRotation().getDegrees()));
+    }
+
+    @Override
+    public String toString() {
+        return "SwerveSubsystem Current Pose: " + LoggingCommand.format(getPose());
     }
 }
