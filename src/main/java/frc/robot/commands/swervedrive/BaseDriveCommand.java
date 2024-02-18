@@ -29,25 +29,41 @@ public abstract class BaseDriveCommand extends LoggingCommand {
      * Utility function to compute the required rotation speed of the robot given its current
      * heading. Uses a PID controller to compute the offset.
      *
-     * @param heading the desired heading of the robot
+     * @param target the desired heading of the robot
      * @return The required rotation speed of the robot
      * @see frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig
      */
-    public final Rotation2d computeOmega(Rotation2d heading) {
+    public final Rotation2d computeOmega(Rotation2d target) {
+        return computeOmega(target, swerve.getPose().getRotation());
+    }
 
-        double error = (heading.getRadians() - swerve.getPose().getRotation().getRadians()) % (2 * Math.PI);
+    /**
+     * Utility function to compute the required rotation speed of the robot given the heading
+     * provided. Uses a PID controller to compute the offset.
+     *
+     * @param target the desired heading of the robot
+     * @param current the current heading of the robot
+     * @return The required rotation speed of the robot
+     * @see frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig
+     */
+    private static Rotation2d computeOmega(Rotation2d target, Rotation2d current) {
+
+        double targetRadians  = target.getRadians();
+        double currentRadians = current.getRadians();
+
+        double error          = targetRadians - currentRadians;
+
+        error = error % (2 * Math.PI);
         if (error > Math.PI) {
             error -= (2 * Math.PI);
         }
 
-        // don't worry about minuscule errors
-        if (Math.abs(error) < ROTATION_TOLERANCE_RADIANS) {
-            error = 0;
+        if (Math.abs(error) <= ROTATION_TOLERANCE.getRadians()) {
+            error = 0.0;
         }
 
-        double omega = (error * P) * MAX_ROTATIONAL_VELOCITY_RAD_PER_SEC;
-
-        return Rotation2d.fromRadians(omega);
+        double omegaRadians = error * P * MAX_ROTATIONAL_VELOCITY_PER_SEC.getRadians();
+        return Rotation2d.fromRadians(omegaRadians);
     }
 
 
@@ -126,10 +142,10 @@ public abstract class BaseDriveCommand extends LoggingCommand {
         Translation2d velocity = computeVelocity(delta.getTranslation(), maxSpeedMPS);
         Rotation2d    omega    = computeOmega(desiredPose.getRotation());
 
-        log("Current: " + format(current)
-            + "  Delta: " + format(delta.getTranslation()) + " m @ " + format(delta.getRotation())
-            + "  Target: " + format(desiredPose)
-            + "  Velocity: " + format(velocity) + "m/s @ " + format(omega) + "/s");
+//        log("Current: " + format(current)
+//            + "  Delta: " + format(delta.getTranslation()) + " m @ " + format(delta.getRotation())
+//            + "  Target: " + format(desiredPose)
+//            + "  Velocity: " + format(velocity) + "m/s @ " + format(omega) + "/s");
 
         SmartDashboard.putString("Drive/ToFieldPosition/current", format(current));
         SmartDashboard.putString("Drive/ToFieldPosition/delta", format(delta.getTranslation()) + " m @ "
@@ -155,6 +171,6 @@ public abstract class BaseDriveCommand extends LoggingCommand {
      */
     protected final boolean isCloseEnough(Rotation2d desiredHeading) {
         Rotation2d delta = desiredHeading.minus(swerve.getPose().getRotation());
-        return Math.abs(delta.getRadians()) <= ROTATION_TOLERANCE_RADIANS;
+        return Math.abs(delta.getRadians()) <= ROTATION_TOLERANCE.getRadians();
     }
 }
