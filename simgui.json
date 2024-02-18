@@ -79,7 +79,7 @@
             },
             "open": true
           },
-          "Teleop": {
+          "ToFieldPosition": {
             "open": true
           },
           "ToPosition": {

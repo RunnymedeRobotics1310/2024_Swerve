@@ -47,9 +47,14 @@ public class YagslSubsystem extends SwerveSubsystem {
 
     @Override
     protected void driveRawRobotOriented(ChassisSpeeds velocity) {
-        SmartDashboard.putString("Drive/Swerve/velocity", String.format("%.2f,%.2f m/s %.0f deg/s)",
+        SmartDashboard.putString("Drive/Swerve/chassis", String.format("%.2f,%.2f m/s %.0f deg/s)",
             velocity.vxMetersPerSecond, velocity.vyMetersPerSecond,
             Rotation2d.fromRadians(velocity.omegaRadiansPerSecond).getDegrees()));
+
+        SmartDashboard.putString("Drive/Swerve/velocity", String.format("%.2f m/s %.0f deg/s)",
+            Math.hypot(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond),
+            Rotation2d.fromRadians(velocity.omegaRadiansPerSecond).getDegrees()));
+
         swerveDrive.drive(velocity, false, new Translation2d());
     }
 
