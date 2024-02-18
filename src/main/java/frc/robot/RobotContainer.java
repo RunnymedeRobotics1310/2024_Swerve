@@ -80,7 +80,7 @@ public class RobotContainer {
             .whileTrue(new ResetOdometryCommand(swerveDriveSubsystem, new Pose2d(1.83, 0.40, Rotation2d.fromDegrees(0))));
 
         // drive forward
-        Translation2d        fwd        = new Translation2d(0, .25);
+        Translation2d        fwd        = new Translation2d(0, 7);
         Rotation2d           fwdHeading = Rotation2d.fromDegrees(0);
         DriveDistanceCommand ddc        = new DriveDistanceCommand(swerveDriveSubsystem, fwd, fwdHeading, 3);
         new Trigger(operatorInput::isA).onTrue(ddc);
@@ -104,4 +104,6 @@ public class RobotContainer {
         // todo: implement
         return null;
     }
+
+
 }
