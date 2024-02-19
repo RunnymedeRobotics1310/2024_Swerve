@@ -75,16 +75,17 @@ public abstract class SwerveSubsystem extends SubsystemBase {
      *
      * @param velocity the linear velocity of the robot in metres per second. Positive x is away
      * from the alliance wall, and positive y is toward the left wall when looking through the
-     * driver station glass. Null means no translation.
-     * @param omega the rotation rate of the heading of the robot. CCW positive. Null means no
-     * rotation.
+     * driver station glass.
+     * @param omega the rotation rate of the heading of the robot. CCW positive.
      * @see #driveRobotOriented(ChassisSpeeds)
      */
     public final void driveFieldOriented(Translation2d velocity, Rotation2d omega) {
-        double        x             = velocity == null ? 0 : velocity.getX();
-        double        y             = velocity == null ? 0 : velocity.getY();
-        double        w             = omega == null ? 0 : omega.getRadians();
-        Rotation2d    theta         = this.getPose().getRotation();
+        double     x     = velocity.getX();
+        double     y     = velocity.getY();
+        double     w     = omega.getRadians();
+        Rotation2d theta = this.getPose().getRotation();
+        SmartDashboard.putString("Drive/Swerve/velocity", LoggingCommand.format(velocity) + " m/s");
+
         ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, w, theta);
         this.driveRobotOriented(chassisSpeeds);
     }
