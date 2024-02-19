@@ -23,6 +23,7 @@ import frc.robot.commands.swervedrive.ResetOdometryCommand;
 import frc.robot.commands.swervedrive.TeleopDriveCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.swerve.runnymede.RunnymedeSwerveSubsystem;
 import frc.robot.subsystems.swerve.yagsl.YagslSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
 
@@ -41,9 +42,9 @@ public class RobotContainer {
 
     private final HughVisionSubsystem hughVisionSubsystem  = new HughVisionSubsystem();
 
+    // todo: set up sendable chooser for this to toggle implementation for testing
     private final SwerveSubsystem     swerveDriveSubsystem = new YagslSubsystem(yagslConfig, hughVisionSubsystem);
-    // private final SwerveSubsystem swerveDriveSubsystem = new
-    // RunnymedeSwerveSubsystem(visionSubsystem);
+//    private final SwerveSubsystem     swerveDriveSubsystem = new RunnymedeSwerveSubsystem(hughVisionSubsystem);
 
     private final OperatorInput       operatorInput        = new OperatorInput(
         OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
