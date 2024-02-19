@@ -10,8 +10,8 @@ public class DriveMotor extends SparkMaxNeoMotor {
     /**
      * Configure the SparkMAX and its integrated PIDF (PID + feed forward) control.
      *
-     * @param canBusId          bus id
-     * @param cfg               motor configuration
+     * @param canBusId bus id
+     * @param cfg motor configuration
      * @param wheelRadiusMetres the wheel radius in metres
      * @{link https://docs.revrobotics.com/sparkmax/operating-modes/closed-loop-control}
      */
@@ -30,7 +30,8 @@ public class DriveMotor extends SparkMaxNeoMotor {
         configureSparkMax(() -> encoder.setVelocityConversionFactor(positionConversionfactor / 60));
 
 
-        pid.setFeedbackDevice(encoder); // Configure feedback of the PID controller as the integrated encoder.
+        pid.setFeedbackDevice(encoder); // Configure feedback of the PID controller as the
+                                        // integrated encoder.
         configureSparkMax(() -> pid.setP(cfg.p, 0));
         configureSparkMax(() -> pid.setI(cfg.i, 0));
         configureSparkMax(() -> pid.setD(cfg.d, 0));
@@ -48,8 +49,10 @@ public class DriveMotor extends SparkMaxNeoMotor {
     }
 
     void setReferenceMetresPerSecond(double setpointMPS, double feedforward) {
-        configureSparkMax(() ->
-                pid.setReference(setpointMPS, CANSparkBase.ControlType.kVelocity, 0, feedforward)
-        );
+        configureSparkMax(() -> pid.setReference(setpointMPS, CANSparkBase.ControlType.kVelocity, 0, feedforward));
+    }
+
+    double getVelocityMetresPerSecond() {
+        return encoder.getVelocity();
     }
 }

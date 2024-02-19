@@ -13,62 +13,62 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Represents a swerve drive style drivetrain.
  */
 public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
-
-    private final SwerveModule            frontLeft;
-    private final SwerveModule            frontRight;
-    private final SwerveModule            backLeft;
-    private final SwerveModule            backRight;
-    private final AHRS                    gyro;
-    private Rotation3d                    gyroOffset;
-
+    private final SwerveModule[]          modules;
     private final SwerveDriveKinematics   kinematics;
+    private final AHRS                    gyro;
+    private final SimulatedIMU            simulatedIMU;
+    private Rotation3d                    gyroOffset;
+    public Field2d                        field;
+
     public final SwerveDrivePoseEstimator swerveDrivePoseEstimator;
 
     public RunnymedeSwerveSubsystem(HughVisionSubsystem visionSubsystem) {
         super(visionSubsystem);
 
-        kinematics                    = new SwerveDriveKinematics(
-            FRONT_LEFT.locationMetres,
-            FRONT_RIGHT.locationMetres,
-            BACK_LEFT.locationMetres,
-            BACK_RIGHT.locationMetres);
+        modules      = new SwerveModule[4];
+        modules[0]   = new SwerveModule(FRONT_LEFT, DRIVE, ANGLE);
+        modules[1]   = new SwerveModule(FRONT_RIGHT, DRIVE, ANGLE);
+        modules[2]   = new SwerveModule(BACK_LEFT, DRIVE, ANGLE);
+        modules[3]   = new SwerveModule(BACK_RIGHT, DRIVE, ANGLE);
 
-        gyro                          = new AHRS(SerialPort.Port.kMXP);
-        gyroOffset                    = gyro.getRotation3d();
+        kinematics   = new SwerveDriveKinematics(
+            Arrays.stream(modules).map(SwerveModule::getLocation).toArray(Translation2d[]::new));
 
-        frontLeft                     = new SwerveModule(FRONT_LEFT, DRIVE, ANGLE);
-        frontRight                    = new SwerveModule(FRONT_RIGHT, DRIVE, ANGLE);
-        backLeft                      = new SwerveModule(BACK_LEFT, DRIVE, ANGLE);
-        backRight                     = new SwerveModule(BACK_RIGHT, DRIVE, ANGLE);
+        gyro         = new AHRS(SerialPort.Port.kMXP);
+        gyroOffset   = gyro.getRotation3d();
+        simulatedIMU = new SimulatedIMU();
+
+
+        field        = new Field2d();
+        SmartDashboard.putData(field);
 
         this.swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(
             this.kinematics,
             gyro.getRotation3d().minus(gyroOffset).toRotation2d(),
-            new SwerveModulePosition[] {
-                    frontLeft.getPosition(),
-                    frontRight.getPosition(),
-                    backLeft.getPosition(),
-                    backRight.getPosition()
-            },
+            Arrays.stream(modules).map(SwerveModule::getPosition).toArray(SwerveModulePosition[]::new),
             new Pose2d(new Translation2d(0.0, 0.0), Rotation2d.fromDegrees(0.0)));
     }
 
@@ -85,27 +85,40 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
             MAX_MODULE_SPEED_MPS, MAX_TRANSLATION_SPEED_MPS, MAX_ROTATIONAL_VELOCITY_PER_SEC.getRadians());
 
         // set states
-        frontLeft.setDesiredState(swerveModuleStates[0]);
-        frontRight.setDesiredState(swerveModuleStates[1]);
-        backLeft.setDesiredState(swerveModuleStates[2]);
-        backRight.setDesiredState(swerveModuleStates[3]);
+        for (int i = 0; i < modules.length; i++) {
+            modules[i].setDesiredState(swerveModuleStates[i]);
+        }
     }
 
     @Override
     public void updateOdometryWithStates() {
         swerveDrivePoseEstimator.update(
             gyro.getRotation3d().minus(gyroOffset).toRotation2d(),
-            new SwerveModulePosition[] {
-                    frontLeft.getPosition(),
-                    frontRight.getPosition(),
-                    backLeft.getPosition(),
-                    backRight.getPosition()
-            });
+            Arrays.stream(modules).map(SwerveModule::getPosition).toArray(SwerveModulePosition[]::new));
+
+        Pose2d robotPose = swerveDrivePoseEstimator.getEstimatedPosition();
+
+        field.setRobotPose(robotPose);
+
+        if (RobotBase.isSimulation()) {
+            simulatedIMU.updateOdometry(kinematics, getStates(), getModulePoses(robotPose), field);
+        }
+    }
+
+    private SwerveModuleState[] getStates() {
+        return Arrays.stream(modules).map(SwerveModule::getState).toArray(SwerveModuleState[]::new);
     }
 
     @Override
     public Pose2d getPose() {
         return swerveDrivePoseEstimator.getEstimatedPosition();
+    }
+
+    private Pose2d[] getModulePoses(Pose2d robotPose) {
+        return Arrays.stream(modules).map(m -> {
+            Transform2d tx = new Transform2d(m.getLocation(), m.getState().angle);
+            return robotPose.plus(tx);
+        }).toArray(Pose2d[]::new);
     }
 
     @Override
@@ -123,10 +136,9 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
         // TODO: ADD SAFETY CODE
 
         // set speed to 0 and angle wheels to center
-        frontLeft.setDesiredState(new SwerveModuleState(0.0, frontLeft.getPosition().angle));
-        frontRight.setDesiredState(new SwerveModuleState(0.0, frontRight.getPosition().angle));
-        backLeft.setDesiredState(new SwerveModuleState(0.0, backLeft.getPosition().angle));
-        backRight.setDesiredState(new SwerveModuleState(0.0, backRight.getPosition().angle));
+        for (int i = 0; i < modules.length; i++) {
+            modules[i].setDesiredState(new SwerveModuleState(0.0, modules[i].getPosition().angle));
+        }
 
         // tell kinematics that we aren't moving
         kinematics.toSwerveModuleStates(new ChassisSpeeds());
@@ -135,12 +147,7 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
     @Override
     public void resetOdometry(Pose2d pose) {
         this.swerveDrivePoseEstimator.resetPosition(gyro.getRotation3d().minus(gyroOffset).toRotation2d(),
-            new SwerveModulePosition[] {
-                    frontLeft.getPosition(),
-                    frontRight.getPosition(),
-                    backLeft.getPosition(),
-                    backRight.getPosition()
-            }, pose);
+            Arrays.stream(modules).map(SwerveModule::getPosition).toArray(SwerveModulePosition[]::new), pose);
     }
 
     @Override
