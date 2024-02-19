@@ -33,7 +33,7 @@ public abstract class BaseDriveCommand extends LoggingCommand {
      * @return The required rotation speed of the robot
      * @see frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig
      */
-    public final Rotation2d computeOmega(Rotation2d target) {
+    protected final Rotation2d computeOmega(Rotation2d target) {
         return computeOmega(target, swerve.getPose().getRotation());
     }
 
@@ -123,7 +123,7 @@ public abstract class BaseDriveCommand extends LoggingCommand {
 
     /**
      * Drive as fast as safely possible to the specified pose.
-     * 
+     *
      * @param desiredPose the desired location on the field
      */
     protected final void driveToFieldPose(Pose2d desiredPose) {
@@ -174,8 +174,27 @@ public abstract class BaseDriveCommand extends LoggingCommand {
         return Math.abs(delta.getRadians()) <= ROTATION_TOLERANCE.getRadians();
     }
 
-    protected final Rotation2d getHeadingToFieldPosition(Translation2d position) {
-        Translation2d delta = position.minus(swerve.getPose().getTranslation());
+    /**
+     * Compute the heading required to face the specified position on the field.
+     * <p>
+     * This handy utility enables the user to specify a field position, get
+     * the required headiang for it, and pass it into computeOmega to
+     * determine the required omega to face that position - even as the robot
+     * moves across the field.
+     * <code>
+     *     Rotation2d heading getHeadingToFieldPosition(speaker)
+     *     Rotation2d omega computeOmega(heading)
+     * </code>
+     * <p>
+     * In other words, this utility enables the user to "lock on a target".
+     *
+     * @param target field position
+     * @return the heading toward that position.
+     * @see #computeOmega(Rotation2d)
+     */
+    protected final Rotation2d getHeadingToFieldPosition(Translation2d target) {
+        Translation2d current = swerve.getPose().getTranslation();
+        Translation2d delta   = target.minus(current);
         return delta.getAngle();
     }
 }
