@@ -4,40 +4,37 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import frc.robot.Constants.BotTarget;
+import frc.robot.Constants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
 
 import static frc.robot.Constants.Swerve.Chassis.ROTATION_TOLERANCE;
 
+public class RotateToPlacedNoteCommand extends BaseDriveCommand {
 
-public class RotateToTargetCommand extends BaseDriveCommand {
-
-    private final HughVisionSubsystem hugh;
-    private final BotTarget           target;
+    private final Constants.BotTarget target;
     private Pose2d                    initialPose;
 
     /**
      * Turn the robot to face the vision target specified
-     * 
+     *
      * @param swerve the swerve drive subsystem
-     * @param hugh the vision subsystem capable of seeing the target
      * @param target the target
      */
-    public RotateToTargetCommand(SwerveSubsystem swerve, HughVisionSubsystem hugh, BotTarget target) {
+    public RotateToPlacedNoteCommand(SwerveSubsystem swerve, Constants.BotTarget target) {
         super(swerve);
-        this.hugh        = hugh;
+//        this.hugh        = hugh;
         this.target      = target;
         this.initialPose = null;
 
-        addRequirements(hugh);
+//        addRequirements(hugh);
 
     }
 
     @Override
     public void initialize() {
         logCommandStart("Target: " + target);
-        hugh.setBotTarget(target);
+//        hugh.setBotTarget(target);
         this.initialPose = swerve.getPose();
     }
 
@@ -45,7 +42,7 @@ public class RotateToTargetCommand extends BaseDriveCommand {
     public void execute() {
         super.execute();
 
-        Translation2d robotRelativeTranslation = hugh.getRobotTranslationToTarget();
+        Translation2d robotRelativeTranslation = null;// hugh.getRobotTranslationToTarget();
 
         if (robotRelativeTranslation == null) {
             Rotation2d delta = getHeadingToFieldPosition(target.getLocation().toTranslation2d());
@@ -62,7 +59,7 @@ public class RotateToTargetCommand extends BaseDriveCommand {
     @Override
     public boolean isFinished() {
 
-        Translation2d robotRelativeTranslation = hugh.getRobotTranslationToTarget();
+        Translation2d robotRelativeTranslation = null; // hugh.getRobotTranslationToTarget();
         if (robotRelativeTranslation == null) {
             Rotation2d delta = getHeadingToFieldPosition(target.getLocation().toTranslation2d());
             return isCloseEnough(delta);

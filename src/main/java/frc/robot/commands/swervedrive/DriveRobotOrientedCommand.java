@@ -27,7 +27,8 @@ public class DriveRobotOrientedCommand extends BaseDriveCommand {
 
     @Override
     public void initialize() {
-        super.initialize();
+        logCommandStart(
+            "robotRelativeTranslation: " + robotRelativeTranslation + " robotRelativeHeading: " + robotRelativeHeading);
         Rotation2d    desiredFieldOrientedHeading  = swerve.getPose().getRotation().plus(robotRelativeHeading);
         Translation2d desiredFieldOrientedPosition = swerve.getPose().getTranslation().plus(robotRelativeTranslation);
         this.desiredPose = new Pose2d(desiredFieldOrientedPosition, desiredFieldOrientedHeading);

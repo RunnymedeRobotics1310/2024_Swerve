@@ -173,4 +173,9 @@ public abstract class BaseDriveCommand extends LoggingCommand {
         Rotation2d delta = desiredHeading.minus(swerve.getPose().getRotation());
         return Math.abs(delta.getRadians()) <= ROTATION_TOLERANCE.getRadians();
     }
+
+    protected final Rotation2d getHeadingToFieldPosition(Translation2d position) {
+        Translation2d delta = position.minus(swerve.getPose().getTranslation());
+        return delta.getAngle();
+    }
 }

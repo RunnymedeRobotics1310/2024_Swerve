@@ -16,6 +16,11 @@ public class DriveToPositionCommand extends BaseDriveCommand {
     }
 
     @Override
+    public void initialize() {
+        logCommandStart("desiredPose: " + desiredPose);
+    }
+
+    @Override
     public void execute() {
         super.execute();
         driveToFieldPose(desiredPose);

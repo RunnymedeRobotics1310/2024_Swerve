@@ -57,27 +57,27 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
         addCommands(new DriveDistanceCommand(swerve, new Translation2d(invert * 0.25, 0), new Rotation2d(), 0.1));
 
         /* Note 2 */
-        addCommands(new RotateToTargetCommand(swerve, hugh, wolverine));
+        addCommands(new RotateToPlacedNoteCommand(swerve, wolverine));
 
         // addCommands(new VisionNotePickup());
-        addCommands(new DriveRobotOrientedCommand(swerve, new Translation2d(.25, 0), new Rotation2d()));
+        addCommands(new DriveRobotOrientedCommand(swerve, new Translation2d(.85, 0), new Rotation2d()));
         addCommands(new RotateToTargetCommand(swerve, hugh, speaker));
         // addCommands(new ScoreSpeakerCommand());
 
 
         /* Note 3 */
-        addCommands(new RotateToTargetCommand(swerve, hugh, barnum));
+        addCommands(new RotateToPlacedNoteCommand(swerve, barnum));
 
         // addCommands(new VisionNotePickup());
-        addCommands(new DriveRobotOrientedCommand(swerve, new Translation2d(.25, 0), new Rotation2d()));
+        addCommands(new DriveRobotOrientedCommand(swerve, new Translation2d(.85, 0), new Rotation2d()));
         addCommands(new RotateToTargetCommand(swerve, hugh, speaker));
         // addCommands(new ScoreSpeakerCommand());
 
         /* Note 4 */
-        addCommands(new RotateToTargetCommand(swerve, hugh, valjean));
+        addCommands(new RotateToPlacedNoteCommand(swerve, valjean));
 
         // addCommands(new VisionNotePickup());
-        addCommands(new DriveRobotOrientedCommand(swerve, new Translation2d(.25, 0), new Rotation2d()));
+        addCommands(new DriveRobotOrientedCommand(swerve, new Translation2d(.85, 0), new Rotation2d()));
         addCommands(new RotateToTargetCommand(swerve, hugh, speaker));
         // addCommands(new ScoreSpeakerCommand());
 

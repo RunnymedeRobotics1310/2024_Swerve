@@ -22,7 +22,8 @@ public class DriveDistanceCommand extends BaseDriveCommand {
 
     @Override
     public void initialize() {
-        super.initialize();
+        logCommandStart(
+            "Velocity: " + velocityVectorMps + " headingSetpoint: " + headingSetpoint + " distance: " + distanceMetres + "m");
         Rotation2d    angle       = velocityVectorMps.getAngle();
         Translation2d translation = new Translation2d(angle.getCos() * distanceMetres, angle.getSin() * distanceMetres);
         desiredPose = new Pose2d(swerve.getPose().getTranslation().plus(translation), headingSetpoint);

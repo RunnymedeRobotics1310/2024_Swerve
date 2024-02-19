@@ -313,7 +313,7 @@ public class HughVisionSubsystem extends SubsystemBase {
         case RED_AMP -> activeAprilTagTargets = TARGET_RED_AMP;
         case RED_SOURCE -> activeAprilTagTargets = TARGET_RED_SOURCE;
         case RED_STAGE -> activeAprilTagTargets = TARGET_RED_STAGE;
-        default -> activeAprilTagTargets = TARGET_NONE;
+        default -> throw new IllegalArgumentException(botTarget.toString());
         }
     }
 
