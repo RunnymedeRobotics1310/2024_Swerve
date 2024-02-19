@@ -24,7 +24,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.SerialPort;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
@@ -76,10 +75,6 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
 
     @Override
     protected void driveRawRobotOriented(ChassisSpeeds velocity) {
-        SmartDashboard.putString("Drive/Swerve/velocity", String.format("%.2f,%.2f m/s, Omega: %.2f rad/s)",
-            velocity.vxMetersPerSecond, velocity.vyMetersPerSecond,
-            velocity.omegaRadiansPerSecond));
-
 
         // calculate desired states
         ChassisSpeeds       discretized        = ChassisSpeeds.discretize(velocity, Robot.kDefaultPeriod);

@@ -55,12 +55,25 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         y = yLimiter.calculate(y);
         w = omegaLimiter.calculate(w);
 
-        driveRawRobotOriented(new ChassisSpeeds(x, y, w));
+        ChassisSpeeds safeVelocity = new ChassisSpeeds(x, y, w);
+
+        SmartDashboard.putString("Drive/Swerve/chassis_robot", String.format("%.2f,%.2f m/s %.0f deg/s)",
+            safeVelocity.vxMetersPerSecond, safeVelocity.vyMetersPerSecond,
+            Rotation2d.fromRadians(safeVelocity.omegaRadiansPerSecond).getDegrees()));
+
+        SmartDashboard.putString("Drive/Swerve/velocity_robot", String.format("%.2f m/s %.0f deg/s)",
+            Math.hypot(safeVelocity.vxMetersPerSecond, safeVelocity.vyMetersPerSecond),
+            Rotation2d.fromRadians(safeVelocity.omegaRadiansPerSecond).getDegrees()));
+
+        driveRawRobotOriented(safeVelocity);
     }
 
     /**
-     * The primary method for controlling the drivebase. The provided {@link ChassisSpeeds}
-     * specifies the robot-relative chassis speeds of the robot.
+     * The internal method for controlling the drivebase. This code does not apply any
+     * limiters or validation, and should be used by implementing swerve drive subsystems
+     * only.
+     * <p>
+     * Takes the desired chassis speeds of the robot - in a robot-oriented configuration.
      *
      * @param velocity The intended velocity of the robot chassis relative to itself.
      * @see ChassisSpeeds for how to construct a ChassisSpeeds object including
@@ -84,7 +97,7 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         double     y     = velocity.getY();
         double     w     = omega.getRadians();
         Rotation2d theta = this.getPose().getRotation();
-        SmartDashboard.putString("Drive/Swerve/velocity", LoggingCommand.format(velocity) + " m/s");
+        SmartDashboard.putString("Drive/Swerve/velocity_field", LoggingCommand.format(velocity) + " m/s");
 
         ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, w, theta);
         this.driveRobotOriented(chassisSpeeds);
