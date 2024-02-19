@@ -43,6 +43,7 @@ public class YagslSubsystem extends SwerveSubsystem {
         }
         // Runnymede does its own heading correction in the commands.
         swerveDrive.setHeadingCorrection(false);
+        swerveDrive.setCosineCompensator(!SwerveDriveTelemetry.isSimulation);
     }
 
     @Override
