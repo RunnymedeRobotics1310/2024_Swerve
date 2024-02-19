@@ -369,7 +369,7 @@ public class HughVisionSubsystem extends SubsystemBase {
         }
 
         // Hugh is on the rear of the bot, so add 180 to values given to translate to front
-        return new Rotation2d(angleToTarget + 180);
+        return Rotation2d.fromDegrees(angleToTarget + 180);
     }
 
     /**
