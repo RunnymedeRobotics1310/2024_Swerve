@@ -8,6 +8,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.BotTarget;
+import frc.robot.commands.auto.stubs.FakeScoreSpeakerCommand;
+import frc.robot.commands.auto.stubs.FakeVisionNotePickupCommand;
 import frc.robot.commands.swervedrive.*;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
@@ -46,43 +48,38 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
         Pose2d     startingPose     = new Pose2d(1.37, 5.55, startingRotation);
         // Configure
         addCommands(new LogMessageCommand("Starting Auto"));
-
         addCommands(new ResetOdometryCommand(swerve, startingPose));
 
         /* ***AUTO PATTERN*** */
 
         /* Note 1 */
-        // addCommands(new ScoreSpeakerCommand());
+        // back up to not hit the speaker while rotating
+        addCommands(new DriveDistanceCommand(swerve, new Translation2d(invert * 0.5, 0), new Rotation2d(), 0.1));
+        addCommands(new FakeScoreSpeakerCommand(swerve));
 
-        addCommands(new DriveDistanceCommand(swerve, new Translation2d(invert * 0.25, 0), new Rotation2d(), 0.1));
 
         /* Note 2 */
         addCommands(new RotateToPlacedNoteCommand(swerve, wolverine));
-
-        // addCommands(new VisionNotePickup());
-        addCommands(new DriveRobotOrientedCommand(swerve, new Translation2d(.85, 0), new Rotation2d()));
+        addCommands(new FakeVisionNotePickupCommand(swerve, wolverine));
         addCommands(new RotateToTargetCommand(swerve, hugh, speaker));
-        // addCommands(new ScoreSpeakerCommand());
+        addCommands(new FakeScoreSpeakerCommand(swerve));
 
 
         /* Note 3 */
         addCommands(new RotateToPlacedNoteCommand(swerve, barnum));
-
-        // addCommands(new VisionNotePickup());
-        addCommands(new DriveRobotOrientedCommand(swerve, new Translation2d(.85, 0), new Rotation2d()));
+        addCommands(new FakeVisionNotePickupCommand(swerve, barnum));
         addCommands(new RotateToTargetCommand(swerve, hugh, speaker));
-        // addCommands(new ScoreSpeakerCommand());
+        addCommands(new FakeScoreSpeakerCommand(swerve));
 
         /* Note 4 */
         addCommands(new RotateToPlacedNoteCommand(swerve, valjean));
-
-        // addCommands(new VisionNotePickup());
-        addCommands(new DriveRobotOrientedCommand(swerve, new Translation2d(.85, 0), new Rotation2d()));
+        addCommands(new FakeVisionNotePickupCommand(swerve, valjean));
         addCommands(new RotateToTargetCommand(swerve, hugh, speaker));
-        // addCommands(new ScoreSpeakerCommand());
+        addCommands(new FakeScoreSpeakerCommand(swerve));
 
         /* Exit Zone */
-        addCommands(new DriveToPositionCommand(swerve, new Pose2d(new Translation2d(7, 6.5), new Rotation2d())));
+        addCommands(
+            new DriveToPositionCommand(swerve, new Pose2d(new Translation2d(7, valjean.getLocation().getY()), new Rotation2d())));
 //        addCommands(new DriveDistanceCommand(swerve, new Translation2d(invert * 1, 0), Rotation2d.fromDegrees(0), 1));
 
         // tell people we're done
