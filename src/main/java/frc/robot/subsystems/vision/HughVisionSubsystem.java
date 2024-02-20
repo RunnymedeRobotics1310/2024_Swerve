@@ -239,7 +239,7 @@ public class HughVisionSubsystem extends SubsystemBase {
             return new Pose2d();
         }
         Translation2d tran2d = new Translation2d(inData[0], inData[1]);
-        Rotation2d    r2d    = new Rotation2d((Units.degreesToRadians(inData[5]) + 180) % 360);
+        Rotation2d    r2d    = Rotation2d.fromDegrees(inData[5]);
         return new Pose2d(tran2d, r2d);
     }
 
