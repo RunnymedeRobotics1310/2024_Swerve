@@ -79,7 +79,8 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
 
         /* Exit Zone */
         addCommands(
-            new DriveToPositionCommand(swerve, new Pose2d(new Translation2d(7, valjean.getLocation().getY()), new Rotation2d())));
+            new DriveToPositionCommand(swerve,
+                new Pose2d(new Translation2d(3.5, valjean.getLocation().getY()), new Rotation2d())));
 //        addCommands(new DriveDistanceCommand(swerve, new Translation2d(invert * 1, 0), Rotation2d.fromDegrees(0), 1));
 
         // tell people we're done
