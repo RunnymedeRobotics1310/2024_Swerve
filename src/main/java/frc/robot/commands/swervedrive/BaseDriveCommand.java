@@ -92,15 +92,16 @@ public abstract class BaseDriveCommand extends LoggingCommand {
             maxSpeed = MAX_TRANSLATION_SPEED_MPS;
         }
 
-        double xSign          = Math.signum(translationToTravel.getX());
-        double ySign          = Math.signum(translationToTravel.getY());
+        double xSign         = Math.signum(translationToTravel.getX());
+        double ySign         = Math.signum(translationToTravel.getY());
 
-        double decelDistance  = Math.abs(DECEL_FROM_MAX_TO_STOP_DIST_METRES);
+        double decelDistance = Math.abs(DECEL_FROM_MAX_TO_STOP_DIST_METRES);
 
-        double decelDistRatio = absDistMetres / DECEL_FROM_MAX_TO_STOP_DIST_METRES;
-        if (decelDistRatio < 1) {
-            decelDistance = decelDistance * decelDistRatio;
-        }
+        // TODO: This logic below is incorrect. Delay this optimization until we figure it out.
+//        double decelDistRatio = absDistMetres / DECEL_FROM_MAX_TO_STOP_DIST_METRES;
+//        if (decelDistRatio < 1) {
+//            decelDistance = decelDistance * decelDistRatio;
+//        }
 
 
         final double speed;
