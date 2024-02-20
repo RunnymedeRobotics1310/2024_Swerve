@@ -64,9 +64,9 @@ public final class Constants {
             public static final Rotation2d MAX_ROTATIONAL_VELOCITY_PER_SEC        = Rotation2d.fromRotations(1);
             public static final Rotation2d ROTATION_TOLERANCE                     = Rotation2d.fromDegrees(1);
             public static final double     TRANSLATION_TOLERANCE_METRES           = 0.02;
-            public static final double     DECEL_FROM_MAX_TO_STOP_DIST_METRES     = 0.75;
+            public static final double     DECEL_FROM_MAX_TO_STOP_DIST_METRES     = 1.9;
             public static final double     MAX_ROTATION_ACCELERATION_RAD_PER_SEC2 = Rotation2d.fromRotations(800).getRadians();
-            public static final double     MAX_TRANSLATION_ACCELERATION_MPS2      = 1500;
+            public static final double     MAX_TRANSLATION_ACCELERATION_MPS2      = 8;
 
             /**
              * Standard drive speed factor. Regular teleop drive will use this factor of the max
@@ -96,7 +96,9 @@ public final class Constants {
             }
 
             public static final class VelocityPIDConfig {
-                public static final double P = 1;
+//                public static final double P = 15;
+//                public static final double P = 1.5;
+                public static final double P = 1.2;
                 // .002 is too low but stable
                 public static final double I = 0;
                 public static final double D = 0;
