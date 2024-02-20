@@ -91,6 +91,10 @@ public abstract class BaseDriveCommand extends LoggingCommand {
         if (maxSpeed > MAX_TRANSLATION_SPEED_MPS) {
             maxSpeed = MAX_TRANSLATION_SPEED_MPS;
         }
+        else {
+            // todo: remoe this option entirely
+            maxSpeed = MAX_TRANSLATION_SPEED_MPS;
+        }
 
         double xSign         = Math.signum(translationToTravel.getX());
         double ySign         = Math.signum(translationToTravel.getY());
