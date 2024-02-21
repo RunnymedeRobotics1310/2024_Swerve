@@ -239,7 +239,8 @@ public class HughVisionSubsystem extends SubsystemBase {
             return new Pose2d();
         }
         Translation2d tran2d = new Translation2d(inData[0], inData[1]);
-        Rotation2d    r2d    = Rotation2d.fromDegrees(inData[5]);
+        // Add 180deg to rotation because Hugh is on rear of bot
+        Rotation2d    r2d    = Rotation2d.fromDegrees((inData[5] + 180) % 360);
         return new Pose2d(tran2d, r2d);
     }
 
@@ -280,7 +281,7 @@ public class HughVisionSubsystem extends SubsystemBase {
 
         PoseConfidence poseConfidence = PoseConfidence.HIGH;
         if (numTargets == 1) {
-            poseConfidence = PoseConfidence.MID;
+            poseConfidence = PoseConfidence.LOW;
         }
 
         return new VisionPositionInfo(pose, latency, poseConfidence);

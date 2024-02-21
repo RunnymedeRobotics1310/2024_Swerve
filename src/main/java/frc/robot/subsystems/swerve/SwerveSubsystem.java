@@ -161,10 +161,10 @@ public abstract class SwerveSubsystem extends SubsystemBase {
             return;
         }
 
-        double timestamp = Timer.getFPGATimestamp() - visPose.latencyMillis();
+        double timeInSeconds = Timer.getFPGATimestamp() - (visPose.latencyMillis() / 1000);
 
         SmartDashboard.putString("Drive/Swerve/vispose", visPose.toString());
-        this.addVisionMeasurement(visPose.pose(), timestamp, stds);
+        this.addVisionMeasurement(visPose.pose(), timeInSeconds, stds);
     }
 
     public abstract void resetOdometry(Pose2d replacementPose);
