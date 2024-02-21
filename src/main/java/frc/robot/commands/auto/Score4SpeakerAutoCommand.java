@@ -10,7 +10,11 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.BotTarget;
 import frc.robot.commands.auto.stubs.FakeScoreSpeakerCommand;
 import frc.robot.commands.auto.stubs.FakeVisionNotePickupCommand;
-import frc.robot.commands.swervedrive.*;
+import frc.robot.commands.swervedrive.DriveDistanceCommand;
+import frc.robot.commands.swervedrive.DriveToPositionCommand;
+import frc.robot.commands.swervedrive.ResetOdometryCommand;
+import frc.robot.commands.swervedrive.RotateToPlacedNoteCommand;
+import frc.robot.commands.swervedrive.RotateToTargetCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
 
@@ -18,34 +22,42 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
 
     public Score4SpeakerAutoCommand(SwerveSubsystem swerve, HughVisionSubsystem hugh) {
 
-        final Alliance  alliance = getAlliance().orElse(Alliance.Blue);
-        final int       invert;
-        final BotTarget wolverine;
-        final BotTarget barnum;
-        final BotTarget valjean;
-        final BotTarget speaker;
+        final Alliance   alliance         = getAlliance().orElse(Alliance.Blue);
+        final int        invert;
+        final BotTarget  wolverine;
+        final BotTarget  barnum;
+        final BotTarget  valjean;
+        final BotTarget  speaker;
+        final Pose2d     startingPose;
+        final Rotation2d startingRotation = Rotation2d.fromDegrees(0);
+        final Pose2d     finishPose;
+
+
 
         if (alliance == Alliance.Blue) {
-            wolverine = BotTarget.BLUE_NOTE_WOLVERINE;
-            barnum    = BotTarget.BLUE_NOTE_BARNUM;
-            valjean   = BotTarget.BLUE_NOTE_VALJEAN;
-            speaker   = BotTarget.BLUE_SPEAKER;
-            invert    = 1;
+            startingPose = new Pose2d(1.37, 5.55, startingRotation);
+            wolverine    = BotTarget.BLUE_NOTE_WOLVERINE;
+            barnum       = BotTarget.BLUE_NOTE_BARNUM;
+            valjean      = BotTarget.BLUE_NOTE_VALJEAN;
+            speaker      = BotTarget.BLUE_SPEAKER;
+            invert       = 1;
+            finishPose   = new Pose2d(new Translation2d(3.5, valjean.getLocation().getY()), new Rotation2d());
         }
         // Red Alliance
         else {
-            wolverine = BotTarget.RED_NOTE_WOLVERINE;
-            barnum    = BotTarget.RED_NOTE_BARNUM;
-            valjean   = BotTarget.RED_NOTE_VALJEAN;
-            speaker   = BotTarget.RED_SPEAKER;
-            invert    = -1;
+            startingPose = new Pose2d(1517, 5.55, startingRotation);
+            wolverine    = BotTarget.RED_NOTE_WOLVERINE;
+            barnum       = BotTarget.RED_NOTE_BARNUM;
+            valjean      = BotTarget.RED_NOTE_VALJEAN;
+            speaker      = BotTarget.RED_SPEAKER;
+            invert       = -1;
+            finishPose   = new Pose2d(new Translation2d(1304, valjean.getLocation().getY()), new Rotation2d());
+
         }
 
 
 
         // TODO: implement Auto Selector
-        Rotation2d startingRotation = Rotation2d.fromDegrees(0);
-        Pose2d     startingPose     = new Pose2d(1.37, 5.55, startingRotation);
         // Configure
         addCommands(new LogMessageCommand("Starting Auto"));
         addCommands(new ResetOdometryCommand(swerve, startingPose));
@@ -78,10 +90,9 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
         addCommands(new FakeScoreSpeakerCommand(swerve));
 
         /* Exit Zone */
-        addCommands(
-            new DriveToPositionCommand(swerve,
-                new Pose2d(new Translation2d(3.5, valjean.getLocation().getY()), new Rotation2d())));
-//        addCommands(new DriveDistanceCommand(swerve, new Translation2d(invert * 1, 0), Rotation2d.fromDegrees(0), 1));
+        addCommands(new DriveToPositionCommand(swerve, finishPose));
+        // addCommands(new DriveDistanceCommand(swerve, new Translation2d(invert * 1, 0),
+        // Rotation2d.fromDegrees(0), 1));
 
         // tell people we're done
         addCommands(new LogMessageCommand("Auto Complete"));
