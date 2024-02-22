@@ -173,7 +173,7 @@ public abstract class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
         super.periodic();
         updateOdometryWithStates();
-        updateOdometryWithVisionInfo();
+        // updateOdometryWithVisionInfo();
         Pose2d pose = getPose();
         SmartDashboard.putString("Drive/Swerve/location",
             String.format("%.2f,%.2f m", pose.getTranslation().getX(), pose.getTranslation().getY()));
