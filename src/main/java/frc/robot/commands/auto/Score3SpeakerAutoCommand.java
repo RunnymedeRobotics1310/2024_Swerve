@@ -18,13 +18,12 @@ import frc.robot.commands.swervedrive.RotateToTargetCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
 
-public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
+public class Score3SpeakerAutoCommand extends SequentialCommandGroup {
 
-    public Score4SpeakerAutoCommand(SwerveSubsystem swerve, HughVisionSubsystem hugh) {
+    public Score3SpeakerAutoCommand(SwerveSubsystem swerve, HughVisionSubsystem hugh) {
 
         final Alliance   alliance         = getAlliance().orElse(Alliance.Blue);
         final int        invert;
-        final BotTarget  wolverine;
         final BotTarget  barnum;
         final BotTarget  valjean;
         final BotTarget  speaker;
@@ -36,7 +35,6 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
 
         if (alliance == Alliance.Blue) {
             startingPose = new Pose2d(1.37, 5.55, startingRotation);
-            wolverine    = BotTarget.BLUE_NOTE_WOLVERINE;
             barnum       = BotTarget.BLUE_NOTE_BARNUM;
             valjean      = BotTarget.BLUE_NOTE_VALJEAN;
             speaker      = BotTarget.BLUE_SPEAKER;
@@ -46,7 +44,6 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
         // Red Alliance
         else {
             startingPose = new Pose2d(15.17, 5.55, startingRotation);
-            wolverine    = BotTarget.RED_NOTE_WOLVERINE;
             barnum       = BotTarget.RED_NOTE_BARNUM;
             valjean      = BotTarget.RED_NOTE_VALJEAN;
             speaker      = BotTarget.RED_SPEAKER;
@@ -55,9 +52,6 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
 
         }
 
-
-
-        // TODO: implement Auto Selector
         // Configure
         addCommands(new LogMessageCommand("Starting Auto"));
         addCommands(new ResetOdometryCommand(swerve, startingPose));
@@ -69,21 +63,13 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
         addCommands(new DriveDistanceCommand(swerve, new Translation2d(invert * 0.5, 0), new Rotation2d(), 0.1));
         addCommands(new FakeScoreSpeakerCommand(swerve));
 
-
         /* Note 2 */
-        addCommands(new RotateToPlacedNoteCommand(swerve, wolverine));
-        addCommands(new FakeVisionNotePickupCommand(swerve, wolverine));
-        addCommands(new RotateToTargetCommand(swerve, hugh, speaker));
-        addCommands(new FakeScoreSpeakerCommand(swerve));
-
-
-        /* Note 3 */
         addCommands(new RotateToPlacedNoteCommand(swerve, barnum));
         addCommands(new FakeVisionNotePickupCommand(swerve, barnum));
         addCommands(new RotateToTargetCommand(swerve, hugh, speaker));
         addCommands(new FakeScoreSpeakerCommand(swerve));
 
-        /* Note 4 */
+        /* Note 3 */
         addCommands(new RotateToPlacedNoteCommand(swerve, valjean));
         addCommands(new FakeVisionNotePickupCommand(swerve, valjean));
         addCommands(new RotateToTargetCommand(swerve, hugh, speaker));
