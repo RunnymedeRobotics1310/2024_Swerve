@@ -34,16 +34,16 @@ public class RotateToSpeakerCommand extends BaseDriveCommand {
     public void execute() {
         super.execute();
         // todo: use heading from hugh
-        Rotation2d heading = super.getHeadingToFieldPosition(speaker);
-        log("Heading to speaker: " + heading + " from location " + swerve.getPose().getTranslation() + " for speaker " + speaker);
-        Pose2d targetPose = new Pose2d(swerve.getPose().getTranslation(), heading);
+        Rotation2d heading    = super.getHeadingToFieldPosition(speaker).plus(Rotation2d.fromDegrees(180));
+//        log("Heading to speaker: " + heading + " from location " + swerve.getPose().getTranslation() + " for speaker " + speaker);
+        Pose2d     targetPose = new Pose2d(swerve.getPose().getTranslation(), heading);
         driveToFieldPose(targetPose);
     }
 
     @Override
     public boolean isFinished() {
         // todo: use heading from hugh
-        Rotation2d heading = super.getHeadingToFieldPosition(speaker);
+        Rotation2d heading = super.getHeadingToFieldPosition(speaker).plus(Rotation2d.fromDegrees(180));
         return isCloseEnough(heading);
     }
 }
