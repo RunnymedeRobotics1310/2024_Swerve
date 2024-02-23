@@ -57,13 +57,24 @@ public abstract class BaseDriveCommand extends LoggingCommand {
         if (error > Math.PI) {
             error -= (2 * Math.PI);
         }
-
-        if (Math.abs(error) <= ROTATION_TOLERANCE.getRadians()) {
-            error = 0.0;
+        else if (error < -Math.PI) {
+            error += (2 * Math.PI);
         }
 
-        double omegaRadians = error * P * MAX_ROTATIONAL_VELOCITY_PER_SEC.getRadians();
-        return Rotation2d.fromRadians(omegaRadians);
+        final Rotation2d result;
+        if (Math.abs(error) <= ROTATION_TOLERANCE.getRadians()) {
+            // close enough - done!
+            result = Rotation2d.fromRadians(0);
+        }
+        else {
+            double omegaRadians = error * P * MAX_ROTATIONAL_VELOCITY_PER_SEC.getRadians();
+            if (Math.abs(omegaRadians) < MIN_ROTATIONAL_VELOCITY_PER_SEC.getRadians()) {
+                omegaRadians = Math.signum(omegaRadians) * MIN_ROTATIONAL_VELOCITY_PER_SEC.getRadians();
+            }
+            result = Rotation2d.fromRadians(omegaRadians);
+        }
+
+        return result;
     }
 
 

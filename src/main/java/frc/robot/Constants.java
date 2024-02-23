@@ -11,6 +11,7 @@ import static frc.robot.subsystems.vision.PoseConfidence.MID;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -62,6 +63,7 @@ public final class Constants {
              */
             public static final double     MAX_TRANSLATION_SPEED_MPS              = 4.42;
             public static final Rotation2d MAX_ROTATIONAL_VELOCITY_PER_SEC        = Rotation2d.fromRotations(1);
+            public static final Rotation2d MIN_ROTATIONAL_VELOCITY_PER_SEC        = Rotation2d.fromDegrees(10);
             public static final Rotation2d ROTATION_TOLERANCE                     = Rotation2d.fromDegrees(1);
             public static final double     TRANSLATION_TOLERANCE_METRES           = 0.02;
             public static final double     DECEL_FROM_MAX_TO_STOP_DIST_METRES     = 1.9;
@@ -250,6 +252,19 @@ public final class Constants {
             return "BotTarget: " + name() + " at " + location;
         }
     }
+
+    public static final class UsefulPoses {
+
+        public static final Pose2d SCORE_BLUE_AMP = (new Pose2d(BotTarget.BLUE_AMP.getLocation().getX(), 7.8,
+            Rotation2d.fromDegrees(90)));
+        public static final Pose2d SCORE_RED_AMP  = (new Pose2d(BotTarget.RED_AMP.getLocation().getX(), 7.8,
+            Rotation2d.fromDegrees(90)));
+
+        public static final Pose2d BLUE_2_2_20    = new Pose2d(2, 2, Rotation2d.fromDegrees(20));
+        public static final Pose2d RED_2_2_20     = new Pose2d(14.54, 2, Rotation2d.fromDegrees(-20));
+
+    }
+
 
     public static final class VisionConstants {
         /** Time to switch pipelines and acquire a new vision target */

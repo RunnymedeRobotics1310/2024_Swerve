@@ -1,7 +1,7 @@
 package frc.robot.commands.swervedrive;
 
-import static edu.wpi.first.wpilibj.DriverStation.getAlliance;
 import static frc.robot.Constants.Swerve.Chassis.*;
+import static frc.robot.RunnymedeUtils.getRunnymedeAlliance;
 import static frc.robot.commands.operator.OperatorInput.Axis.X;
 import static frc.robot.commands.operator.OperatorInput.Axis.Y;
 import static frc.robot.commands.operator.OperatorInput.Stick.LEFT;
@@ -42,7 +42,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
 
         // The FRC field-oriented ccoordinate system
         // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
-        final Alliance alliance                     = getAlliance().orElse(Alliance.Blue);
+        final Alliance alliance                     = getRunnymedeAlliance();
 
         // The coordinate system defines (0,0) as the right side of the blue alliance wall. The
         // x-axis is positive toward the red alliance, and the y-axis is positive to the left.

@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OiConstants;
 import frc.robot.commands.CancelCommand;
-import frc.robot.commands.auto.Score4SpeakerAutoCommand;
+import frc.robot.commands.auto.*;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.DriveDistanceCommand;
 import frc.robot.commands.swervedrive.DriveToPositionCommand;
@@ -25,6 +25,9 @@ import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.swerve.yagsl.YagslSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
+
+import static frc.robot.Constants.UsefulPoses.BLUE_2_2_20;
+import static frc.robot.Constants.UsefulPoses.RED_2_2_20;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -90,7 +93,7 @@ public class RobotContainer {
         Translation2d          location    = new Translation2d(2, 2);
         Rotation2d             heading     = Rotation2d.fromDegrees(-20);
         Pose2d                 desiredPose = new Pose2d(location, heading);
-        DriveToPositionCommand dtpc        = new DriveToPositionCommand(swerveDriveSubsystem, desiredPose);
+        DriveToPositionCommand dtpc        = new DriveToPositionCommand(swerveDriveSubsystem, BLUE_2_2_20, RED_2_2_20);
         new Trigger(operatorInput::isY).onTrue(dtpc);
         new Trigger(operatorInput::isB).onTrue(new Score4SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem));
     }

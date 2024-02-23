@@ -4,6 +4,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+
+import java.util.function.BooleanSupplier;
 
 public class RunnymedeUtils {
 
@@ -160,4 +163,10 @@ public class RunnymedeUtils {
         Rotation2d    dw = target.getRotation().minus(current.getRotation());
         return new Transform2d(dx, dw);
     }
+
+    public static DriverStation.Alliance getRunnymedeAlliance() {
+        return DriverStation.Alliance.Blue;
+//        return DriverStation.getAlliance().orElse(DriverStation.Alliance.Red);
+    }
+
 }
