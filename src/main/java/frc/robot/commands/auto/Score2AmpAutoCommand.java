@@ -59,7 +59,7 @@ public class Score2AmpAutoCommand extends SequentialCommandGroup {
         /* Note 2 */
         addCommands(new RotateToPlacedNoteCommand(swerve, valjean));
         addCommands(new FakeVisionNotePickupCommand(swerve, valjean));
-        addCommands(new RotateToTargetCommand(swerve, hugh, amp));
+        addCommands(new RotateToTargetCommand(swerve, hugh, amp, false));
         addCommands(new DriveToPositionCommand(swerve, ampPose));
         // addCommands(new ScoreAmpCommand(swerve));
 

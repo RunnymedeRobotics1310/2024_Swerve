@@ -7,6 +7,11 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 public class FakeScoreSpeakerCommand extends DriveDistanceCommand {
     public FakeScoreSpeakerCommand(SwerveSubsystem swerve) {
-        super(swerve, new Translation2d(0.1, 0), Rotation2d.fromDegrees(180), 0.15);
+        super(swerve, new Translation2d(0.1, 0), Rotation2d.fromDegrees(0), 0.0);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return true;
     }
 }

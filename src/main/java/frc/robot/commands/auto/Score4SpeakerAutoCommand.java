@@ -73,20 +73,20 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
         /* Note 2 */
         addCommands(new RotateToPlacedNoteCommand(swerve, wolverine));
         addCommands(new FakeVisionNotePickupCommand(swerve, wolverine));
-        addCommands(new RotateToTargetCommand(swerve, hugh, speaker));
+        addCommands(new RotateToTargetCommand(swerve, hugh, speaker, false));
         addCommands(new FakeScoreSpeakerCommand(swerve));
 
 
         /* Note 3 */
         addCommands(new RotateToPlacedNoteCommand(swerve, barnum));
         addCommands(new FakeVisionNotePickupCommand(swerve, barnum));
-        addCommands(new RotateToTargetCommand(swerve, hugh, speaker));
+        addCommands(new RotateToTargetCommand(swerve, hugh, speaker, false));
         addCommands(new FakeScoreSpeakerCommand(swerve));
 
         /* Note 4 */
         addCommands(new RotateToPlacedNoteCommand(swerve, valjean));
         addCommands(new FakeVisionNotePickupCommand(swerve, valjean));
-        addCommands(new RotateToTargetCommand(swerve, hugh, speaker));
+        addCommands(new RotateToTargetCommand(swerve, hugh, speaker, false));
         addCommands(new FakeScoreSpeakerCommand(swerve));
 
         /* Exit Zone */

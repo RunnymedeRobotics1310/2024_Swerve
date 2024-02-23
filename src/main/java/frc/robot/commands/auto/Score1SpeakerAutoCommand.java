@@ -54,7 +54,7 @@ public class Score1SpeakerAutoCommand extends SequentialCommandGroup {
 
         /* Note 1 */
         addCommands(new DriveDistanceCommand(swerve, new Translation2d(invert * 0.5, 0), Rotation2d.fromDegrees(-28), 0.1));
-        addCommands(new RotateToTargetCommand(swerve, hugh, speaker));
+        addCommands(new RotateToTargetCommand(swerve, hugh, speaker, false));
         addCommands(new FakeScoreSpeakerCommand(swerve));
 
         /* Exit Zone */
