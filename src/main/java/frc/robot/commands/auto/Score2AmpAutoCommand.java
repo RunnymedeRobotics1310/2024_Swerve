@@ -29,21 +29,21 @@ public class Score2AmpAutoCommand extends SequentialCommandGroup {
 
 
         if (alliance == Alliance.Blue) {
-            startingPose = new Pose2d(1.5, 7, Rotation2d.fromDegrees(90));
+            startingPose = new Pose2d(1.5, 7.8, Rotation2d.fromDegrees(90));
             amp          = BotTarget.BLUE_AMP;
-            ampPose      = new Pose2d(amp.getLocation().getX(), 7, Rotation2d.fromDegrees(90));
+            ampPose      = new Pose2d(amp.getLocation().getX(), 7.8, Rotation2d.fromDegrees(90));
             valjean      = BotTarget.BLUE_NOTE_VALJEAN;
             invert       = 1;
-            finishPose   = new Pose2d(4, 7, new Rotation2d(90));
+            finishPose   = new Pose2d(4, 7.8, new Rotation2d(90));
         }
         // Red Alliance
         else {
-            startingPose = new Pose2d(15.91, 7, Rotation2d.fromDegrees(90));
+            startingPose = new Pose2d(15.91, 7.8, Rotation2d.fromDegrees(90));
             amp          = BotTarget.RED_AMP;
-            ampPose      = new Pose2d(amp.getLocation().getX(), 7, Rotation2d.fromDegrees(90));
+            ampPose      = new Pose2d(amp.getLocation().getX(), 7.8, Rotation2d.fromDegrees(90));
             valjean      = BotTarget.RED_NOTE_VALJEAN;
             invert       = -1;
-            finishPose   = new Pose2d(12.54, 7, new Rotation2d());
+            finishPose   = new Pose2d(12.54, 7.8, new Rotation2d());
 
         }
 

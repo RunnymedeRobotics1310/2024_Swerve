@@ -77,8 +77,6 @@ public class Score3SpeakerAutoCommand extends SequentialCommandGroup {
 
         /* Exit Zone */
         addCommands(new DriveToPositionCommand(swerve, finishPose));
-        // addCommands(new DriveDistanceCommand(swerve, new Translation2d(invert * 1, 0),
-        // Rotation2d.fromDegrees(0), 1));
 
         // tell people we're done
         addCommands(new LogMessageCommand("Auto Complete"));
