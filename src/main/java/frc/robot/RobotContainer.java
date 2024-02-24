@@ -95,7 +95,12 @@ public class RobotContainer {
         Pose2d                 desiredPose = new Pose2d(location, heading);
         DriveToPositionCommand dtpc        = new DriveToPositionCommand(swerveDriveSubsystem, BLUE_2_2_20, RED_2_2_20);
         new Trigger(operatorInput::isY).onTrue(dtpc);
+//        new Trigger(operatorInput::isB).onTrue(new Score1SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem));
+//        new Trigger(operatorInput::isB).onTrue(new Score3SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem));
         new Trigger(operatorInput::isB).onTrue(new Score4SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem));
+//        new Trigger(operatorInput::isB).onTrue(new Score1AmpAutoCommand(swerveDriveSubsystem, hughVisionSubsystem));
+//        new Trigger(operatorInput::isB).onTrue(new Score2AmpAutoCommand(swerveDriveSubsystem, hughVisionSubsystem));
+
     }
 
     /**

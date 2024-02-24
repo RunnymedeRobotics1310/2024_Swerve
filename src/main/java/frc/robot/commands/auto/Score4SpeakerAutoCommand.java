@@ -17,25 +17,21 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
 
     public Score4SpeakerAutoCommand(SwerveSubsystem swerve, HughVisionSubsystem hugh) {
 
-        final Pose2d blueStartingPose = new Pose2d(1.37, 5.55, Rotation2d.fromDegrees(0));
-        final Pose2d redStartingPose  = new Pose2d(15.17, 5.55, Rotation2d.fromDegrees(180));
-
-        final Pose2d blueFinishPose   = new Pose2d(new Translation2d(3.5, 7), new Rotation2d());
-        final Pose2d redFinishPose    = new Pose2d(new Translation2d(13.04, 7), new Rotation2d());
+        final Pose2d blueFinishPose = new Pose2d(new Translation2d(3.5, 7), new Rotation2d());
+        final Pose2d redFinishPose  = new Pose2d(new Translation2d(13.04, 7), new Rotation2d());
 
 
         // TODO: implement Auto Selector
         // Configure
         addCommands(new LogMessageCommand("Starting Auto"));
-        addCommands(new ResetOdometryCommand(swerve, blueStartingPose, redStartingPose));
 
         /* ***AUTO PATTERN*** */
 
         /* Note 1 */
         // back up to not hit the speaker while rotating
         addCommands(new DriveToPositionCommand(swerve,
-            blueStartingPose.plus(new Transform2d(.25, 0, new Rotation2d())),
-            redStartingPose.plus(new Transform2d(.25, 0, new Rotation2d()))));
+            BotTarget.BLUE_SPEAKER.getLocation().toTranslation2d().plus(new Translation2d(1.6, 0)),
+            BotTarget.RED_SPEAKER.getLocation().toTranslation2d().plus(new Translation2d(-1.6, 0))));
         addCommands(new FakeScoreSpeakerCommand(swerve));
 
 

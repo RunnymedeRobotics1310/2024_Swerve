@@ -41,7 +41,6 @@ public class DriveToPositionFacingCommand extends BaseDriveCommand {
     @Override
     public void end(boolean interrupted) {
         super.end(interrupted);
-        swerve.lock();
     }
 
     @Override

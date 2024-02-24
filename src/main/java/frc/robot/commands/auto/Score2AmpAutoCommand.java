@@ -21,16 +21,12 @@ public class Score2AmpAutoCommand extends SequentialCommandGroup {
 
     public Score2AmpAutoCommand(SwerveSubsystem swerve, HughVisionSubsystem hugh) {
 
-        Pose2d blueStartPose  = new Pose2d(1.5, 7.8, Rotation2d.fromDegrees(90));
-        Pose2d redStartPose   = new Pose2d(15.91, 7.8, Rotation2d.fromDegrees(90));
-
         Pose2d blueFinishPose = new Pose2d(4, 7.0, new Rotation2d(90));
         Pose2d redFinishPose  = new Pose2d(12.54, 7.0, new Rotation2d());
 
         // TODO: implement Auto Selector
         // Configure
         addCommands(new LogMessageCommand("Starting Auto"));
-        addCommands(new ResetOdometryCommand(swerve, blueStartPose, redStartPose));
 
         /* Note 1 */
         addCommands(new DriveToPositionCommand(swerve, SCORE_BLUE_AMP, SCORE_RED_AMP));
