@@ -1,5 +1,7 @@
 package frc.robot.commands.swervedrive;
 
+import static frc.robot.Constants.Swerve.Chassis.ROTATION_TOLERANCE;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -8,9 +10,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 import frc.robot.RunnymedeUtils;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
-import frc.robot.subsystems.vision.HughVisionSubsystem;
-
-import static frc.robot.Constants.Swerve.Chassis.ROTATION_TOLERANCE;
 
 public class RotateToPlacedNoteCommand extends BaseDriveCommand {
 
@@ -26,11 +25,11 @@ public class RotateToPlacedNoteCommand extends BaseDriveCommand {
      */
     public RotateToPlacedNoteCommand(SwerveSubsystem swerve, Constants.BotTarget blueTarget, Constants.BotTarget redTarget) {
         super(swerve);
-//        this.hugh        = hugh;
+        // this.hugh = hugh;
         this.blueTarget  = blueTarget;
         this.redTarget   = redTarget;
         this.initialPose = null;
-//        addRequirements(hugh);
+        // addRequirements(hugh);
 
     }
 
@@ -38,7 +37,7 @@ public class RotateToPlacedNoteCommand extends BaseDriveCommand {
     public void initialize() {
         this.target = RunnymedeUtils.getRunnymedeAlliance() == DriverStation.Alliance.Blue ? blueTarget : redTarget;
         logCommandStart("Target: " + target);
-//        hugh.setBotTarget(target);
+        // hugh.setBotTarget(target);
         this.initialPose = swerve.getPose();
     }
 
@@ -46,7 +45,7 @@ public class RotateToPlacedNoteCommand extends BaseDriveCommand {
     public void execute() {
         super.execute();
 
-        Translation2d robotRelativeTranslation = null;// hugh.getRobotTranslationToTarget();
+        Translation2d robotRelativeTranslation = null;// jackman.getRobotTranslationToTarget();
 
         if (robotRelativeTranslation == null) {
             Rotation2d delta = getHeadingToFieldPosition(target.getLocation().toTranslation2d());
@@ -63,7 +62,7 @@ public class RotateToPlacedNoteCommand extends BaseDriveCommand {
     @Override
     public boolean isFinished() {
 
-        Translation2d robotRelativeTranslation = null; // hugh.getRobotTranslationToTarget();
+        Translation2d robotRelativeTranslation = null; // jackman.getRobotTranslationToTarget();
         if (robotRelativeTranslation == null) {
             Rotation2d delta = getHeadingToFieldPosition(target.getLocation().toTranslation2d());
             return isCloseEnough(delta);
