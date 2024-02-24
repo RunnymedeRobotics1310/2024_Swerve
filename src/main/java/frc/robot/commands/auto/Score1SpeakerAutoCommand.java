@@ -17,18 +17,14 @@ public class Score1SpeakerAutoCommand extends SequentialCommandGroup {
 
     public Score1SpeakerAutoCommand(SwerveSubsystem swerve, HughVisionSubsystem hugh) {
 
-        Pose2d blueStartingPose = new Pose2d(0.63, 4, Rotation2d.fromDegrees(-28));
-        Pose2d redStartingPose  = new Pose2d(15.61, 4.3, Rotation2d.fromDegrees(+208));
-
-        Pose2d blueFinishPose   = new Pose2d(4, 1.5, new Rotation2d());
-        Pose2d redFinishPose    = new Pose2d(12.54, 1.8, new Rotation2d());
+        Pose2d blueFinishPose = new Pose2d(4, 1.5, new Rotation2d());
+        Pose2d redFinishPose  = new Pose2d(12.54, 1.8, new Rotation2d());
 
 
 
         // TODO: implement Auto Selector
         // Configure
         addCommands(new LogMessageCommand("Starting Auto"));
-        addCommands(new ResetOdometryCommand(swerve, blueStartingPose, redStartingPose));
 
         /* ***AUTO PATTERN*** */
 

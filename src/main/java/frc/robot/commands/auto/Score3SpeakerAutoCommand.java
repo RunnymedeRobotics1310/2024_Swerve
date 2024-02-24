@@ -21,26 +21,22 @@ public class Score3SpeakerAutoCommand extends SequentialCommandGroup {
     public Score3SpeakerAutoCommand(SwerveSubsystem swerve, HughVisionSubsystem hugh) {
 
 
-        Pose2d blueStartingPose = new Pose2d(1.37, 5.55, Rotation2d.fromDegrees(0));
-        Pose2d redStartingPose  = new Pose2d(15.17, 5.55, Rotation2d.fromDegrees(180));
-
-        Pose2d blueFinishPose   = new Pose2d(new Translation2d(3.5, BLUE_NOTE_VALJEAN.getLocation().getY()),
+        Pose2d blueFinishPose = new Pose2d(new Translation2d(3.5, BLUE_NOTE_VALJEAN.getLocation().getY()),
             Rotation2d.fromDegrees(0));
-        Pose2d redFinishPose    = new Pose2d(new Translation2d(13.04, RED_NOTE_VALJEAN.getLocation().getY()),
+        Pose2d redFinishPose  = new Pose2d(new Translation2d(13.04, RED_NOTE_VALJEAN.getLocation().getY()),
             Rotation2d.fromDegrees(180));
 
 
         // Configure
         addCommands(new LogMessageCommand("Starting Auto"));
-        addCommands(new ResetOdometryCommand(swerve, blueStartingPose, redStartingPose));
 
         /* ***AUTO PATTERN*** */
 
         /* Note 1 */
         // back up to not hit the speaker while rotating
         addCommands(new DriveToPositionCommand(swerve,
-            blueStartingPose.plus(new Transform2d(.25, 0, new Rotation2d())),
-            redStartingPose.plus(new Transform2d(.25, 0, new Rotation2d()))));
+            BotTarget.BLUE_SPEAKER.getLocation().toTranslation2d().plus(new Translation2d(1.6, 0)),
+            BotTarget.RED_SPEAKER.getLocation().toTranslation2d().plus(new Translation2d(-1.6, 0))));
         addCommands(new FakeScoreSpeakerCommand(swerve));
 
         /* Note 3 */
