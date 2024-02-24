@@ -56,6 +56,11 @@ public class HughVisionSubsystem extends SubsystemBase {
     NetworkTableEntry                  tl                                   = table.getEntry("tl");
     NetworkTableEntry                  cl                                   = table.getEntry("cl");
 
+    NetworkTableEntry                  botpose_avgarea                      = table.getEntry("botpose_avgarea");
+    NetworkTableEntry                  botpose_avgdist                      = table.getEntry("botpose_avgdist");
+    NetworkTableEntry                  botpose_span                         = table.getEntry("botpose_span");
+    NetworkTableEntry                  botpose_tagcount                     = table.getEntry("botpose_tagcount");
+
     NetworkTableEntry                  botpose_wpiblue                      = table.getEntry("botpose_wpiblue");
     NetworkTableEntry                  botpose_wpired                       = table.getEntry("botpose_wpibred");
 
@@ -63,16 +68,18 @@ public class HughVisionSubsystem extends SubsystemBase {
 
     NetworkTableEntry                  tid                                  = table.getEntry("tid");
 
+    NetworkTableEntry                  priorityid                           = table.getEntry("priorityid");
+
     NetworkTableEntry                  json                                 = table.getEntry("json");
 
     private BotTarget                  botTarget                            = BotTarget.NONE;
 
-    private static final List<Integer> TARGET_BLUE_SPEAKER                  = List.of(7, 8);
+    private static final List<Integer> TARGET_BLUE_SPEAKER                  = List.of(8, 7);
     private static final List<Integer> TARGET_BLUE_SOURCE                   = List.of(9, 10);
     private static final List<Integer> TARGET_BLUE_AMP                      = List.of(6);
     private static final List<Integer> TARGET_BLUE_STAGE                    = List.of(14, 15, 16);
 
-    private static final List<Integer> TARGET_RED_SPEAKER                   = List.of(3, 4);
+    private static final List<Integer> TARGET_RED_SPEAKER                   = List.of(4, 3);
     private static final List<Integer> TARGET_RED_SOURCE                    = List.of(1, 2);
     private static final List<Integer> TARGET_RED_AMP                       = List.of(5);
     private static final List<Integer> TARGET_RED_STAGE                     = List.of(11, 12, 13);
@@ -92,24 +99,25 @@ public class HughVisionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // read values periodically and post to smart dashboard periodically
+        double[]           bp          = getBotPose();
+        AprilTagInfo[]     visibleTags = getVisibleTagInfo();
+        double             avgDist     = getTargetAvgDistance();
+        VisionPositionInfo visPos      = getPositionInfo(bp, visibleTags.length, avgDist);
+
         SmartDashboard.putString("VisionHugh/BotTarget", getBotTarget().toString());
+        SmartDashboard.putString("VisionHugh/PriorityId", "" + getPriorityId());
         SmartDashboard.putBoolean("VisionHugh/Target Found", isCurrentTargetVisible());
         SmartDashboard.putNumber("VisionHugh/tid", tid.getDouble(-1.0));
         SmartDashboard.putNumber("VisionHugh/tx", tx.getDouble(-1.0));
         SmartDashboard.putNumber("VisionHugh/ty", ty.getDouble(-1.0));
         SmartDashboard.putNumber("VisionHugh/ta", ta.getDouble(-1.0));
         SmartDashboard.putNumber("VisionHugh/tl", tl.getDouble(-1.0));
-
-        double[]           bp          = getBotPose();
-        AprilTagInfo[]     visibleTags = getVisibleTagInfo();
-        VisionPositionInfo visPos      = getPositionInfo(bp, visibleTags.length);
-
         SmartDashboard.putNumberArray("VisionHugh/Botpose", bp == null ? new double[0] : bp);
-        SmartDashboard.putString("VisionHugh/PoseConfidence", visPos == null ? "NONE" : visPos.poseConfidence().toString());
-        SmartDashboard.putNumber("VisionHugh/Number of Tags", visibleTags.length);
+        SmartDashboard.putNumber("VisionHugh/TargetAvgDist", avgDist);
+        SmartDashboard.putString("VisionHugh/PoseConf", visPos == null ? "NONE" : visPos.poseConfidence().toString());
+        SmartDashboard.putString("VisionHugh/NumTags", "" + getNumActiveTargets());
         SmartDashboard.putString("VisionHugh/AprilTagInfo", aprilTagInfoArrayToString(visibleTags));
-
-        SmartDashboard.putNumber("VisionHugh/DistanceToTarget", getDistanceToTargetMetres());
+        SmartDashboard.putNumber("VisionHugh/DistToTarget", getDistanceToTargetMetres());
         SmartDashboard.putBoolean("VisionHugh/AlignedWithTarget", isAlignedWithTarget());
     }
 
@@ -144,26 +152,31 @@ public class HughVisionSubsystem extends SubsystemBase {
         return ty.getDouble(Double.MIN_VALUE);
     }
 
+    /**
+     * Sets the priority Tag ID
+     *
+     * @return limelight Y target coordinates
+     */
+    private void setPriorityId(double tagId) {
+        priorityid.setDouble(tagId);
+    }
 
-    private int countOccurrences(String str, String subStr) {
-        int count     = 0;
-        int fromIndex = 0;
+    /**
+     * Gets the priority Tag ID
+     *
+     * @return priority tag id. -1 means no priority
+     */
+    private double getPriorityId() {
+        return priorityid.getDouble(-1);
+    }
 
-        if (str == null) {
-            return 0;
-        }
-        // Check if the substring is not empty to avoid infinite loop
-        if (subStr == null || subStr.isEmpty()) {
-            return 0;
-        }
-
-        while ((fromIndex = str.indexOf(subStr, fromIndex)) != -1) {
-            count++;
-            fromIndex += subStr.length(); // Move to the end of the current occurrence to find the
-                                          // next one
-        }
-
-        return count;
+    /**
+     * Gets the average target distance
+     *
+     * @return Average distance to target in meters. If no value, returns Double.MAX_VALUE.
+     */
+    private double getTargetAvgDistance() {
+        return botpose_avgdist.getDouble(Double.MAX_VALUE);
     }
 
     /**
@@ -252,8 +265,7 @@ public class HughVisionSubsystem extends SubsystemBase {
     }
 
     private int getNumActiveTargets() {
-        String jsonStr = json.getString(null);
-        return countOccurrences(jsonStr, "fID");
+        return botpose_tagcount.getNumber(0).intValue();
     }
 
     private double[] getBotPose() {
@@ -286,28 +298,38 @@ public class HughVisionSubsystem extends SubsystemBase {
      * @return position info or null
      * @since 2024-02-10
      */
-    public VisionPositionInfo getPositionInfo(double[] botPose, int numTargets) {
-        if (botPose == null) {
+    private VisionPositionInfo getPositionInfo(double[] botPose, int numTargets, double avgTargetDistance) {
+        // If No Pose, No Targets Visible, or Bot is floating in mid air, return null
+        if (botPose == null || numTargets < 1 || botPose[2] > 1) {
             return null;
         }
 
-        double latency = botPose[6];
-        Pose2d pose    = toPose2D(botPose);
+        double         latency        = botPose[6];
+        Pose2d         pose           = toPose2D(botPose);
 
-        if (numTargets < 1) {
-            return null;
-        }
+        PoseConfidence poseConfidence = PoseConfidence.NONE;
 
-        // if bot is floating in mid air, return null
-        if (botPose[2] > 1) {
-            return null;
-        }
-
-        PoseConfidence poseConfidence = PoseConfidence.HIGH;
         if (numTargets == 1) {
-            // TODO: Get lower confidence working, but for now we will not return 1 target updates
-            // poseConfidence = PoseConfidence.LOW;
-            return null;
+            if (avgTargetDistance <= 2) {
+                poseConfidence = PoseConfidence.HIGH;
+            }
+            else if (avgTargetDistance <= 2.4) {
+                poseConfidence = PoseConfidence.MEDIUM;
+            }
+            else if (avgTargetDistance <= 3) {
+                poseConfidence = PoseConfidence.LOW;
+            }
+        }
+        else { // numTargets > 1
+            if (avgTargetDistance <= 5) {
+                poseConfidence = PoseConfidence.HIGH;
+            }
+            else if (avgTargetDistance <= 6) {
+                poseConfidence = PoseConfidence.MEDIUM;
+            }
+            else if (avgTargetDistance <= 7) {
+                poseConfidence = PoseConfidence.LOW;
+            }
         }
 
         return new VisionPositionInfo(pose, latency, poseConfidence);
@@ -330,7 +352,7 @@ public class HughVisionSubsystem extends SubsystemBase {
      * @since 2024-02-10
      */
     public VisionPositionInfo getPositionInfo() {
-        return getPositionInfo(getBotPose(), getNumActiveTargets());
+        return getPositionInfo(getBotPose(), getNumActiveTargets(), getTargetAvgDistance());
     }
 
     /**
@@ -360,7 +382,16 @@ public class HughVisionSubsystem extends SubsystemBase {
         case RED_AMP -> activeAprilTagTargets = TARGET_RED_AMP;
         case RED_SOURCE -> activeAprilTagTargets = TARGET_RED_SOURCE;
         case RED_STAGE -> activeAprilTagTargets = TARGET_RED_STAGE;
+        case NONE -> activeAprilTagTargets = TARGET_NONE;
+        case ALL -> activeAprilTagTargets = TARGET_ALL;
         default -> throw new IllegalArgumentException(botTarget.toString());
+        }
+
+        if (botTarget == BotTarget.ALL || botTarget == BotTarget.NONE) {
+            setPriorityId(-1);
+        }
+        else {
+            setPriorityId(activeAprilTagTargets.get(0));
         }
     }
 

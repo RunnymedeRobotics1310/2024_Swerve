@@ -5,9 +5,7 @@
 package frc.robot;
 
 import static edu.wpi.first.math.util.Units.inchesToMeters;
-import static frc.robot.subsystems.vision.PoseConfidence.HIGH;
-import static frc.robot.subsystems.vision.PoseConfidence.LOW;
-import static frc.robot.subsystems.vision.PoseConfidence.MID;
+import static frc.robot.subsystems.vision.PoseConfidence.*;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -235,7 +233,11 @@ public final class Constants {
         CENTRE_NOTE_5(new Translation3d(8.16, 7.47, 0)),
 
         // When No Target is Set
-        NONE(new Translation3d(0, 0, 0));
+        NONE(new Translation3d(0, 0, 0)),
+
+        // No focus, but go to any tag visible
+        ALL(new Translation3d(0, 0, 0));
+
 
         private final Translation3d location;
 
@@ -289,18 +291,18 @@ public final class Constants {
 
             // todo: measure / tune these values
             if (confidence == HIGH) {
-                xyMetresStds = 0.5;
+                xyMetresStds = 0.05;
+                degreesStds  = 2;
+            }
+            else if (confidence == MEDIUM || poseDifferenceMetres < 0.5) {
+                xyMetresStds = 0.15;
                 degreesStds  = 6;
             }
-            else if (confidence == MID || poseDifferenceMetres < 0.5) {
-                xyMetresStds = 1.0;
+            else if (confidence == LOW || poseDifferenceMetres < 0.8) {
+                xyMetresStds = 0.30;
                 degreesStds  = 12;
             }
-            else if (confidence == LOW || poseDifferenceMetres < 0.8) {
-                xyMetresStds = 2.0;
-                degreesStds  = 24;
-            }
-            else {
+            else { // Covers the Confidence.NONE case
                 return null;
             }
 

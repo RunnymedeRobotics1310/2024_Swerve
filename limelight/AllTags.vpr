@@ -5,7 +5,7 @@ aspect_max:20.000000
 aspect_min:0.000000
 black_level:0
 blue_balance:1975
-botfloorsnap:1
+botfloorsnap:0
 botlength:0.7112
 bottype:swerve
 botwidth:0.7112
@@ -58,7 +58,7 @@ image_source:0
 img_to_show:0
 intersection_filter:0
 invert_hue:0
-lcgain:15
+lcgain:10
 multigroup_max:2
 multigroup_min:1
 multigroup_rejector:0
@@ -68,13 +68,13 @@ pipeline_res:3
 pipeline_type:4
 python_snapscript_name:
 red_balance:1200
-roi_x:0.000000
+roi_x:0
 roi_y:0.000000
 rsf:0.26
-rspitch:20
+rspitch:31
 rsroll:0
 rss:0
-rsu:0.32
+rsu:0.25
 rsyaw:0
 sat_max:255
 sat_min:70
