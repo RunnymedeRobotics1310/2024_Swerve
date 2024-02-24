@@ -86,25 +86,27 @@ public class HughVisionSubsystem extends SubsystemBase {
     public HughVisionSubsystem() {
         this.pipeline.setNumber(PIPELINE_APRIL_TAG_DETECT);
         this.camMode.setNumber(CAM_MODE_VISION);
-        this.ledMode.setNumber(LED_MODE_PIPELINE);
+        this.ledMode.setNumber(LED_MODE_ON);
     }
 
     @Override
     public void periodic() {
         // read values periodically and post to smart dashboard periodically
-        SmartDashboard.putString("LimelightHugh/BotTarget", getBotTarget().toString());
-        SmartDashboard.putBoolean("LimelightHugh/Target Found", isCurrentTargetVisible());
-        SmartDashboard.putNumber("LimelightHugh/tid", tid.getDouble(-1.0));
-        SmartDashboard.putNumber("LimelightHugh/tx", tx.getDouble(-1.0));
-        SmartDashboard.putNumber("LimelightHugh/ty", ty.getDouble(-1.0));
-        SmartDashboard.putNumber("LimelightHugh/ta", ta.getDouble(-1.0));
-        SmartDashboard.putNumber("LimelightHugh/tl", tl.getDouble(-1.0));
+        SmartDashboard.putString("VisionHugh/BotTarget", getBotTarget().toString());
+        SmartDashboard.putBoolean("VisionHugh/Target Found", isCurrentTargetVisible());
+        SmartDashboard.putNumber("VisionHugh/tid", tid.getDouble(-1.0));
+        SmartDashboard.putNumber("VisionHugh/tx", tx.getDouble(-1.0));
+        SmartDashboard.putNumber("VisionHugh/ty", ty.getDouble(-1.0));
+        SmartDashboard.putNumber("VisionHugh/ta", ta.getDouble(-1.0));
+        SmartDashboard.putNumber("VisionHugh/tl", tl.getDouble(-1.0));
         double[] bp = getBotPose();
-        SmartDashboard.putNumberArray("LimelightHugh/Botpose", bp == null ? new double[0] : bp);
-        SmartDashboard.putNumber("LimelightHugh/Number of Tags", getNumActiveTargets());
-        SmartDashboard.putString("LimelightHugh/AprilTagInfo", aprilTagInfoArrayToString(getVisibleTagInfo()));
-        SmartDashboard.putNumber("LimelightHugh/DistanceToTarget", getDistanceToTargetMetres());
-        SmartDashboard.putBoolean("LimelightHugh/AlignedWithTarget", isAlignedWithTarget());
+        SmartDashboard.putNumberArray("VisionHugh/Botpose", bp == null ? new double[0] : bp);
+        VisionPositionInfo visPos = getPositionInfo();
+        SmartDashboard.putString("VisionHugh/PoseConfidence", visPos == null ? "NONE" : visPos.poseConfidence().toString());
+        SmartDashboard.putNumber("VisionHugh/Number of Tags", getNumActiveTargets());
+        SmartDashboard.putString("VisionHugh/AprilTagInfo", aprilTagInfoArrayToString(getVisibleTagInfo()));
+        SmartDashboard.putNumber("VisionHugh/DistanceToTarget", getDistanceToTargetMetres());
+        SmartDashboard.putBoolean("VisionHugh/AlignedWithTarget", isAlignedWithTarget());
     }
 
     /**
