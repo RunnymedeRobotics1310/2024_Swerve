@@ -281,7 +281,9 @@ public class HughVisionSubsystem extends SubsystemBase {
 
         PoseConfidence poseConfidence = PoseConfidence.HIGH;
         if (numTargets == 1) {
-            poseConfidence = PoseConfidence.LOW;
+            // TODO: Get lower confidence working, but for now we will not return 1 target updates
+            // poseConfidence = PoseConfidence.LOW;
+            return null;
         }
 
         return new VisionPositionInfo(pose, latency, poseConfidence);
