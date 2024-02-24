@@ -37,7 +37,7 @@ public class HughVisionSubsystem extends SubsystemBase {
     private static final long          PIPELINE_VISUAL                      = 2;
 
 
-    private static final double        TARGET_ALIGNMENT_THRESHOLD           = 5;
+    private static final double        TARGET_ALIGNMENT_THRESHOLD           = 7.5;
 
     NetworkTable                       table                                = NetworkTableInstance.getDefault()
         .getTable("limelight-hugh");
@@ -77,8 +77,10 @@ public class HughVisionSubsystem extends SubsystemBase {
     private static final List<Integer> TARGET_RED_AMP                       = List.of(5);
     private static final List<Integer> TARGET_RED_STAGE                     = List.of(11, 12, 13);
     private static final List<Integer> TARGET_NONE                          = List.of();
+    private static final List<Integer> TARGET_ALL                           = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+        14, 15, 16);
 
-    private List<Integer>              activeAprilTagTargets                = TARGET_NONE;
+    private List<Integer>              activeAprilTagTargets                = TARGET_ALL;
 
 
     public HughVisionSubsystem() {
@@ -176,21 +178,38 @@ public class HughVisionSubsystem extends SubsystemBase {
                 if (index == -1)
                     break; // No more fID found
 
-                int    fIDStart = index + 6;                                 // Start of fID value
-                int    fIDEnd   = jsonStr.indexOf(",", fIDStart);
-                String fID      = jsonStr.substring(fIDStart, fIDEnd).trim();
+                // Get Tag ID
+                int    fIDStart    = index + 6;
+                int    fIDEnd      = jsonStr.indexOf(",", fIDStart);
+                String fID         = jsonStr.substring(fIDStart, fIDEnd).trim();
 
-                int    txIndex  = jsonStr.indexOf("\"tx\":", fIDEnd);
-                int    txStart  = txIndex + 5;                               // Start of tx value
-                int    txEnd    = jsonStr.indexOf(",", txStart);
+                // Get yTranslation (1st element of array)
+                int    yTransIndex = jsonStr.indexOf("\"t6t_rs\":", fIDEnd);
+                int    yTransStart = yTransIndex + 10;
+                int    yTransEnd   = jsonStr.indexOf(",", yTransStart);
+                String yTransStr   = jsonStr.substring(yTransStart, yTransEnd).trim();
+
+                // Get xTranslation (3rd element of array)
+                int    xTransIndex = jsonStr.indexOf(",", yTransEnd + 1);
+                int    xTransStart = xTransIndex + 1;
+                int    xTransEnd   = jsonStr.indexOf(",", xTransStart);
+                String xTransStr   = jsonStr.substring(xTransStart, xTransEnd).trim();
+
+                // Get xOffset
+                int    txIndex     = jsonStr.indexOf("\"tx\":", fIDEnd);
+                int    txStart     = txIndex + 5;
+                int    txEnd       = jsonStr.indexOf(",", txStart);
                 if (txEnd == -1) { // Check if tx is the last value before the object ends
                     txEnd = jsonStr.indexOf("}", txStart);
                 }
                 String       tx      = jsonStr.substring(txStart, txEnd).trim();
 
-                int          tid     = Integer.parseInt(fID);
-                double       targetx = Double.parseDouble(tx);
-                AprilTagInfo ati     = new AprilTagInfo(tid, targetx);
+                int          tagId   = Integer.parseInt(fID);
+                double       xOffset = Double.parseDouble(tx);
+                double       xTrans  = Double.parseDouble(xTransStr);
+                double       yTrans  = Double.parseDouble(yTransStr);
+
+                AprilTagInfo ati     = new AprilTagInfo(tagId, xOffset, xTrans, yTrans);
                 tags.add(ati);
 
                 index = txEnd; // Move index to end of the current tx to find the next fID
@@ -328,7 +347,7 @@ public class HughVisionSubsystem extends SubsystemBase {
      */
     public boolean isCurrentTargetVisible() {
         AprilTagInfo[] visibleTags = getVisibleTagInfo();
-        return Arrays.stream(visibleTags).anyMatch(tag -> activeAprilTagTargets.contains(tag.tid()));
+        return Arrays.stream(visibleTags).anyMatch(tag -> activeAprilTagTargets.contains(tag.tagId()));
     }
 
     /**
@@ -391,10 +410,10 @@ public class HughVisionSubsystem extends SubsystemBase {
             return null;
         }
 
-        // Limelight is returning [0] = X = Height, [1] = Y = Left/Right, [2] = Z = Forward/Back.
+        // Limelight is returning [0] = X = Left/Right, [1] = Y = Height, [2] = Z = Forward/Back.
         // We need to return X = Forward/Back, and Y = Left/Right
         // Because Hugh is on the back of the Bot, X needs to have its sign reversed.
-        return new Translation2d(targetPoseInBotSpace[2] * -1, targetPoseInBotSpace[1]);
+        return new Translation2d(-targetPoseInBotSpace[2], targetPoseInBotSpace[0]);
     }
 
     @Override
