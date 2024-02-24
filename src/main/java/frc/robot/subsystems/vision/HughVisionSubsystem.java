@@ -99,12 +99,16 @@ public class HughVisionSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("VisionHugh/ty", ty.getDouble(-1.0));
         SmartDashboard.putNumber("VisionHugh/ta", ta.getDouble(-1.0));
         SmartDashboard.putNumber("VisionHugh/tl", tl.getDouble(-1.0));
-        double[] bp = getBotPose();
+
+        double[]           bp          = getBotPose();
+        AprilTagInfo[]     visibleTags = getVisibleTagInfo();
+        VisionPositionInfo visPos      = getPositionInfo(bp, visibleTags.length);
+
         SmartDashboard.putNumberArray("VisionHugh/Botpose", bp == null ? new double[0] : bp);
-        VisionPositionInfo visPos = getPositionInfo();
         SmartDashboard.putString("VisionHugh/PoseConfidence", visPos == null ? "NONE" : visPos.poseConfidence().toString());
-        SmartDashboard.putNumber("VisionHugh/Number of Tags", getNumActiveTargets());
-        SmartDashboard.putString("VisionHugh/AprilTagInfo", aprilTagInfoArrayToString(getVisibleTagInfo()));
+        SmartDashboard.putNumber("VisionHugh/Number of Tags", visibleTags.length);
+        SmartDashboard.putString("VisionHugh/AprilTagInfo", aprilTagInfoArrayToString(visibleTags));
+
         SmartDashboard.putNumber("VisionHugh/DistanceToTarget", getDistanceToTargetMetres());
         SmartDashboard.putBoolean("VisionHugh/AlignedWithTarget", isAlignedWithTarget());
     }
@@ -204,14 +208,15 @@ public class HughVisionSubsystem extends SubsystemBase {
                 if (txEnd == -1) { // Check if tx is the last value before the object ends
                     txEnd = jsonStr.indexOf("}", txStart);
                 }
-                String       tx      = jsonStr.substring(txStart, txEnd).trim();
+                String       tx             = jsonStr.substring(txStart, txEnd).trim();
 
-                int          tagId   = Integer.parseInt(fID);
-                double       xOffset = Double.parseDouble(tx);
-                double       xTrans  = Double.parseDouble(xTransStr);
-                double       yTrans  = Double.parseDouble(yTransStr);
+                int          tagId          = Integer.parseInt(fID);
+                double       xOffset        = Double.parseDouble(tx);
+                double       xTrans         = Double.parseDouble(xTransStr);
+                double       yTrans         = Double.parseDouble(yTransStr);
+                double       targetDistance = Math.hypot(xTrans, yTrans);
 
-                AprilTagInfo ati     = new AprilTagInfo(tagId, xOffset, xTrans, yTrans);
+                AprilTagInfo ati            = new AprilTagInfo(tagId, xOffset, xTrans, yTrans, targetDistance);
                 tags.add(ati);
 
                 index = txEnd; // Move index to end of the current tx to find the next fID
@@ -230,9 +235,16 @@ public class HughVisionSubsystem extends SubsystemBase {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         for (int i = 0; i < tagArray.length; i++) {
-            sb.append(tagArray[i].toString());
+            AprilTagInfo tag = tagArray[i];
+            sb.append("[Tag:");
+            sb.append(tag.tagId());
+            sb.append(",xDeg:");
+            sb.append(tag.xAngle());
+            sb.append(",Dist:");
+            sb.append(tag.targetDistance());
+            sb.append("]");
             if (i < tagArray.length - 1) {
-                sb.append(", ");
+                sb.append(",");
             }
         }
         sb.append("]");
@@ -266,24 +278,15 @@ public class HughVisionSubsystem extends SubsystemBase {
     }
 
     /**
-     *
-     * PUBLIC API FROM HERE DOWN
-     *
-     */
-
-    /**
      * Get the position of the robot as computed by the Vision Subsystem. Includes latency data.
-     * 
+     *
      * If no valid position can be returned (due to bad or erratic data, blocked view, etc.),
      * returns null
-     * 
+     *
      * @return position info or null
      * @since 2024-02-10
      */
-    public VisionPositionInfo getPositionInfo() {
-        double[] botPose    = getBotPose();
-        int      numTargets = getNumActiveTargets();
-
+    public VisionPositionInfo getPositionInfo(double[] botPose, int numTargets) {
         if (botPose == null) {
             return null;
         }
@@ -308,6 +311,26 @@ public class HughVisionSubsystem extends SubsystemBase {
         }
 
         return new VisionPositionInfo(pose, latency, poseConfidence);
+    }
+
+
+    /**
+     *
+     * PUBLIC API FROM HERE DOWN
+     *
+     */
+
+    /**
+     * Get the position of the robot as computed by the Vision Subsystem. Includes latency data.
+     * 
+     * If no valid position can be returned (due to bad or erratic data, blocked view, etc.),
+     * returns null
+     * 
+     * @return position info or null
+     * @since 2024-02-10
+     */
+    public VisionPositionInfo getPositionInfo() {
+        return getPositionInfo(getBotPose(), getNumActiveTargets());
     }
 
     /**
