@@ -1,20 +1,21 @@
 package frc.robot.commands.auto;
 
 
+import static frc.robot.Constants.BotTarget.BLUE_NOTE_VALJEAN;
+import static frc.robot.Constants.BotTarget.RED_NOTE_VALJEAN;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.BotTarget;
 import frc.robot.commands.auto.stubs.FakeScoreSpeakerCommand;
 import frc.robot.commands.auto.stubs.FakeVisionNotePickupCommand;
-import frc.robot.commands.swervedrive.*;
+import frc.robot.commands.swervedrive.DriveToPositionCommand;
+import frc.robot.commands.swervedrive.RotateToPlacedNoteCommand;
+import frc.robot.commands.swervedrive.RotateToSpeakerCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
-
-import static frc.robot.Constants.BotTarget.BLUE_NOTE_VALJEAN;
-import static frc.robot.Constants.BotTarget.RED_NOTE_VALJEAN;
 
 public class Score3SpeakerAutoCommand extends SequentialCommandGroup {
 
@@ -27,7 +28,6 @@ public class Score3SpeakerAutoCommand extends SequentialCommandGroup {
             Rotation2d.fromDegrees(180));
 
 
-        // Configure
         addCommands(new LogMessageCommand("Starting Auto"));
 
         /* ***AUTO PATTERN*** */

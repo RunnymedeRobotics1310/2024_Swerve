@@ -4,18 +4,28 @@
 
 package frc.robot;
 
+import static frc.robot.Constants.UsefulPoses.BLUE_2_2_20;
+import static frc.robot.Constants.UsefulPoses.RED_2_2_20;
+
 import java.io.File;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.AutoConstants.AutoPattern;
 import frc.robot.Constants.OiConstants;
 import frc.robot.commands.CancelCommand;
-import frc.robot.commands.auto.*;
+import frc.robot.commands.auto.Score1AmpAutoCommand;
+import frc.robot.commands.auto.Score1SpeakerAutoCommand;
+import frc.robot.commands.auto.Score2AmpAutoCommand;
+import frc.robot.commands.auto.Score3SpeakerAutoCommand;
+import frc.robot.commands.auto.Score4SpeakerAutoCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.DriveDistanceCommand;
 import frc.robot.commands.swervedrive.DriveToPositionCommand;
@@ -25,9 +35,6 @@ import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.swerve.yagsl.YagslSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
-
-import static frc.robot.Constants.UsefulPoses.BLUE_2_2_20;
-import static frc.robot.Constants.UsefulPoses.RED_2_2_20;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -48,6 +55,8 @@ public class RobotContainer {
     private final SwerveSubsystem     swerveDriveSubsystem = new YagslSubsystem(yagslConfig, hughVisionSubsystem);
     // private final SwerveSubsystem swerveDriveSubsystem = new
     // RunnymedeSwerveSubsystem(hughVisionSubsystem);
+
+    SendableChooser<AutoPattern>      autoPatternChooser   = new SendableChooser<>();
 
     private final OperatorInput       operatorInput        = new OperatorInput(
         OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
@@ -95,11 +104,15 @@ public class RobotContainer {
         Pose2d                 desiredPose = new Pose2d(location, heading);
         DriveToPositionCommand dtpc        = new DriveToPositionCommand(swerveDriveSubsystem, BLUE_2_2_20, RED_2_2_20);
         new Trigger(operatorInput::isY).onTrue(dtpc);
-//        new Trigger(operatorInput::isB).onTrue(new Score1SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem));
-//        new Trigger(operatorInput::isB).onTrue(new Score3SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem));
+        // new Trigger(operatorInput::isB).onTrue(new Score1SpeakerAutoCommand(swerveDriveSubsystem,
+        // hughVisionSubsystem));
+        // new Trigger(operatorInput::isB).onTrue(new Score3SpeakerAutoCommand(swerveDriveSubsystem,
+        // hughVisionSubsystem));
         new Trigger(operatorInput::isB).onTrue(new Score4SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem));
-//        new Trigger(operatorInput::isB).onTrue(new Score1AmpAutoCommand(swerveDriveSubsystem, hughVisionSubsystem));
-//        new Trigger(operatorInput::isB).onTrue(new Score2AmpAutoCommand(swerveDriveSubsystem, hughVisionSubsystem));
+        // new Trigger(operatorInput::isB).onTrue(new Score1AmpAutoCommand(swerveDriveSubsystem,
+        // hughVisionSubsystem));
+        // new Trigger(operatorInput::isB).onTrue(new Score2AmpAutoCommand(swerveDriveSubsystem,
+        // hughVisionSubsystem));
 
     }
 
@@ -109,10 +122,31 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // return new Score4SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem);
-        // todo: implement
-        return null;
-    }
 
+        switch (autoPatternChooser.getSelected()) {
+
+        case SCORE_1_AMP:
+            return new Score1AmpAutoCommand(swerveDriveSubsystem, hughVisionSubsystem);
+
+        case SCORE_2_AMP:
+            return new Score2AmpAutoCommand(swerveDriveSubsystem, hughVisionSubsystem);
+
+        case SCORE_1_SPEAKER:
+            return new Score1SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem);
+
+        case SCORE_3_SPEAKER:
+            return new Score3SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem);
+
+        case SCORE_4_SPEAKER:
+
+            return new Score4SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem);
+
+        default:
+            // If the chooser did not work, then do nothing as the default auto.
+            return new InstantCommand();
+
+        }
+
+    }
 
 }

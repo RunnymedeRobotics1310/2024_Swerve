@@ -5,7 +5,9 @@
 package frc.robot;
 
 import static edu.wpi.first.math.util.Units.inchesToMeters;
-import static frc.robot.subsystems.vision.PoseConfidence.*;
+import static frc.robot.subsystems.vision.PoseConfidence.HIGH;
+import static frc.robot.subsystems.vision.PoseConfidence.LOW;
+import static frc.robot.subsystems.vision.PoseConfidence.MEDIUM;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -96,8 +98,8 @@ public final class Constants {
             }
 
             public static final class VelocityPIDConfig {
-//                public static final double P = 15;
-//                public static final double P = 1.5;
+                // public static final double P = 15;
+                // public static final double P = 1.5;
                 public static final double P = 1.2;
                 // .002 is too low but stable
                 public static final double I = 0;
@@ -307,6 +309,13 @@ public final class Constants {
             }
 
             return VecBuilder.fill(xyMetresStds, xyMetresStds, Units.degreesToRadians(degreesStds));
+        }
+    }
+
+    public static final class AutoConstants {
+
+        public static enum AutoPattern {
+            SCORE_1_AMP, SCORE_2_AMP, SCORE_1_SPEAKER, SCORE_3_SPEAKER, SCORE_4_SPEAKER
         }
     }
 }

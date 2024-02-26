@@ -3,13 +3,14 @@ package frc.robot.commands.auto;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.BotTarget;
 import frc.robot.commands.auto.stubs.FakeScoreSpeakerCommand;
 import frc.robot.commands.auto.stubs.FakeVisionNotePickupCommand;
-import frc.robot.commands.swervedrive.*;
+import frc.robot.commands.swervedrive.DriveToPositionCommand;
+import frc.robot.commands.swervedrive.RotateToPlacedNoteCommand;
+import frc.robot.commands.swervedrive.RotateToSpeakerCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
 
@@ -21,8 +22,6 @@ public class Score4SpeakerAutoCommand extends SequentialCommandGroup {
         final Pose2d redFinishPose  = new Pose2d(new Translation2d(13.04, 7), new Rotation2d());
 
 
-        // TODO: implement Auto Selector
-        // Configure
         addCommands(new LogMessageCommand("Starting Auto"));
 
         /* ***AUTO PATTERN*** */
