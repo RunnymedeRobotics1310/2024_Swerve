@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -70,6 +71,19 @@ public class RobotContainer {
         swerveDriveSubsystem.setDefaultCommand(new TeleopDriveCommand(swerveDriveSubsystem, operatorInput));
         // Configure the trigger bindings
         configureBindings();
+        // Initialize the autonomous choosers
+        initAutoSelectors();
+    }
+
+    private void initAutoSelectors() {
+
+        // FIXME: (low) consider moving all of the choosers to their own classes.
+        autoPatternChooser.setDefaultOption("1 Amp", AutoPattern.SCORE_1_AMP);
+        SmartDashboard.putData("Auto Pattern", autoPatternChooser);
+        autoPatternChooser.addOption("2 Amp", AutoPattern.SCORE_2_AMP);
+        autoPatternChooser.addOption("1 Speaker", AutoPattern.SCORE_1_SPEAKER);
+        autoPatternChooser.addOption("3 Speaker", AutoPattern.SCORE_3_SPEAKER);
+        autoPatternChooser.addOption("4 Speaker", AutoPattern.SCORE_4_SPEAKER);
     }
 
     /**
