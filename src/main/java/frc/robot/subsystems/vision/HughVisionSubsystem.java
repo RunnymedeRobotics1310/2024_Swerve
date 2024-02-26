@@ -56,13 +56,20 @@ public class HughVisionSubsystem extends SubsystemBase {
     NetworkTableEntry                  tl                                   = table.getEntry("tl");
     NetworkTableEntry                  cl                                   = table.getEntry("cl");
 
-    NetworkTableEntry                  botpose_avgarea                      = table.getEntry("botpose_avgarea");
-    NetworkTableEntry                  botpose_avgdist                      = table.getEntry("botpose_avgdist");
-    NetworkTableEntry                  botpose_span                         = table.getEntry("botpose_span");
-    NetworkTableEntry                  botpose_tagcount                     = table.getEntry("botpose_tagcount");
-
     NetworkTableEntry                  botpose_wpiblue                      = table.getEntry("botpose_wpiblue");
     NetworkTableEntry                  botpose_wpired                       = table.getEntry("botpose_wpibred");
+
+    private static final int           BOTPOSE_INDEX_TX                     = 0;
+    private static final int           BOTPOSE_INDEX_TY                     = 1;
+    private static final int           BOTPOSE_INDEX_TZ                     = 2;
+    private static final int           BOTPOSE_INDEX_R                      = 3;
+    private static final int           BOTPOSE_INDEX_P                      = 4;
+    private static final int           BOTPOSE_INDEX_Y                      = 5;
+    private static final int           BOTPOSE_INDEX_LATENCY                = 6;
+    private static final int           BOTPOSE_INDEX_TAGCOUNT               = 7;
+    private static final int           BOTPOSE_INDEX_TAGSPAN                = 8;
+    private static final int           BOTPOSE_INDEX_AVGDIST                = 9;
+    private static final int           BOTPOSE_INDEX_AVGAREA                = 10;
 
     NetworkTableEntry                  targetpose_robotspace                = table.getEntry("targetpose_robotspace");
 
@@ -112,7 +119,7 @@ public class HughVisionSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("VisionHugh/ty", ty.getDouble(-1.0));
         SmartDashboard.putNumber("VisionHugh/ta", ta.getDouble(-1.0));
         SmartDashboard.putNumber("VisionHugh/tl", tl.getDouble(-1.0));
-        SmartDashboard.putNumberArray("VisionHugh/Botpose", bp == null ? new double[0] : bp);
+        SmartDashboard.putString("VisionHugh/Botpose", Arrays.toString(bp));
         SmartDashboard.putNumber("VisionHugh/TargetAvgDist", avgDist);
         SmartDashboard.putString("VisionHugh/PoseConf", visPos == null ? "NONE" : visPos.poseConfidence().toString());
         SmartDashboard.putString("VisionHugh/NumTags", "" + getNumActiveTargets());
@@ -176,11 +183,16 @@ public class HughVisionSubsystem extends SubsystemBase {
      * @return Average distance to target in meters. If no value, returns Double.MAX_VALUE.
      */
     private double getTargetAvgDistance() {
-        return botpose_avgdist.getDouble(Double.MAX_VALUE);
+        double[] botPose = getBotPose();
+        if (botPose == null || botPose.length < 11 || botPose[BOTPOSE_INDEX_AVGDIST] == Double.MIN_VALUE) {
+            return Double.MAX_VALUE;
+        }
+
+        return botPose[BOTPOSE_INDEX_AVGDIST];
     }
 
     /**
-     * Performs a String based parsing of limelight's json blob in order to obtain information on
+     * Performs a String based parsing of limelight's json blob in order to obtain9 information on
      * multiple targets when they are in view, since limelight only gives easy access to the
      * closest/largest one. Not using JSON parsers libs due to up to 2.5ms parsing time.
      *
@@ -265,12 +277,18 @@ public class HughVisionSubsystem extends SubsystemBase {
     }
 
     private int getNumActiveTargets() {
-        return botpose_tagcount.getNumber(0).intValue();
+        double[] botPose = getBotPose();
+        if (botPose == null || botPose.length < 11 || botPose[BOTPOSE_INDEX_TAGCOUNT] == Double.MIN_VALUE) {
+            return 0;
+        }
+
+        return (int) botPose[BOTPOSE_INDEX_TAGCOUNT];
     }
 
     private double[] getBotPose() {
         double[] botpose = botpose_wpiblue.getDoubleArray(new double[] { Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE,
-                Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE });
+                Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE,
+                Double.MIN_VALUE, Double.MIN_VALUE });
         if (botpose[0] == Double.MIN_VALUE) {
             return null;
         }
