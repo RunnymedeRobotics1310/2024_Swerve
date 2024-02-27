@@ -31,6 +31,7 @@ import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.DriveDistanceCommand;
 import frc.robot.commands.swervedrive.DriveToPositionCommand;
 import frc.robot.commands.swervedrive.ResetOdometryCommand;
+import frc.robot.commands.swervedrive.RotateToSpeakerCommand;
 import frc.robot.commands.swervedrive.TeleopDriveCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -107,26 +108,28 @@ public class RobotContainer {
             .whileTrue(new ResetOdometryCommand(swerveDriveSubsystem, new Pose2d(1.83, 0.40, Rotation2d.fromDegrees(0))));
 
         // drive forward
-        Translation2d        fwd        = new Translation2d(0, 7);
-        Rotation2d           fwdHeading = Rotation2d.fromDegrees(0);
-        DriveDistanceCommand ddc        = new DriveDistanceCommand(swerveDriveSubsystem, fwd, fwdHeading, 3);
-        new Trigger(operatorInput::isA).onTrue(ddc);
+        Translation2d          fwd         = new Translation2d(0, 7);
+        Rotation2d             fwdHeading  = Rotation2d.fromDegrees(0);
+        DriveDistanceCommand   ddc         = new DriveDistanceCommand(swerveDriveSubsystem, fwd, fwdHeading, 3);
+        // new Trigger(operatorInput::isA).onTrue(ddc);
 
         // drive to position test
         Translation2d          location    = new Translation2d(2, 2);
         Rotation2d             heading     = Rotation2d.fromDegrees(-20);
         Pose2d                 desiredPose = new Pose2d(location, heading);
         DriveToPositionCommand dtpc        = new DriveToPositionCommand(swerveDriveSubsystem, BLUE_2_2_20, RED_2_2_20);
-        new Trigger(operatorInput::isY).onTrue(dtpc);
+        // new Trigger(operatorInput::isY).onTrue(dtpc);
         // new Trigger(operatorInput::isB).onTrue(new Score1SpeakerAutoCommand(swerveDriveSubsystem,
         // hughVisionSubsystem));
         // new Trigger(operatorInput::isB).onTrue(new Score3SpeakerAutoCommand(swerveDriveSubsystem,
         // hughVisionSubsystem));
-        new Trigger(operatorInput::isB).onTrue(new Score4SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem));
+        // new Trigger(operatorInput::isB).onTrue(new Score4SpeakerAutoCommand(swerveDriveSubsystem,
+        // hughVisionSubsystem));
         // new Trigger(operatorInput::isB).onTrue(new Score1AmpAutoCommand(swerveDriveSubsystem,
         // hughVisionSubsystem));
         // new Trigger(operatorInput::isB).onTrue(new Score2AmpAutoCommand(swerveDriveSubsystem,
         // hughVisionSubsystem));
+        new Trigger(operatorInput::isB).onTrue(new RotateToSpeakerCommand(swerveDriveSubsystem, hughVisionSubsystem));
 
     }
 

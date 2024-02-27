@@ -59,9 +59,9 @@ public class RotateToTargetCommand extends BaseDriveCommand {
     public void execute() {
         super.execute();
 
-        Translation2d robotRelativeTranslation = hugh.getRobotTranslationToTarget();
+        Rotation2d targetOffset = hugh.getTargetOffset();
 
-        if (robotRelativeTranslation == null) {
+        if (targetOffset == null) {
             Rotation2d delta = getHeadingToFieldPosition(target.getLocation().toTranslation2d());
             delta = delta.plus(Rotation2d.fromDegrees(180 * (forwards ? 1 : -1)));
             Rotation2d omega = computeOmega(delta);
@@ -69,7 +69,7 @@ public class RotateToTargetCommand extends BaseDriveCommand {
             swerve.driveFieldOriented(new Translation2d(), omega);
         }
         else {
-            Rotation2d delta = robotRelativeTranslation.getAngle();
+            Rotation2d delta = targetOffset;
             delta = delta.plus(Rotation2d.fromDegrees(180 * (forwards ? 1 : -1)));
             Rotation2d omega = computeOmega(delta);
             log("delta: " + delta + " omega: " + omega);
@@ -81,15 +81,15 @@ public class RotateToTargetCommand extends BaseDriveCommand {
     @Override
     public boolean isFinished() {
 
-        Translation2d robotRelativeTranslation = hugh.getRobotTranslationToTarget();
-        if (robotRelativeTranslation == null) {
+        Rotation2d targetOffset = hugh.getTargetOffset();
+        if (targetOffset == null) {
             Rotation2d delta = getHeadingToFieldPosition(target.getLocation().toTranslation2d());
             delta = delta.plus(Rotation2d.fromDegrees(180 * (forwards ? 1 : -1)));
 
             return isCloseEnough(delta);
         }
         else {
-            return Math.abs(robotRelativeTranslation.getAngle().getRadians()) <= ROTATION_TOLERANCE.getRadians();
+            return Math.abs(targetOffset.getRadians()) <= ROTATION_TOLERANCE.getRadians();
         }
 
     }
