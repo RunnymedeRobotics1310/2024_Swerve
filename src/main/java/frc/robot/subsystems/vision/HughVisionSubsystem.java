@@ -7,6 +7,7 @@ import java.util.List;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -85,7 +86,7 @@ public class HughVisionSubsystem extends SubsystemBase {
     private static final List<Integer> TARGET_BLUE_AMP                      = List.of(6);
     private static final List<Integer> TARGET_BLUE_STAGE                    = List.of(14, 15, 16);
 
-    private static final List<Integer> TARGET_RED_SPEAKER                   = List.of(4, 3);
+    private static final List<Integer> TARGET_RED_SPEAKER                   = List.of(3, 4);
     private static final List<Integer> TARGET_RED_SOURCE                    = List.of(1, 2);
     private static final List<Integer> TARGET_RED_AMP                       = List.of(5);
     private static final List<Integer> TARGET_RED_STAGE                     = List.of(11, 12, 13);
@@ -95,6 +96,7 @@ public class HughVisionSubsystem extends SubsystemBase {
 
     private List<Integer>              activeAprilTagTargets                = TARGET_ALL;
 
+    private static final double        TAG_8_TO_7_DELTA                     = 0.565868;
 
     public HughVisionSubsystem() {
         this.pipeline.setNumber(PIPELINE_APRIL_TAG_DETECT);
@@ -125,6 +127,7 @@ public class HughVisionSubsystem extends SubsystemBase {
         SmartDashboard.putString("VisionHugh/AprilTagInfo", aprilTagInfoArrayToString(visibleTags));
         SmartDashboard.putNumber("VisionHugh/DistToTarget", getDistanceToTargetMetres());
         SmartDashboard.putBoolean("VisionHugh/AlignedWithTarget", isAlignedWithTarget());
+        SmartDashboard.putString("VisionHugh/TargetOffset", getTargetOffset() == null ? "null" : getTargetOffset().toString());
     }
 
     /**
@@ -352,7 +355,6 @@ public class HughVisionSubsystem extends SubsystemBase {
         return new VisionPositionInfo(pose, latency, poseConfidence);
     }
 
-
     /**
      *
      * PUBLIC API FROM HERE DOWN
@@ -456,15 +458,33 @@ public class HughVisionSubsystem extends SubsystemBase {
      * visible.
      */
     public Rotation2d getTargetOffset() {
-        int    currentTagId  = (int) tid.getInteger(-1);
-        double angleToTarget = getTargetX();
+        int      currentTagId         = (int) tid.getInteger(-1);
+        double[] targetPoseInBotSpace = targetpose_robotspace.getDoubleArray(new double[] { Double.MIN_VALUE, Double.MIN_VALUE,
+                Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE });
+        double   angleToTag           = getTargetX();
+        double   tagX                 = targetPoseInBotSpace[2];
+        double   tagY                 = targetPoseInBotSpace[0];
 
-        if (!activeAprilTagTargets.contains(currentTagId) || angleToTarget == Double.MIN_VALUE) {
+        if (!activeAprilTagTargets.contains(currentTagId) || angleToTag == Double.MIN_VALUE
+            || targetPoseInBotSpace[0] == Double.MIN_VALUE) {
             return null;
         }
 
-        // Hugh is on the rear of the bot, so add 180 to values given to translate to front
-        return Rotation2d.fromDegrees(-angleToTarget);
+        // If we are targeting the blue speaker, and the current tag is the one on the left of
+        // centre, we need to do some math to determine proper location towards center
+        if (botTarget == BotTarget.BLUE_SPEAKER && currentTagId == 8) {
+            double radiansToTarget = Math.toRadians(angleToTag);
+            double y_offset        = Math.cos(radiansToTarget) * TAG_8_TO_7_DELTA;
+            double x_offset        = Math.sin(radiansToTarget) * TAG_8_TO_7_DELTA;
+
+            double newTagX         = tagX + x_offset;
+            double newTagY         = tagY + y_offset;
+
+            angleToTag = Math.toDegrees(Math.atan2(newTagY, newTagX));
+        }
+
+        // Limelight is Clockwise Positive, but Drive/Odemetry is CCW positive, so we switch signs
+        return Rotation2d.fromDegrees(-angleToTag);
     }
 
     /**
