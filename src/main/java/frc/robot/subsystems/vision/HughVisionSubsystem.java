@@ -7,7 +7,6 @@ import java.util.List;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -86,7 +85,7 @@ public class HughVisionSubsystem extends SubsystemBase {
     private static final List<Integer> TARGET_BLUE_AMP                      = List.of(6);
     private static final List<Integer> TARGET_BLUE_STAGE                    = List.of(14, 15, 16);
 
-    private static final List<Integer> TARGET_RED_SPEAKER                   = List.of(3, 4);
+    private static final List<Integer> TARGET_RED_SPEAKER                   = List.of(4, 3);
     private static final List<Integer> TARGET_RED_SOURCE                    = List.of(1, 2);
     private static final List<Integer> TARGET_RED_AMP                       = List.of(5);
     private static final List<Integer> TARGET_RED_STAGE                     = List.of(11, 12, 13);
@@ -96,7 +95,7 @@ public class HughVisionSubsystem extends SubsystemBase {
 
     private List<Integer>              activeAprilTagTargets                = TARGET_ALL;
 
-    private static final double        TAG_8_TO_7_DELTA                     = 0.565868;
+    private static final double        SPEAKER_TAG_DELTA                    = 0.565868;
 
     public HughVisionSubsystem() {
         this.pipeline.setNumber(PIPELINE_APRIL_TAG_DETECT);
@@ -472,10 +471,11 @@ public class HughVisionSubsystem extends SubsystemBase {
 
         // If we are targeting the blue speaker, and the current tag is the one on the left of
         // centre, we need to do some math to determine proper location towards center
-        if (botTarget == BotTarget.BLUE_SPEAKER && currentTagId == 8) {
+        if ((botTarget == BotTarget.BLUE_SPEAKER && currentTagId == 8) ||
+            (botTarget == BotTarget.RED_SPEAKER && currentTagId == 3)) {
             double radiansToTarget = Math.toRadians(angleToTag);
-            double y_offset        = Math.cos(radiansToTarget) * TAG_8_TO_7_DELTA;
-            double x_offset        = Math.sin(radiansToTarget) * TAG_8_TO_7_DELTA;
+            double y_offset        = Math.cos(radiansToTarget) * SPEAKER_TAG_DELTA;
+            double x_offset        = Math.sin(radiansToTarget) * SPEAKER_TAG_DELTA;
 
             double newTagX         = tagX + x_offset;
             double newTagY         = tagY + y_offset;
