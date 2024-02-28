@@ -7,7 +7,6 @@ import java.util.List;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -81,7 +80,7 @@ public class HughVisionSubsystem extends SubsystemBase {
 
     private BotTarget                  botTarget                            = BotTarget.NONE;
 
-    private static final List<Integer> TARGET_BLUE_SPEAKER                  = List.of(8, 7);
+    private static final List<Integer> TARGET_BLUE_SPEAKER                  = List.of(7, 8);
     private static final List<Integer> TARGET_BLUE_SOURCE                   = List.of(9, 10);
     private static final List<Integer> TARGET_BLUE_AMP                      = List.of(6);
     private static final List<Integer> TARGET_BLUE_STAGE                    = List.of(14, 15, 16);
@@ -334,7 +333,7 @@ public class HughVisionSubsystem extends SubsystemBase {
             else if (avgTargetDistance <= 2.4) {
                 poseConfidence = PoseConfidence.MEDIUM;
             }
-            else if (avgTargetDistance <= 3) {
+            else if (avgTargetDistance <= 2.8) {
                 poseConfidence = PoseConfidence.LOW;
             }
         }
@@ -465,7 +464,7 @@ public class HughVisionSubsystem extends SubsystemBase {
         }
 
         // Hugh is on the rear of the bot, so add 180 to values given to translate to front
-        return Rotation2d.fromDegrees(angleToTarget + 180);
+        return Rotation2d.fromDegrees(-angleToTarget);
     }
 
     /**
