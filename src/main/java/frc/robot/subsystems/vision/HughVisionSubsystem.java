@@ -335,7 +335,7 @@ public class HughVisionSubsystem extends SubsystemBase {
             else if (avgTargetDistance <= 2.4) {
                 poseConfidence = PoseConfidence.MEDIUM;
             }
-            else if (avgTargetDistance <= 3) {
+            else if (avgTargetDistance <= 2.8) {
                 poseConfidence = PoseConfidence.LOW;
             }
         }

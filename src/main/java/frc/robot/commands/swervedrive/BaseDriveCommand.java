@@ -1,16 +1,22 @@
 package frc.robot.commands.swervedrive;
 
+import static frc.robot.Constants.Swerve.Chassis.DECEL_FROM_MAX_TO_STOP_DIST_METRES;
+import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_PER_SEC;
+import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
+import static frc.robot.Constants.Swerve.Chassis.MIN_ROTATIONAL_VELOCITY_PER_SEC;
+import static frc.robot.Constants.Swerve.Chassis.ROTATION_TOLERANCE;
+import static frc.robot.Constants.Swerve.Chassis.TRANSLATION_TOLERANCE_METRES;
+import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.P;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.Swerve.Chassis.VelocityPIDConfig;
 import frc.robot.RunnymedeUtils;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
-
-import static frc.robot.Constants.Swerve.Chassis.*;
-import static frc.robot.Constants.Swerve.Chassis.HeadingPIDConfig.P;
 
 public abstract class BaseDriveCommand extends LoggingCommand {
     protected final SwerveSubsystem swerve;
@@ -50,8 +56,13 @@ public abstract class BaseDriveCommand extends LoggingCommand {
 
         double targetRadians  = target.getRadians();
         double currentRadians = current.getRadians();
+        return computeOmegaForOffset(Rotation2d.fromRadians(targetRadians - currentRadians));
 
-        double error          = targetRadians - currentRadians;
+    }
+
+    public static Rotation2d computeOmegaForOffset(Rotation2d offset) {
+
+        double error = offset.getRadians();
 
         error = error % (2 * Math.PI);
         if (error > Math.PI) {
@@ -113,10 +124,10 @@ public abstract class BaseDriveCommand extends LoggingCommand {
         double decelDistance = Math.abs(DECEL_FROM_MAX_TO_STOP_DIST_METRES);
 
         // TODO: This logic below is incorrect. Delay this optimization until we figure it out.
-//        double decelDistRatio = absDistMetres / DECEL_FROM_MAX_TO_STOP_DIST_METRES;
-//        if (decelDistRatio < 1) {
-//            decelDistance = decelDistance * decelDistRatio;
-//        }
+        // double decelDistRatio = absDistMetres / DECEL_FROM_MAX_TO_STOP_DIST_METRES;
+        // if (decelDistRatio < 1) {
+        // decelDistance = decelDistance * decelDistRatio;
+        // }
 
 
         final double speed;
@@ -158,10 +169,10 @@ public abstract class BaseDriveCommand extends LoggingCommand {
         Translation2d velocity = computeVelocity(delta.getTranslation(), maxSpeedMPS);
         Rotation2d    omega    = computeOmega(desiredPose.getRotation());
 
-//        log("Current: " + format(current)
-//            + "  Delta: " + format(delta.getTranslation()) + " m @ " + format(delta.getRotation())
-//            + "  Target: " + format(desiredPose)
-//            + "  Velocity: " + format(velocity) + "m/s @ " + format(omega) + "/s");
+        // log("Current: " + format(current)
+        // + " Delta: " + format(delta.getTranslation()) + " m @ " + format(delta.getRotation())
+        // + " Target: " + format(desiredPose)
+        // + " Velocity: " + format(velocity) + "m/s @ " + format(omega) + "/s");
 
         SmartDashboard.putString("Drive/ToFieldPosition/current", format(current));
         SmartDashboard.putString("Drive/ToFieldPosition/delta", format(delta.getTranslation()) + " m @ "
