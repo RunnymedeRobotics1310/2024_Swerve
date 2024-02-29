@@ -1,12 +1,16 @@
 package frc.robot.commands.test;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
+import static frc.robot.commands.test.SystemTestCommand.MotorOrModule.*;
+
 public class SystemTestCommand extends LoggingCommand {
 
-    private enum MotorOrModule {
+    enum MotorOrModule {
+        NONE,
         FRONT_LEFT, BACK_LEFT, BACK_RIGHT, FRONT_RIGHT,
         AIM, LINK,
         SHOOTER_TOP, SHOOTER_BOTTOM,
@@ -16,6 +20,12 @@ public class SystemTestCommand extends LoggingCommand {
 
     private final OperatorInput   oi;
     private final SwerveSubsystem drive;
+
+    private boolean               enabled       = false;
+    private MotorOrModule         selectedMotor = NONE;
+    private double                motorSpeed;
+    private double                moduleDriveSpeed;
+    private double                moduleRotationSpeed;
 
     public SystemTestCommand(OperatorInput oi, SwerveSubsystem drive) {
         this.oi    = oi;
@@ -41,7 +51,10 @@ public class SystemTestCommand extends LoggingCommand {
     public void initialize() {
         super.initialize();
         stopAllMotors();
+        enabled = true;
+        updateDashboard();
     }
+
 
     @Override
     public void execute() {
@@ -70,10 +83,24 @@ public class SystemTestCommand extends LoggingCommand {
     @Override
     public void end(boolean interrupted) {
         stopAllMotors();
+        enabled = false;
+        updateDashboard();
         super.end(interrupted);
     }
 
     private void stopAllMotors() {
+        motorSpeed          = 0;
+        moduleDriveSpeed    = 0;
+        moduleRotationSpeed = 0;
         drive.stop();
     }
+
+    private void updateDashboard() {
+        SmartDashboard.putBoolean("1310 Test Mode/Enabled", enabled);
+        SmartDashboard.putString("1310 Test Mode/Motor or Module", selectedMotor.toString());
+        SmartDashboard.putNumber("1310 Test Mode/Motor Speed", motorSpeed);
+        SmartDashboard.putNumber("1310 Test Mode/Module Drive Speed", moduleDriveSpeed);
+        SmartDashboard.putNumber("1310 Test Mode/Module Rotate Speed", moduleRotationSpeed);
+    }
+
 }
