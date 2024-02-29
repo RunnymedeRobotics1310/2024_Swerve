@@ -151,6 +151,13 @@ public final class Constants {
         }
 
         public static final class Module {
+            /**
+             * The name of the module is used in debugging, but it is also used to
+             * reference modules in the YAGSL config (if that implementation is used).
+             * Be sure to give this name the same name as the yagsl config file (e.g.
+             * src/main/deploy/swerve/neo/modules/backleft.json) --> "backleft"
+             */
+            public String              name;
             public double              wheelRadiusMetres;
             public Translation2d       locationMetres;
             public int                 driveCANID;
@@ -160,6 +167,7 @@ public final class Constants {
             public static final Module BACK_LEFT = new Module();
 
             static {
+                BACK_LEFT.name                         = "backleft";
                 BACK_LEFT.wheelRadiusMetres            = Chassis.SDS_MK4I_WHEEL_RADIUS_METRES;
                 BACK_LEFT.locationMetres               = new Translation2d(inchesToMeters(-11.375), inchesToMeters(10.875));
                 BACK_LEFT.driveCANID                   = 35;
@@ -171,6 +179,7 @@ public final class Constants {
             public static final Module BACK_RIGHT = new Module();
 
             static {
+                BACK_RIGHT.name                         = "backright";
                 BACK_RIGHT.wheelRadiusMetres            = Chassis.SDS_MK4I_WHEEL_RADIUS_METRES;
                 BACK_RIGHT.locationMetres               = new Translation2d(inchesToMeters(-11.375), inchesToMeters(-10.875));
                 BACK_RIGHT.driveCANID                   = 30;
@@ -182,6 +191,7 @@ public final class Constants {
             public static final Module FRONT_LEFT = new Module();
 
             static {
+                FRONT_LEFT.name                         = "frontleft";
                 FRONT_LEFT.wheelRadiusMetres            = Chassis.SDS_MK4I_WHEEL_RADIUS_METRES;
                 FRONT_LEFT.locationMetres               = new Translation2d(inchesToMeters(11.375), inchesToMeters(10.875));
                 FRONT_LEFT.driveCANID                   = 10;
@@ -193,6 +203,7 @@ public final class Constants {
             public static final Module FRONT_RIGHT = new Module();
 
             static {
+                FRONT_RIGHT.name                         = "frontright";
                 FRONT_RIGHT.wheelRadiusMetres            = Chassis.SDS_MK4I_WHEEL_RADIUS_METRES;
                 FRONT_RIGHT.locationMetres               = new Translation2d(inchesToMeters(11.375), inchesToMeters(-10.875));
                 FRONT_RIGHT.driveCANID                   = 20;

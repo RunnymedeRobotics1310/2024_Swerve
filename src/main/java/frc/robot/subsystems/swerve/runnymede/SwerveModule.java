@@ -11,6 +11,7 @@ import frc.robot.Constants;
 
 public class SwerveModule {
 
+    private final String                name;
     private final Translation2d         location;
     private final DriveMotor            driveMotor;
     private final AngleMotor            angleMotor;
@@ -24,6 +25,7 @@ public class SwerveModule {
      * TODO: figure out how to handle brownouts.
      */
     public SwerveModule(Constants.Swerve.Module cfg, Constants.Swerve.Motor driveCfg, Constants.Swerve.Motor angleCfg) {
+        this.name     = cfg.name;
         this.location = cfg.locationMetres;
         driveMotor    = new DriveMotor(cfg.driveCANID, driveCfg, cfg.wheelRadiusMetres);
         angleMotor    = new AngleMotor(cfg.angleCANID, angleCfg);
@@ -36,6 +38,10 @@ public class SwerveModule {
         }
 
         sim = new SimulatedSwerveModule();
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Translation2d getLocation() {

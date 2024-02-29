@@ -1,7 +1,10 @@
 package frc.robot.commands.test;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -180,7 +183,56 @@ public class SystemTestCommand extends LoggingCommand {
         switch (selectedMotor) {
         case NONE:
             break;
+        case FRONT_LEFT_DRIVE: {
+            double     mps   = motorSpeed * Constants.Swerve.Chassis.MAX_MODULE_SPEED_MPS;
+            Rotation2d angle = Rotation2d.fromDegrees(0);
+            drive.setModuleStateForTestMode(Constants.Swerve.Module.FRONT_LEFT, new SwerveModuleState(mps, angle));
+            break;
         }
+        case FRONT_LEFT_TURN: {
+            double     mps   = 0;
+            Rotation2d angle = Rotation2d.fromDegrees(0); // todo: pull from stick
+            drive.setModuleStateForTestMode(Constants.Swerve.Module.FRONT_LEFT, new SwerveModuleState(mps, angle));
+            break;
+        }
+        case BACK_LEFT_DRIVE: {
+            double     mps   = motorSpeed * Constants.Swerve.Chassis.MAX_MODULE_SPEED_MPS;
+            Rotation2d angle = Rotation2d.fromDegrees(0);
+            drive.setModuleStateForTestMode(Constants.Swerve.Module.BACK_LEFT, new SwerveModuleState(mps, angle));
+            break;
+        }
+        case BACK_LEFT_TURN: {
+            double     mps   = 0;
+            Rotation2d angle = Rotation2d.fromDegrees(0); // todo: pull from stick
+            drive.setModuleStateForTestMode(Constants.Swerve.Module.BACK_LEFT, new SwerveModuleState(mps, angle));
+            break;
+        }
+        case BACK_RIGHT_DRIVE: {
+            double     mps   = motorSpeed * Constants.Swerve.Chassis.MAX_MODULE_SPEED_MPS;
+            Rotation2d angle = Rotation2d.fromDegrees(0);
+            drive.setModuleStateForTestMode(Constants.Swerve.Module.BACK_RIGHT, new SwerveModuleState(mps, angle));
+            break;
+        }
+        case BACK_RIGHT_TURN: {
+            double     mps   = 0;
+            Rotation2d angle = Rotation2d.fromDegrees(0); // todo: pull from stick
+            drive.setModuleStateForTestMode(Constants.Swerve.Module.BACK_RIGHT, new SwerveModuleState(mps, angle));
+            break;
+        }
+        case FRONT_RIGHT_DRIVE: {
+            double     mps   = motorSpeed * Constants.Swerve.Chassis.MAX_MODULE_SPEED_MPS;
+            Rotation2d angle = Rotation2d.fromDegrees(0);
+            drive.setModuleStateForTestMode(Constants.Swerve.Module.FRONT_RIGHT, new SwerveModuleState(mps, angle));
+            break;
+        }
+        case FRONT_RIGHT_TURN: {
+            double     mps   = 0;
+            Rotation2d angle = Rotation2d.fromDegrees(0); // todo: pull from stick
+            drive.setModuleStateForTestMode(Constants.Swerve.Module.FRONT_RIGHT, new SwerveModuleState(mps, angle));
+            break;
+        }
+        }
+
         // todo: implement
     }
 

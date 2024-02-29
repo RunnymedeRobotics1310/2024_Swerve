@@ -6,15 +6,16 @@ import java.io.File;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
 import swervelib.SwerveDrive;
+import swervelib.SwerveModule;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
@@ -44,6 +45,24 @@ public class YagslSubsystem extends SwerveSubsystem {
         // Runnymede does its own heading correction in the commands.
         swerveDrive.setHeadingCorrection(false);
         swerveDrive.setCosineCompensator(!SwerveDriveTelemetry.isSimulation);
+    }
+
+    public void setModuleStateForTestMode(Constants.Swerve.Module module, SwerveModuleState desiredState) {
+        SwerveModule swerveModule = swerveDrive.getModuleMap().get(module.name);
+        if (swerveModule == null) {
+            System.out.println("Invalid module name: " + module.name);
+            return;
+        }
+
+        // save cosine compensator setting
+        boolean coco = swerveModule.configuration.useCosineCompensator;
+        swerveModule.configuration.useCosineCompensator = false;
+
+        // set the state
+        swerveModule.setDesiredState(desiredState, true, true);
+
+        // restore the cosine compensator setting
+        swerveModule.configuration.useCosineCompensator = coco;
     }
 
     @Override

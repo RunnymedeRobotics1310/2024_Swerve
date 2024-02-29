@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
@@ -72,6 +73,21 @@ public class RunnymedeSwerveSubsystem extends SwerveSubsystem {
             new Pose2d(new Translation2d(0.0, 0.0), Rotation2d.fromDegrees(0.0)));
     }
 
+    public void setModuleStateForTestMode(Constants.Swerve.Module module, SwerveModuleState desiredState) {
+        SwerveModule swerveModule = null;
+        for (SwerveModule m : modules) {
+            if (m.getName().equals(module.name)) {
+                swerveModule = m;
+            }
+        }
+        if (swerveModule == null) {
+            System.out.println("Invalid module name: " + module.name);
+            return;
+        }
+
+        // set the state
+        swerveModule.setDesiredState(desiredState);
+    }
 
     @Override
     protected void driveRawRobotOriented(ChassisSpeeds velocity) {

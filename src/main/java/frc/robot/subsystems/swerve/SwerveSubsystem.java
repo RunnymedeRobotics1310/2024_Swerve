@@ -11,11 +11,13 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
 import frc.robot.subsystems.vision.VisionPositionInfo;
@@ -173,6 +175,15 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         SmartDashboard.putString("Drive/Swerve/vispose", visPose.toString());
         this.addVisionMeasurement(visPose.pose(), timeInSeconds, stds);
     }
+
+    /**
+     * Set the swerve module state for the specified module. This is intended to be used ONLY in
+     * test mode!
+     * 
+     * @param module the module configuration object - used to identify the module only.
+     * @param desiredState the desired state of the swerve module
+     */
+    public abstract void setModuleStateForTestMode(Constants.Swerve.Module module, SwerveModuleState desiredState);
 
     public abstract void resetOdometry(Pose2d replacementPose);
 
