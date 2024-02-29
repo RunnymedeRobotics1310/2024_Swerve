@@ -18,17 +18,12 @@ public class RotateToTargetCommand extends BaseDriveCommand {
     private final BotTarget           blueTarget;
     private final BotTarget           redTarget;
     private BotTarget                 target;
-    private Pose2d                    initialPose;
     private final boolean             forwards;
     int                               alignedCount = 0;
 
 
     public static RotateToTargetCommand createRotateToSpeakerCommand(SwerveSubsystem swerve, HughVisionSubsystem hugh) {
         return new RotateToTargetCommand(swerve, hugh, BotTarget.BLUE_SPEAKER, BotTarget.RED_SPEAKER);
-    }
-
-    public static RotateToTargetCommand createRotateToAmpCommand(SwerveSubsystem swerve, HughVisionSubsystem hugh) {
-        return new RotateToTargetCommand(swerve, hugh, BotTarget.BLUE_AMP, BotTarget.RED_AMP);
     }
 
     /**
@@ -39,28 +34,23 @@ public class RotateToTargetCommand extends BaseDriveCommand {
      */
     private RotateToTargetCommand(SwerveSubsystem swerve, HughVisionSubsystem hugh, BotTarget blueTarget, BotTarget redTarget) {
         super(swerve);
-        this.hugh        = hugh;
-        this.blueTarget  = blueTarget;
-        this.redTarget   = redTarget;
-        this.target      = null;
-        this.initialPose = null;
-        this.forwards    = getForwards(blueTarget);
-        ;
+        this.hugh       = hugh;
+        this.blueTarget = blueTarget;
+        this.redTarget  = redTarget;
+        this.target     = null;
+        this.forwards   = getForwards(blueTarget);
 
         addRequirements(hugh);
-
     }
 
     private boolean getForwards(BotTarget tgt) {
-        /*
-         * if (tgt == BotTarget.BLUE_SPEAKER || tgt == BotTarget.BLUE_AMP) {
-         * return false;
-         * }
-         * else {
-         * return true;
-         * }
-         */
-        return false;
+
+        if (tgt == BotTarget.BLUE_SPEAKER || tgt == BotTarget.BLUE_AMP) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
     @Override
@@ -73,8 +63,7 @@ public class RotateToTargetCommand extends BaseDriveCommand {
         }
         logCommandStart("Target: " + target);
         hugh.setBotTarget(target);
-        this.initialPose = swerve.getPose();
-        alignedCount     = 0;
+        alignedCount = 0;
     }
 
 
