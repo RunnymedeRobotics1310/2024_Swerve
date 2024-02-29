@@ -30,7 +30,6 @@ public class SystemTestCommand extends LoggingCommand {
     private boolean               enabled             = false;
     private Motor                 selectedMotor       = NONE;
     private double                motorSpeed;
-    private double                povMotorSpeed       = 0;
 
     private boolean               previousLeftBumper  = false;
     private boolean               previousRightBumper = false;
@@ -76,7 +75,7 @@ public class SystemTestCommand extends LoggingCommand {
 
     /**
      * Use the bumpers to select the next / previous motor in the motor ring.
-     *
+     * <p>
      * Switching motors will cause all motors to stop
      */
     private void readSelectedMotor() {
@@ -116,13 +115,13 @@ public class SystemTestCommand extends LoggingCommand {
     /**
      * The SystemTestCommand can use either the POV or the triggers to control
      * the motor speed. If the triggers are used, the POV is cleared.
-     *
+     * <p>
      * Once the motor is selected, use the POV up and down to
      * adjust the motor speed.
-     *
+     * <p>
      * The speed is adjusted 50 times / second as the user holds the
-     * POV control. Allow a 5 seconds to ramp the speed from 0 to full value.
-     *
+     * POV control. Allow 5 seconds to ramp the speed from 0 to full value.
+     * <p>
      * increment = 1.0 (full) / 50 adjustments/sec / 5 sec = .004 adjustment size / loop.
      */
     private void readMotorSpeed() {
@@ -132,53 +131,46 @@ public class SystemTestCommand extends LoggingCommand {
         double rightTrigger = controller.getRightTriggerAxis();
 
 
-        if (leftTrigger > 0 && rightTrigger > 0) {
+        if (controller.getXButton()) {
+            // If the X button is pressed, reset the motor speed to zero
+            motorSpeed = 0;
+        }
+        else if (leftTrigger > 0 && rightTrigger > 0) {
 
             // If both triggers are pressed, then stop the motor
-            motorSpeed    = 0;
-            povMotorSpeed = 0;
+            motorSpeed = 0;
         }
         else if (leftTrigger > 0) {
 
-            motorSpeed    = -leftTrigger;
-            povMotorSpeed = 0;
+            motorSpeed = -leftTrigger;
         }
         else if (rightTrigger > 0) {
 
-            motorSpeed    = rightTrigger;
-            povMotorSpeed = 0;
+            motorSpeed = rightTrigger;
         }
         else {
 
             // No triggers are pressed, use the POV to control the motor speed
             if (pov == 0) {
 
-                povMotorSpeed += 0.004;
+                motorSpeed += 0.004;
 
-                if (povMotorSpeed > 1.0) {
-                    povMotorSpeed = 1.0;
+                if (motorSpeed > 1.0) {
+                    motorSpeed = 1.0;
                 }
             }
 
             if (pov == 180) {
 
-                povMotorSpeed -= 0.004;
+                motorSpeed -= 0.004;
 
-                if (povMotorSpeed < -1.0) {
-                    povMotorSpeed = -1.0;
+                if (motorSpeed < -1.0) {
+                    motorSpeed = -1.0;
                 }
             }
 
-            motorSpeed = povMotorSpeed;
         }
 
-        /*
-         * If the X button is pressed, reset the motor speed to zero
-         */
-        if (controller.getXButton()) {
-            motorSpeed    = 0;
-            povMotorSpeed = 0;
-        }
     }
 
     /**
@@ -220,8 +212,7 @@ public class SystemTestCommand extends LoggingCommand {
     }
 
     private void stopAllMotors() {
-        motorSpeed    = 0;
-        povMotorSpeed = 0;
+        motorSpeed = 0;
         drive.stop();
     }
 
