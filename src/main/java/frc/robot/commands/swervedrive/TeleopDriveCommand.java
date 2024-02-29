@@ -137,7 +137,6 @@ public class TeleopDriveCommand extends BaseDriveCommand {
                 headingSetpoint = getHeadingToFieldPosition(speaker).plus(Rotation2d.fromDegrees(180));
             }
             else if (headingSetpoint == null) {
-                lockOnSpeaker   = false;
                 headingSetpoint = swerve.getPose().getRotation();
             }
 
