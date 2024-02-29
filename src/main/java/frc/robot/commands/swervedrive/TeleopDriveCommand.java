@@ -1,6 +1,10 @@
 package frc.robot.commands.swervedrive;
 
-import static frc.robot.Constants.Swerve.Chassis.*;
+import static frc.robot.Constants.Swerve.Chassis.GENERAL_SPEED_FACTOR;
+import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_PER_SEC;
+import static frc.robot.Constants.Swerve.Chassis.MAX_SPEED_FACTOR;
+import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
+import static frc.robot.Constants.Swerve.Chassis.SLOW_SPEED_FACTOR;
 import static frc.robot.RunnymedeUtils.getRunnymedeAlliance;
 import static frc.robot.commands.operator.OperatorInput.Axis.X;
 import static frc.robot.commands.operator.OperatorInput.Axis.Y;
@@ -13,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
@@ -21,6 +26,8 @@ public class TeleopDriveCommand extends BaseDriveCommand {
     private final OperatorInput   oi;
     private final SlewRateLimiter inputOmegaLimiter = new SlewRateLimiter(4.42);
     private Rotation2d            headingSetpoint   = Rotation2d.fromDegrees(0);
+
+    private boolean               facingSpeaker     = false;
 
     /**
      * Used to drive a swerve robot in full field-centric mode.
@@ -42,58 +49,65 @@ public class TeleopDriveCommand extends BaseDriveCommand {
 
         // The FRC field-oriented ccoordinate system
         // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
-        final Alliance alliance                     = getRunnymedeAlliance();
+        final Alliance      alliance                     = getRunnymedeAlliance();
 
         // The coordinate system defines (0,0) as the right side of the blue alliance wall. The
         // x-axis is positive toward the red alliance, and the y-axis is positive to the left.
         // When the robot is on the red alliance, we need to invert inputs for the stick values
         // to move the robot in the right direction.
-        final boolean  invert                       = alliance == Alliance.Red;
+        final boolean       invert                       = alliance == Alliance.Red;
 
         // With the driver standing behind the driver station glass, "forward" on the left stick is
         // its y value, but that should convert into positive x movement on the field. The
         // Runnymede Controller inverts stick y-axis values, so "forward" on stick is positive.
         // Thus, positive y stick axis maps to positive x translation on the field.
-        final double   vX                           = oi.getDriverControllerAxis(LEFT, Y);
+        final double        vX                           = oi.getDriverControllerAxis(LEFT, Y);
 
         // Left and right movement on the left stick (the stick's x-axis) maps to the y-axis on the
         // field. Left on the stick (negative x) maps to positive y on the field, and vice versa.
         // Thus, negative x stick axis maps to positive y translation on the field.
-        final double   vY                           = -oi.getDriverControllerAxis(LEFT, X);
+        final double        vY                           = -oi.getDriverControllerAxis(LEFT, X);
 
         // Left and right on the right stick will change the direction the robot is facing - its
         // heading. Positive x values on the stick translate to clockwise motion, and vice versa.
         // The coordinate system has positive motion as CCW.
         // Therefore, negative x stick value maps to positive rotation on the field.
-        final double   ccwRotAngularVelPct          = -oi.getDriverControllerAxis(RIGHT, X);
+        final double        ccwRotAngularVelPct          = -oi.getDriverControllerAxis(RIGHT, X);
 
         // User wants to jump directly to a specific heading. Computation is deferred because it is
         // complex
         // and may not be necessary. See below for details.
-        final int      rawDesiredHeadingDeg         = oi.getPOV();
+        final int           rawDesiredHeadingDeg         = oi.getPOV();
+
+        final boolean       faceSpeaker                  = oi.isFaceSpeaker();
+        final Translation2d speaker                      = alliance == Alliance.Blue
+            ? Constants.BotTarget.BLUE_SPEAKER.getLocation().toTranslation2d()
+            : Constants.BotTarget.RED_SPEAKER.getLocation().toTranslation2d();
 
         // Compute boost factor
-        final boolean  isSlow                       = oi.isDriverLeftBumper();
-        final boolean  isFast                       = oi.isDriverRightBumper();
-        final double   boostFactor                  = isSlow ? SLOW_SPEED_FACTOR
+        final boolean       isSlow                       = oi.isDriverLeftBumper();
+        final boolean       isFast                       = oi.isDriverRightBumper();
+        final double        boostFactor                  = isSlow ? SLOW_SPEED_FACTOR
             : (isFast ? MAX_SPEED_FACTOR : GENERAL_SPEED_FACTOR);
 
 
-        Translation2d  velocity                     = calculateTeleopVelocity(vX, vY, boostFactor, invert);
+        Translation2d       velocity                     = calculateTeleopVelocity(vX, vY, boostFactor, invert);
 
-        Rotation2d     omega;
+        Rotation2d          omega;
 
-        double         correctedCcwRotAngularVelPct = inputOmegaLimiter.calculate(ccwRotAngularVelPct);
+        double              correctedCcwRotAngularVelPct = inputOmegaLimiter.calculate(ccwRotAngularVelPct);
 
         // User is steering!
         if (correctedCcwRotAngularVelPct != 0) {
             // Compute omega
+            facingSpeaker = false;
             double w = Math.pow(correctedCcwRotAngularVelPct, 3) * MAX_ROTATIONAL_VELOCITY_PER_SEC.getRadians();
             omega           = Rotation2d.fromRadians(w);
             // Save previous heading for when we are finished steering.
             headingSetpoint = swerve.getPose().getRotation();
         }
         else if (rawDesiredHeadingDeg > -1) {
+            facingSpeaker = false;
             // User wants to jump to POV
             // POV coordinates don't match field coordinates. POV is CW+ and field is CCW+. Also,
             // POV 0 is 90 degrees on the field (for blue alliance, and -90 for red).
@@ -103,15 +117,30 @@ public class TeleopDriveCommand extends BaseDriveCommand {
             double correctedHeadingDeg = ((rawDesiredHeadingDeg * -1) + (invert ? 180 : 0) + 360) % 360;
             SmartDashboard.putNumber("Drive/Teleop/correctedHeadingDeg", correctedHeadingDeg);
             Rotation2d desiredHeading = Rotation2d.fromDegrees(correctedHeadingDeg);
+
             omega           = computeOmega(desiredHeading);
             // Save the previous heading for when the jump is done
             headingSetpoint = desiredHeading;
         }
+        else if (faceSpeaker) {
+            Rotation2d desiredHeading = super.getHeadingToFieldPosition(speaker)
+                .plus(Rotation2d.fromDegrees(180));
+
+            omega           = computeOmega(desiredHeading);
+            headingSetpoint = desiredHeading;
+            facingSpeaker   = true;
+        }
         else {
             // Translating only. Just drive on the last heading we knew.
-            if (headingSetpoint == null) {
+
+            if (facingSpeaker) {
+                headingSetpoint = getHeadingToFieldPosition(speaker).plus(Rotation2d.fromDegrees(180));
+            }
+            else if (headingSetpoint == null) {
+                facingSpeaker   = false;
                 headingSetpoint = swerve.getPose().getRotation();
             }
+
             omega = computeOmega(headingSetpoint);
         }
 

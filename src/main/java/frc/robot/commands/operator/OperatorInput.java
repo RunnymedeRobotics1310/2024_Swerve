@@ -45,7 +45,7 @@ public class OperatorInput {
         return driverController.getAButton();
     }
 
-    public boolean isY() {
+    public boolean isFaceSpeaker() {
         return driverController.getYButton();
     }
 
