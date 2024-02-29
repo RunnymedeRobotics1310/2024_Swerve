@@ -118,6 +118,13 @@ public abstract class SwerveSubsystem extends SubsystemBase {
     public abstract void zeroGyro();
 
     /**
+     * Stop all motors as fast as possible
+     */
+    public void stop() {
+        driveRobotOriented(new ChassisSpeeds(0, 0, 0));
+    }
+
+    /**
      * Lock the swerve drive to prevent it from moving.
      */
     public abstract void lock();

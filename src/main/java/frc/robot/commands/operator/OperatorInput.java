@@ -1,5 +1,6 @@
 package frc.robot.commands.operator;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 
 /**
@@ -30,6 +31,10 @@ public class OperatorInput {
     public OperatorInput(int driverControllerPort, int operatorControllerPort) {
         driverController   = new RunnymedeGameController(driverControllerPort);
         operatorController = new RunnymedeGameController(operatorControllerPort);
+    }
+
+    public boolean isToggleTestMode() {
+        return !DriverStation.isFMSAttached() && driverController.getBackButton() && driverController.getStartButton();
     }
 
     public boolean isDriverLeftBumper() {

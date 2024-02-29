@@ -34,6 +34,7 @@ import frc.robot.commands.swervedrive.ResetOdometryCommand;
 import frc.robot.commands.swervedrive.RotateToTargetCommand;
 import frc.robot.commands.swervedrive.TeleopDriveCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
+import frc.robot.commands.test.SystemTestCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.swerve.yagsl.YagslSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
@@ -102,6 +103,11 @@ public class RobotContainer {
      * joysticks}.
      */
     private void configureBindings() {
+        // Enter Test Mode (Start and Back pressed at the same time)
+        new Trigger(() -> (operatorInput.isToggleTestMode()))
+            .onTrue(
+                new SystemTestCommand(operatorInput, swerveDriveSubsystem));
+
         new Trigger(operatorInput::isZeroGyro).onTrue(new ZeroGyroCommand(swerveDriveSubsystem));
         new Trigger(operatorInput::isCancel).whileTrue(new CancelCommand(swerveDriveSubsystem));
         new Trigger(operatorInput::isX)
