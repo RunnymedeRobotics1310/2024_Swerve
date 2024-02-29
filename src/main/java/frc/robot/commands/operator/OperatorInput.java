@@ -37,6 +37,11 @@ public class OperatorInput {
         return !DriverStation.isFMSAttached() && driverController.getBackButton() && driverController.getStartButton();
     }
 
+    public XboxController getRawDriverController() {
+        return driverController;
+    }
+
+
     public boolean isDriverLeftBumper() {
         return driverController.getLeftBumper();
     }
