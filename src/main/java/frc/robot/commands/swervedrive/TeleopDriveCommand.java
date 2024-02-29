@@ -27,7 +27,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
     private final SlewRateLimiter inputOmegaLimiter = new SlewRateLimiter(4.42);
     private Rotation2d            headingSetpoint   = Rotation2d.fromDegrees(0);
 
-    private boolean               facingSpeaker     = false;
+    private boolean               lockOnSpeaker     = false;
 
     /**
      * Used to drive a swerve robot in full field-centric mode.
@@ -100,14 +100,14 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         // User is steering!
         if (correctedCcwRotAngularVelPct != 0) {
             // Compute omega
-            facingSpeaker = false;
+            lockOnSpeaker = false;
             double w = Math.pow(correctedCcwRotAngularVelPct, 3) * MAX_ROTATIONAL_VELOCITY_PER_SEC.getRadians();
             omega           = Rotation2d.fromRadians(w);
             // Save previous heading for when we are finished steering.
             headingSetpoint = swerve.getPose().getRotation();
         }
         else if (rawDesiredHeadingDeg > -1) {
-            facingSpeaker = false;
+            lockOnSpeaker = false;
             // User wants to jump to POV
             // POV coordinates don't match field coordinates. POV is CW+ and field is CCW+. Also,
             // POV 0 is 90 degrees on the field (for blue alliance, and -90 for red).
@@ -128,16 +128,16 @@ public class TeleopDriveCommand extends BaseDriveCommand {
 
             omega           = computeOmega(desiredHeading);
             headingSetpoint = desiredHeading;
-            facingSpeaker   = true;
+            lockOnSpeaker   = true;
         }
         else {
             // Translating only. Just drive on the last heading we knew.
 
-            if (facingSpeaker) {
+            if (lockOnSpeaker) {
                 headingSetpoint = getHeadingToFieldPosition(speaker).plus(Rotation2d.fromDegrees(180));
             }
             else if (headingSetpoint == null) {
-                facingSpeaker   = false;
+                lockOnSpeaker   = false;
                 headingSetpoint = swerve.getPose().getRotation();
             }
 
