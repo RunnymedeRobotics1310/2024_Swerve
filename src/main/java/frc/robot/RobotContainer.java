@@ -36,6 +36,7 @@ import frc.robot.commands.swervedrive.TeleopDriveCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.commands.test.SystemTestCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.swerve.runnymede.RunnymedeSwerveSubsystem;
 import frc.robot.subsystems.swerve.yagsl.YagslSubsystem;
 import frc.robot.subsystems.vision.HughVisionSubsystem;
 
@@ -55,9 +56,8 @@ public class RobotContainer {
     private final HughVisionSubsystem hughVisionSubsystem  = new HughVisionSubsystem();
 
     // todo: set up sendable chooser for this to toggle implementation for testing
-    private final SwerveSubsystem     swerveDriveSubsystem = new YagslSubsystem(yagslConfig, hughVisionSubsystem);
-    // private final SwerveSubsystem swerveDriveSubsystem = new
-    // RunnymedeSwerveSubsystem(hughVisionSubsystem);
+//    private final SwerveSubsystem     swerveDriveSubsystem = new YagslSubsystem(yagslConfig, hughVisionSubsystem);
+    private final SwerveSubsystem     swerveDriveSubsystem = new RunnymedeSwerveSubsystem(hughVisionSubsystem);
 
     SendableChooser<AutoPattern>      autoPatternChooser   = new SendableChooser<>();
 
