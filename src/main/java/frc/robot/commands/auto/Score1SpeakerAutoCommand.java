@@ -4,7 +4,6 @@ package frc.robot.commands.auto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants.BotTarget;
 import frc.robot.commands.auto.stubs.FakeScoreSpeakerCommand;
 import frc.robot.commands.swervedrive.DriveToPositionCommand;
 import frc.robot.commands.swervedrive.RotateToTargetCommand;
@@ -24,7 +23,7 @@ public class Score1SpeakerAutoCommand extends SequentialCommandGroup {
         /* ***AUTO PATTERN*** */
 
         /* Note 1 */
-        addCommands(new RotateToTargetCommand(swerve, hugh, BotTarget.BLUE_SPEAKER, BotTarget.RED_SPEAKER, false));
+        addCommands(RotateToTargetCommand.createRotateToSpeakerCommand(swerve, hugh));
         addCommands(new FakeScoreSpeakerCommand(swerve));
 
         /* Exit Zone */

@@ -32,6 +32,7 @@ import frc.robot.commands.swervedrive.DriveDistanceCommand;
 import frc.robot.commands.swervedrive.DriveToPositionCommand;
 import frc.robot.commands.swervedrive.ResetOdometryCommand;
 import frc.robot.commands.swervedrive.RotateToSpeakerCommand;
+import frc.robot.commands.swervedrive.RotateToTargetCommand;
 import frc.robot.commands.swervedrive.TeleopDriveCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -129,7 +130,10 @@ public class RobotContainer {
         // hughVisionSubsystem));
         // new Trigger(operatorInput::isB).onTrue(new Score2AmpAutoCommand(swerveDriveSubsystem,
         // hughVisionSubsystem));
-        new Trigger(operatorInput::isB).onTrue(new RotateToSpeakerCommand(swerveDriveSubsystem, hughVisionSubsystem));
+        new Trigger(operatorInput::isA).onTrue(new RotateToSpeakerCommand(swerveDriveSubsystem, hughVisionSubsystem));
+
+        new Trigger(operatorInput::isB)
+            .onTrue(RotateToTargetCommand.createRotateToSpeakerCommand(swerveDriveSubsystem, hughVisionSubsystem));
 
     }
 
