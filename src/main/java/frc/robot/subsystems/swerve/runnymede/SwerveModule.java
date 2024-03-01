@@ -31,13 +31,9 @@ public class SwerveModule {
         angleMotor    = new AngleMotor(cfg.angleCANID, angleCfg);
         encoder       = new CanCoder(cfg.encoderCANID, cfg.encoderAbsoluteOffsetDegrees, false);
 
-        double angle = encoder.getAbsolutePositionInDegrees();
-        angleMotor.setInternalEncoderPositionDegrees(angle);
-        if (encoder.readingError) {
-            throw new IllegalStateException("Absolute encoder " + cfg.encoderCANID + " could not be read.");
-        }
+        sim           = new SimulatedSwerveModule();
 
-        sim = new SimulatedSwerveModule();
+        updateInternalEncoder();
     }
 
     public String getName() {
@@ -92,6 +88,30 @@ public class SwerveModule {
 
             angleMotor.setReferenceDegrees(desiredState.angle.getDegrees(), 0);
         }
+
+        updateInternalEncoder();
+
+        SmartDashboard.putNumber("Module[" + name + "] Speed Setpoint", desiredState.speedMetersPerSecond);
+        SmartDashboard.putNumber("Module[" + name + "] Angle Setpoint", desiredState.angle.getDegrees());
     }
 
+    private void updateInternalEncoder() {
+        double angle = encoder.getAbsolutePositionInDegrees();
+        if (encoder.readingError) {
+            throw new IllegalStateException("Absolute encoder " + encoder.getDeviceId() + " could not be read.");
+        }
+        angleMotor.setInternalEncoderPositionDegrees(angle);
+    }
+
+
+    public void updateTelemetry() {
+        // if (absoluteEncoder != null) {
+        // SmartDashboard.putNumber(rawAbsoluteAngleName, absoluteEncoder.getAbsolutePosition());
+        // }
+        // SmartDashboard.putNumber(rawAngleName, angleMotor.getPosition());
+        // SmartDashboard.putNumber(rawDriveName, driveMotor.getPosition());
+        // SmartDashboard.putNumber(adjAbsoluteAngleName, getAbsolutePosition());
+        // SmartDashboard.putNumber(absoluteEncoderIssueName, getAbsoluteEncoderReadIssue() ? 1 :
+        // 0);
+    }
 }

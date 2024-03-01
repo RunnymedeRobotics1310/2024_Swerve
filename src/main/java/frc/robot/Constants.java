@@ -5,6 +5,8 @@
 package frc.robot;
 
 import static edu.wpi.first.math.util.Units.inchesToMeters;
+import static frc.robot.Constants.Swerve.Chassis.TRACK_WIDTH_METRES;
+import static frc.robot.Constants.Swerve.Chassis.WHEEL_BASE_METRES;
 import static frc.robot.subsystems.vision.PoseConfidence.HIGH;
 import static frc.robot.subsystems.vision.PoseConfidence.LOW;
 import static frc.robot.subsystems.vision.PoseConfidence.MEDIUM;
@@ -42,6 +44,15 @@ public final class Constants {
     public static final class Swerve {
 
         public static final class Chassis {
+
+            /**
+             * Front to back from the middle of the wheels
+             */
+            public static final double     WHEEL_BASE_METRES                      = inchesToMeters(21);
+            /**
+             * Side to side from the middle of the wheels
+             */
+            public static final double     TRACK_WIDTH_METRES                     = inchesToMeters(21.75);
 
             public static final double     SDS_MK4I_WHEEL_RADIUS_METRES           = 0.0051;
             /**
@@ -126,8 +137,8 @@ public final class Constants {
                 DRIVE.currentLimitAmps = 40;
                 DRIVE.nominalVoltage   = 12;
                 DRIVE.rampRate         = 0.25;
-                DRIVE.gearRatio        = 6.75;     // SDS MK4i L2 --> 6.75:1
-                DRIVE.p                = 0.0020645;
+                DRIVE.gearRatio        = 6.75; // SDS MK4i L2 --> 6.75:1
+                DRIVE.p                = 0.11; // 0.0020645;
                 DRIVE.i                = 0;
                 DRIVE.d                = 0;
                 DRIVE.ff               = 0;
@@ -142,7 +153,7 @@ public final class Constants {
                 ANGLE.nominalVoltage   = 12;
                 ANGLE.rampRate         = 0.25;
                 ANGLE.gearRatio        = 150.0 / 7; // SDS MK4i 150/7:1
-                ANGLE.p                = 0.01;
+                ANGLE.p                = 0.0125;    // 0.01
                 ANGLE.i                = 0;
                 ANGLE.d                = 0;
                 ANGLE.ff               = 0;
@@ -169,7 +180,7 @@ public final class Constants {
             static {
                 BACK_LEFT.name                         = "backleft";
                 BACK_LEFT.wheelRadiusMetres            = Chassis.SDS_MK4I_WHEEL_RADIUS_METRES;
-                BACK_LEFT.locationMetres               = new Translation2d(inchesToMeters(-11.375), inchesToMeters(10.875));
+                BACK_LEFT.locationMetres               = new Translation2d(-TRACK_WIDTH_METRES / 2, WHEEL_BASE_METRES / 2);
                 BACK_LEFT.driveCANID                   = 35;
                 BACK_LEFT.angleCANID                   = 36;
                 BACK_LEFT.encoderCANID                 = 37;
@@ -181,7 +192,7 @@ public final class Constants {
             static {
                 BACK_RIGHT.name                         = "backright";
                 BACK_RIGHT.wheelRadiusMetres            = Chassis.SDS_MK4I_WHEEL_RADIUS_METRES;
-                BACK_RIGHT.locationMetres               = new Translation2d(inchesToMeters(-11.375), inchesToMeters(-10.875));
+                BACK_RIGHT.locationMetres               = new Translation2d(-TRACK_WIDTH_METRES / 2, -WHEEL_BASE_METRES / 2);
                 BACK_RIGHT.driveCANID                   = 30;
                 BACK_RIGHT.angleCANID                   = 31;
                 BACK_RIGHT.encoderCANID                 = 32;
@@ -193,11 +204,12 @@ public final class Constants {
             static {
                 FRONT_LEFT.name                         = "frontleft";
                 FRONT_LEFT.wheelRadiusMetres            = Chassis.SDS_MK4I_WHEEL_RADIUS_METRES;
-                FRONT_LEFT.locationMetres               = new Translation2d(inchesToMeters(11.375), inchesToMeters(10.875));
+                FRONT_LEFT.locationMetres               = new Translation2d(TRACK_WIDTH_METRES / 2, WHEEL_BASE_METRES / 2);
                 FRONT_LEFT.driveCANID                   = 10;
                 FRONT_LEFT.angleCANID                   = 11;
                 FRONT_LEFT.encoderCANID                 = 12;
                 FRONT_LEFT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.281494).getDegrees();
+
             }
 
             public static final Module FRONT_RIGHT = new Module();
@@ -205,7 +217,7 @@ public final class Constants {
             static {
                 FRONT_RIGHT.name                         = "frontright";
                 FRONT_RIGHT.wheelRadiusMetres            = Chassis.SDS_MK4I_WHEEL_RADIUS_METRES;
-                FRONT_RIGHT.locationMetres               = new Translation2d(inchesToMeters(11.375), inchesToMeters(-10.875));
+                FRONT_RIGHT.locationMetres               = new Translation2d(TRACK_WIDTH_METRES / 2, -WHEEL_BASE_METRES / 2);
                 FRONT_RIGHT.driveCANID                   = 20;
                 FRONT_RIGHT.angleCANID                   = 21;
                 FRONT_RIGHT.encoderCANID                 = 22;
