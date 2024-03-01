@@ -11,6 +11,7 @@ import com.ctre.phoenix6.signals.MagnetHealthValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Inspired by YAGSL SwerveAbsoluteEncoder and CANCoderSwerve. Designed to be used only
@@ -102,6 +103,11 @@ class CanCoder {
             DriverStation.reportWarning("CANCoder " + encoder.getDeviceID() + " not usable - magnet health RED.", false);
         }
         return true;
+    }
+
+    void updateTelemetry() {
+        SmartDashboard.putNumber("swerve/1310/module/encoder/offsetDegrees", absoluteEncoderOffset);
+        SmartDashboard.putNumber("swerve/1310/module/encoder/positionDegrees", getAbsolutePositionInDegrees());
     }
 
 }

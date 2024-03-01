@@ -6,22 +6,24 @@ import java.util.function.Supplier;
 import com.revrobotics.*;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 abstract class SparkMaxNeoMotor {
 
     /**
-     * The maximum amount of times the swerve motor will attempt to configure a motor if failures occur.
+     * The maximum amount of times the swerve motor will attempt to configure a motor if failures
+     * occur.
      */
-    private final int maximumRetries = 5;
-    protected final CANSparkMax motor;
-    protected final RelativeEncoder encoder;
+    private final int                  maximumRetries = 5;
+    protected final CANSparkMax        motor;
+    protected final RelativeEncoder    encoder;
     protected final SparkPIDController pid;
 
     SparkMaxNeoMotor(int canBusId) {
         // instantiate & configure motor
-        this.motor = new CANSparkMax(canBusId, CANSparkLowLevel.MotorType.kBrushless);
+        this.motor   = new CANSparkMax(canBusId, CANSparkLowLevel.MotorType.kBrushless);
         this.encoder = this.motor.getEncoder();
-        pid = motor.getPIDController();
+        pid          = motor.getPIDController();
         configureCANStatusFrames(10, 20, 20, 500, 500);
         configureSparkMax(motor::restoreFactoryDefaults);
         configureSparkMax(motor::clearFaults);
@@ -48,9 +50,10 @@ abstract class SparkMaxNeoMotor {
     protected final void burnFlash() {
         try {
             Thread.sleep(200);
-        } catch (Exception e) {
         }
-        configureSparkMax(() -> motor.burnFlash());
+        catch (Exception e) {
+        }
+        configureSparkMax(motor::burnFlash);
     }
 
     /**
@@ -68,6 +71,17 @@ abstract class SparkMaxNeoMotor {
         configureSparkMax(() -> motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus2, CANStatus2));
         configureSparkMax(() -> motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus3, CANStatus3));
         configureSparkMax(() -> motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus4, CANStatus4));
-        // TODO: Configure Status Frame 5 and 6 if necessary https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
+        // TODO: Configure Status Frame 5 and 6 if necessary
+        // https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
+    }
+
+    void updateTelemetry(String pfx) {
+        SmartDashboard.putNumber(pfx + "deviceId", motor.getDeviceId());
+        SmartDashboard.putString(pfx + "firmware", motor.getFirmwareString());
+        SmartDashboard.putNumber(pfx + "current", motor.getOutputCurrent());
+        SmartDashboard.putNumber(pfx + "voltage", motor.getBusVoltage());
+        SmartDashboard.putNumber(pfx + "temp", motor.getMotorTemperature());
+        SmartDashboard.putNumber(pfx + "faults", motor.getFaults());
+        SmartDashboard.putNumber(pfx + "voltageComp", motor.getVoltageCompensationNominalVoltage());
     }
 }

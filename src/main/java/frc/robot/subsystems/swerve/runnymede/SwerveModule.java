@@ -21,8 +21,6 @@ public class SwerveModule {
     /**
      * Constructs a SwerveModule with a drive motor, turning motor, drive encoder and turning
      * encoder.
-     * TODO: periodically update neo encoder from absolute encoder
-     * TODO: figure out how to handle brownouts.
      */
     public SwerveModule(Constants.Swerve.Module cfg, Constants.Swerve.Motor driveCfg, Constants.Swerve.Motor angleCfg) {
         this.name     = cfg.name;
@@ -89,10 +87,8 @@ public class SwerveModule {
             angleMotor.setReferenceDegrees(desiredState.angle.getDegrees(), 0);
         }
 
+        // Check to make sure this is not happening too frequently, using too much CAN traffic
         updateInternalEncoder();
-
-        SmartDashboard.putNumber("Module[" + name + "] Speed Setpoint", desiredState.speedMetersPerSecond);
-        SmartDashboard.putNumber("Module[" + name + "] Angle Setpoint", desiredState.angle.getDegrees());
     }
 
     private void updateInternalEncoder() {
@@ -103,15 +99,9 @@ public class SwerveModule {
         angleMotor.setInternalEncoderPositionDegrees(angle);
     }
 
-
     public void updateTelemetry() {
-        // if (absoluteEncoder != null) {
-        // SmartDashboard.putNumber(rawAbsoluteAngleName, absoluteEncoder.getAbsolutePosition());
-        // }
-        // SmartDashboard.putNumber(rawAngleName, angleMotor.getPosition());
-        // SmartDashboard.putNumber(rawDriveName, driveMotor.getPosition());
-        // SmartDashboard.putNumber(adjAbsoluteAngleName, getAbsolutePosition());
-        // SmartDashboard.putNumber(absoluteEncoderIssueName, getAbsoluteEncoderReadIssue() ? 1 :
-        // 0);
+        driveMotor.updateTelemetry();
+        angleMotor.updateTelemetry();
+        encoder.updateTelemetry();
     }
 }
