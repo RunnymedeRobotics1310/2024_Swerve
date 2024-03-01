@@ -157,5 +157,19 @@ gradle-app.setting
 .project
 .settings/
 bin/
-imgui.ini
 
+# IntelliJ
+# .idea folder has its own internal .gitignore so trust it for what to ignore.
+.run
+
+# Fleet
+.fleet
+
+# Simulation GUI and other tools window save file
+*-window.json
+
+# Simulation data log directory
+logs/
+
+# Folder that has CTRE Phoenix Sim device config storage
+ctre_sim/

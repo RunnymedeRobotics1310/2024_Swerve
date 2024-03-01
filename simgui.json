@@ -1,0 +1,143 @@
+{
+  "HALProvider": {
+    "Other Devices": {
+      "CANCoder (v6)[12]": {
+        "header": {
+          "open": true
+        }
+      },
+      "CANCoder (v6)[37]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [10]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [11]": {
+        "header": {
+          "open": true
+        }
+      },
+      "window": {
+        "visible": false
+      }
+    },
+    "Timing": {
+      "window": {
+        "visible": false
+      }
+    }
+  },
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Auto Pattern": "String Chooser",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/navX-Sensor[4]": "Gyro"
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "Robot": {
+          "arrowSize": 25
+        },
+        "XModules": {
+          "arrowSize": 19,
+          "style": "Hidden"
+        },
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "FMSInfo": {
+        "open": true
+      },
+      "LiveWindow": {
+        "open": true
+      },
+      "SmartDashboard": {
+        "Drive": {
+          "Swerve": {
+            "location": {
+              "open": true
+            },
+            "open": true
+          },
+          "Teleop": {
+            "open": true
+          },
+          "ToPosition": {
+            "open": true
+          },
+          "open": true
+        },
+        "DriveTo": {
+          "Position": {
+            "open": true
+          },
+          "open": true
+        },
+        "Swerve Drive": {
+          "open": true
+        },
+        "open": true,
+        "swerve": {
+          "double[]##v_/SmartDashboard/swerve/desiredChassisSpeeds": {
+            "open": true
+          },
+          "open": true
+        }
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "Clients": {
+      "open": true
+    },
+    "Connections": {
+      "open": true
+    },
+    "Server": {
+      "Publishers": {
+        "open": true
+      },
+      "open": true
+    },
+    "visible": true
+  },
+  "Plot": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 427
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    },
+    "Plot <1>": {
+      "window": {
+        "visible": false
+      }
+    }
+  }
+}
