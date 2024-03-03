@@ -47,6 +47,7 @@ public class YagslSubsystem extends SwerveSubsystem {
         swerveDrive.setCosineCompensator(!SwerveDriveTelemetry.isSimulation);
     }
 
+    @Override
     public void setModuleStateForTestMode(Constants.Swerve.Module module, SwerveModuleState desiredState) {
         SwerveModule swerveModule = swerveDrive.getModuleMap().get(module.name);
         if (swerveModule == null) {
@@ -73,6 +74,11 @@ public class YagslSubsystem extends SwerveSubsystem {
     @Override
     public Pose2d getPose() {
         return swerveDrive.getPose();
+    }
+
+    @Override
+    public void updateTelemetry() {
+        // noop - done internally inside SwerveDrive
     }
 
     @Override

@@ -3,9 +3,15 @@ package frc.robot.subsystems.swerve.runnymede;
 
 import com.revrobotics.CANSparkBase;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 public class DriveMotor extends SparkMaxNeoMotor {
+
+    /**
+     * Save the setpoint for telemetry
+     */
+    private double setpointMPS;
 
     /**
      * Configure the SparkMAX and its integrated PIDF (PID + feed forward) control.
@@ -49,10 +55,17 @@ public class DriveMotor extends SparkMaxNeoMotor {
     }
 
     void setReferenceMetresPerSecond(double setpointMPS, double feedforward) {
-        configureSparkMax(() -> pid.setReference(setpointMPS, CANSparkBase.ControlType.kVelocity, 0, feedforward));
+        this.setpointMPS = setpointMPS;
+        configureSparkMax(() -> pid.setReference(this.setpointMPS, CANSparkBase.ControlType.kVelocity, 0, feedforward));
     }
 
     double getVelocityMetresPerSecond() {
         return encoder.getVelocity();
+    }
+
+    void updateTelemetry() {
+        super.updateTelemetry("swerve/1310/module/drive/debug/");
+        SmartDashboard.putNumber("swerve/1310/module/drive/setpointMPS", setpointMPS);
+        SmartDashboard.putNumber("swerve/1310/module/drive/measuredMPS", getVelocityMetresPerSecond());
     }
 }

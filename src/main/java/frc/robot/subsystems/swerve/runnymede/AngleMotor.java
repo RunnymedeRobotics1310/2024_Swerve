@@ -5,16 +5,22 @@ package frc.robot.subsystems.swerve.runnymede;
 import com.revrobotics.CANSparkBase;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 public class AngleMotor extends SparkMaxNeoMotor {
+
+    /**
+     * Save the setpoint for telemetry
+     */
+    private double setpointDegrees;
 
 
     /**
      * Configure the SparkMAX and its integrated PIDF (PID + feed forward) control.
      *
      * @param canBusId bus id
-     * @param cfg      motor configuration
+     * @param cfg motor configuration
      * @{link https://docs.revrobotics.com/sparkmax/operating-modes/closed-loop-control}
      */
     AngleMotor(int canBusId, Constants.Swerve.Motor cfg) {
@@ -28,9 +34,11 @@ public class AngleMotor extends SparkMaxNeoMotor {
         // configure integrated encoder
         final double turnConversionFactor = 1 / (cfg.gearRatio * 360);
         configureSparkMax(() -> encoder.setPositionConversionFactor(turnConversionFactor));
-        configureSparkMax(() -> encoder.setVelocityConversionFactor(turnConversionFactor / 60)); // todo: check 60
+        // todo: check that 60 is correct!
+        configureSparkMax(() -> encoder.setVelocityConversionFactor(turnConversionFactor / 60));
 
-        pid.setFeedbackDevice(encoder); // Configure feedback of the PID controller as the integrated encoder.
+        // Configure feedback of the PID controller as teh integrated controller
+        pid.setFeedbackDevice(encoder);
         configureSparkMax(() -> pid.setP(cfg.p, 0));
         configureSparkMax(() -> pid.setI(cfg.i, 0));
         configureSparkMax(() -> pid.setD(cfg.d, 0));
@@ -54,7 +62,7 @@ public class AngleMotor extends SparkMaxNeoMotor {
     /**
      * Set the integrated encoder position
      *
-     * @param position Integrated encoder position  - degrees for turning motor
+     * @param position Integrated encoder position - degrees for turning motor
      */
     void setInternalEncoderPositionDegrees(double position) {
         if (encoder.getPosition() != position) {
@@ -64,9 +72,13 @@ public class AngleMotor extends SparkMaxNeoMotor {
 
 
     void setReferenceDegrees(double setpoint, double feedforward) {
-        configureSparkMax(() ->
-                pid.setReference(setpoint, CANSparkBase.ControlType.kPosition, 0, feedforward)
-        );
+        this.setpointDegrees = setpoint;
+        configureSparkMax(() -> pid.setReference(setpoint, CANSparkBase.ControlType.kPosition, 0, feedforward));
+    }
 
+    void updateTelemetry() {
+        super.updateTelemetry("swerve/1310/module/angle/debug/");
+        SmartDashboard.putNumber("swerve/1310/module/angle/setpointDeg", setpointDegrees);
+        SmartDashboard.putNumber("swerve/1310/module/angle/positionDeg", getPosition().getDegrees());
     }
 }

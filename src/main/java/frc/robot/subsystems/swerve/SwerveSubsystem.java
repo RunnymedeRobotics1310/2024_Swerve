@@ -176,6 +176,8 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         this.addVisionMeasurement(visPose.pose(), timeInSeconds, stds);
     }
 
+    public abstract void updateTelemetry();
+
     /**
      * Set the swerve module state for the specified module. This is intended to be used ONLY in
      * test mode!
@@ -192,6 +194,7 @@ public abstract class SwerveSubsystem extends SubsystemBase {
         super.periodic();
         updateOdometryWithStates();
         updateOdometryWithVisionInfo();
+        updateTelemetry();
         Pose2d pose = getPose();
         SmartDashboard.putString("Drive/Swerve/location",
             String.format("%.2f,%.2f m", pose.getTranslation().getX(), pose.getTranslation().getY()));

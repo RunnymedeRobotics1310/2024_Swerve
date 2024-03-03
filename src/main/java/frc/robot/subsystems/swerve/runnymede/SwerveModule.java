@@ -21,8 +21,6 @@ public class SwerveModule {
     /**
      * Constructs a SwerveModule with a drive motor, turning motor, drive encoder and turning
      * encoder.
-     * TODO: periodically update neo encoder from absolute encoder
-     * TODO: figure out how to handle brownouts.
      */
     public SwerveModule(Constants.Swerve.Module cfg, Constants.Swerve.Motor driveCfg, Constants.Swerve.Motor angleCfg) {
         this.name     = cfg.name;
@@ -31,13 +29,9 @@ public class SwerveModule {
         angleMotor    = new AngleMotor(cfg.angleCANID, angleCfg);
         encoder       = new CanCoder(cfg.encoderCANID, cfg.encoderAbsoluteOffsetDegrees, false);
 
-        double angle = encoder.getAbsolutePositionInDegrees();
-        angleMotor.setInternalEncoderPositionDegrees(angle);
-        if (encoder.readingError) {
-            throw new IllegalStateException("Absolute encoder " + cfg.encoderCANID + " could not be read.");
-        }
+        sim           = new SimulatedSwerveModule();
 
-        sim = new SimulatedSwerveModule();
+        updateInternalEncoder();
     }
 
     public String getName() {
@@ -92,6 +86,22 @@ public class SwerveModule {
 
             angleMotor.setReferenceDegrees(desiredState.angle.getDegrees(), 0);
         }
+
+        // Check to make sure this is not happening too frequently, using too much CAN traffic
+        updateInternalEncoder();
     }
 
+    private void updateInternalEncoder() {
+        double angle = encoder.getAbsolutePositionInDegrees();
+        if (encoder.readingError) {
+            throw new IllegalStateException("Absolute encoder " + encoder.getDeviceId() + " could not be read.");
+        }
+        angleMotor.setInternalEncoderPositionDegrees(angle);
+    }
+
+    public void updateTelemetry() {
+        driveMotor.updateTelemetry();
+        angleMotor.updateTelemetry();
+        encoder.updateTelemetry();
+    }
 }
