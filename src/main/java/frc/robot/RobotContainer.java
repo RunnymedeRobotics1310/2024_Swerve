@@ -25,6 +25,7 @@ import frc.robot.commands.CancelCommand;
 import frc.robot.commands.auto.Score1AmpAutoCommand;
 import frc.robot.commands.auto.Score1SpeakerAutoCommand;
 import frc.robot.commands.auto.Score2AmpAutoCommand;
+import frc.robot.commands.auto.Score2_5AmpAutoCommand;
 import frc.robot.commands.auto.Score3SpeakerAutoCommand;
 import frc.robot.commands.auto.Score4SpeakerAutoCommand;
 import frc.robot.commands.operator.OperatorInput;
@@ -83,6 +84,7 @@ public class RobotContainer {
         autoPatternChooser.setDefaultOption("1 Amp", AutoPattern.SCORE_1_AMP);
         SmartDashboard.putData("Auto Pattern", autoPatternChooser);
         autoPatternChooser.addOption("2 Amp", AutoPattern.SCORE_2_AMP);
+        autoPatternChooser.addOption("2.5 Amp", AutoPattern.SCORE_2_5_AMP);
         autoPatternChooser.addOption("1 Speaker", AutoPattern.SCORE_1_SPEAKER);
         autoPatternChooser.addOption("3 Speaker", AutoPattern.SCORE_3_SPEAKER);
         autoPatternChooser.addOption("4 Speaker", AutoPattern.SCORE_4_SPEAKER);
@@ -157,6 +159,9 @@ public class RobotContainer {
 
         case SCORE_2_AMP:
             return new Score2AmpAutoCommand(swerveDriveSubsystem, hughVisionSubsystem);
+
+        case SCORE_2_5_AMP:
+            return new Score2_5AmpAutoCommand(swerveDriveSubsystem, hughVisionSubsystem);
 
         case SCORE_1_SPEAKER:
             return new Score1SpeakerAutoCommand(swerveDriveSubsystem, hughVisionSubsystem);
