@@ -340,13 +340,13 @@ public class HughVisionSubsystem extends SubsystemBase {
             }
         }
         else { // numTargets > 1
-            if (avgTargetDistance <= 5) {
+            if (avgTargetDistance <= 4.5) {
                 poseConfidence = PoseConfidence.HIGH;
             }
-            else if (avgTargetDistance <= 6) {
+            else if (avgTargetDistance <= 5.5) {
                 poseConfidence = PoseConfidence.MEDIUM;
             }
-            else if (avgTargetDistance <= 7) {
+            else if (avgTargetDistance <= 6) {
                 poseConfidence = PoseConfidence.LOW;
             }
         }

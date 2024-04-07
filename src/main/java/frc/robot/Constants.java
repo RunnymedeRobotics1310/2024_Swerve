@@ -282,9 +282,9 @@ public final class Constants {
 
     public static final class UsefulPoses {
 
-        public static final Pose2d SCORE_BLUE_AMP = (new Pose2d(BotTarget.BLUE_AMP.getLocation().getX(), 7.8,
+        public static final Pose2d SCORE_BLUE_AMP = (new Pose2d(BotTarget.BLUE_AMP.getLocation().getX(), 7.6,
             Rotation2d.fromDegrees(90)));
-        public static final Pose2d SCORE_RED_AMP  = (new Pose2d(BotTarget.RED_AMP.getLocation().getX(), 7.8,
+        public static final Pose2d SCORE_RED_AMP  = (new Pose2d(BotTarget.RED_AMP.getLocation().getX(), 7.6,
             Rotation2d.fromDegrees(90)));
 
         public static final Pose2d BLUE_2_2_20    = new Pose2d(2, 2, Rotation2d.fromDegrees(20));
@@ -338,7 +338,7 @@ public final class Constants {
     public static final class AutoConstants {
 
         public static enum AutoPattern {
-            SCORE_1_AMP, SCORE_2_AMP, SCORE_1_SPEAKER, SCORE_3_SPEAKER, SCORE_4_SPEAKER
+            SCORE_1_AMP, SCORE_2_AMP, SCORE_2_5_AMP, SCORE_1_SPEAKER, SCORE_3_SPEAKER, SCORE_4_SPEAKER
         }
     }
 }
