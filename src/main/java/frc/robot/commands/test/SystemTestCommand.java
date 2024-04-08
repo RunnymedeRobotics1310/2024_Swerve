@@ -3,36 +3,33 @@ package frc.robot.commands.test;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.telemetry.Telemetry;
 
 import static frc.robot.commands.test.SystemTestCommand.Motor.*;
 
 public class SystemTestCommand extends LoggingCommand {
 
-    enum Motor {
+    public enum Motor {
         NONE,
         FRONT_LEFT_DRIVE, FRONT_LEFT_TURN,
         BACK_LEFT_DRIVE, BACK_LEFT_TURN,
         BACK_RIGHT_DRIVE, BACK_RIGHT_TURN,
         FRONT_RIGHT_DRIVE, FRONT_RIGHT_TURN,
-        AIM, LINK,
-        SHOOTER_TOP, SHOOTER_BOTTOM,
-        INTAKE,
-        CLIMB_LEFT, CLIMB_RIGHT
+
     }
 
     private final OperatorInput   oi;
     private final XboxController  controller;
     private final SwerveSubsystem drive;
 
-
     private boolean               enabled             = false;
     private Motor                 selectedMotor       = NONE;
     private double                motorSpeed;
+    private double                motor2Speed;
     private Rotation2d            angle;
 
     private boolean               previousLeftBumper  = false;
@@ -137,20 +134,8 @@ public class SystemTestCommand extends LoggingCommand {
 
         if (controller.getXButton()) {
             // If the X button is pressed, reset the motor speed to zero
-            motorSpeed = 0;
-        }
-        else if (leftTrigger > 0 && rightTrigger > 0) {
-
-            // If both triggers are pressed, then stop the motor
-            motorSpeed = 0;
-        }
-        else if (leftTrigger > 0) {
-
-            motorSpeed = -leftTrigger;
-        }
-        else if (rightTrigger > 0) {
-
-            motorSpeed = rightTrigger;
+            motorSpeed  = 0;
+            motor2Speed = 0;
         }
         else {
 
@@ -173,6 +158,24 @@ public class SystemTestCommand extends LoggingCommand {
                 }
             }
 
+            // Use the POV left right to control the second motor speed
+            if (pov == 90) {
+
+                motor2Speed += 0.004;
+
+                if (motor2Speed > 1.0) {
+                    motor2Speed = 1.0;
+                }
+            }
+
+            if (pov == 270) {
+
+                motor2Speed -= 0.004;
+
+                if (motor2Speed < -1.0) {
+                    motor2Speed = -1.0;
+                }
+            }
         }
 
     }
@@ -233,8 +236,6 @@ public class SystemTestCommand extends LoggingCommand {
             break;
         }
         }
-
-        // todo: implement
     }
 
     public boolean isFinished() {
@@ -265,16 +266,17 @@ public class SystemTestCommand extends LoggingCommand {
     }
 
     private void stopAllMotors() {
-        motorSpeed = 0;
-        angle      = Rotation2d.fromDegrees(1310);
+        motorSpeed  = 0;
+        motor2Speed = 0;
+        angle       = Rotation2d.fromDegrees(1310);
         drive.stop();
     }
 
     private void updateDashboard() {
-        SmartDashboard.putBoolean("1310 Test Mode/Enabled", enabled);
-        SmartDashboard.putString("1310 Test Mode/Motor", selectedMotor.toString());
-        SmartDashboard.putString("1310 Test Mode/Motor Speed", String.format("%.1f", motorSpeed * 100) + " %");
-        SmartDashboard.putString("1310 Test Mode/Angle", String.format("%.3f", angle.getDegrees()) + " degrees");
+        Telemetry.test.enabled       = enabled;
+        Telemetry.test.selectedMotor = selectedMotor;
+        Telemetry.test.motorSpeed    = motorSpeed;
+        Telemetry.test.motor2Speed   = motor2Speed;
+        Telemetry.test.angle         = angle;
     }
-
 }
