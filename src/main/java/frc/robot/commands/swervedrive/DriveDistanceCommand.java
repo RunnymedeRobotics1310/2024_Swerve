@@ -32,7 +32,7 @@ public class DriveDistanceCommand extends BaseDriveCommand {
     @Override
     public void execute() {
         super.execute();
-        driveToFieldPose(desiredPose, velocityVectorMps.getNorm());
+        swerve.driveToFieldPose(desiredPose, velocityVectorMps.getNorm());
     }
 
     @Override
@@ -43,6 +43,6 @@ public class DriveDistanceCommand extends BaseDriveCommand {
     @Override
     public boolean isFinished() {
         super.isFinished();
-        return isCloseEnough(desiredPose.getTranslation()) && isCloseEnough(desiredPose.getRotation());
+        return swerve.isCloseEnough(desiredPose.getTranslation()) && swerve.isCloseEnough(desiredPose.getRotation());
     }
 }

@@ -5,22 +5,18 @@
 package frc.robot;
 
 import static edu.wpi.first.math.util.Units.inchesToMeters;
-import static frc.robot.Constants.Swerve.Chassis.TRACK_WIDTH_METRES;
-import static frc.robot.Constants.Swerve.Chassis.WHEEL_BASE_METRES;
-import static frc.robot.subsystems.vision.PoseConfidence.HIGH;
-import static frc.robot.subsystems.vision.PoseConfidence.LOW;
-import static frc.robot.subsystems.vision.PoseConfidence.MEDIUM;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
+import frc.robot.subsystems.swerve.SwerveDriveSubsystemConfig;
+import ca.team1310.swervedrive.core.config.CoreSwerveConfig;
+import ca.team1310.swervedrive.core.config.EncoderConfig;
+import ca.team1310.swervedrive.core.config.ModuleConfig;
+import ca.team1310.swervedrive.core.config.MotorConfig;
+import ca.team1310.swervedrive.vision.VisionConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.vision.PoseConfidence;
+import frc.robot.subsystems.swerve.SwerveRotationConfig;
+import frc.robot.subsystems.swerve.SwerveTranslationConfig;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -37,193 +33,134 @@ import frc.robot.subsystems.vision.PoseConfidence;
 public final class Constants {
     public static final class OiConstants {
 
-        public static final int DRIVER_CONTROLLER_PORT   = 0;
-        public static final int OPERATOR_CONTROLLER_PORT = 1;
+        public static final int    DRIVER_CONTROLLER_PORT   = 0;
+        public static final int    OPERATOR_CONTROLLER_PORT = 1;
+
+        /**
+         * Standard drive speed factor. Regular teleop drive will use this factor of the max
+         * translational speed.
+         */
+        public static final double GENERAL_SPEED_FACTOR     = .6;
+
+        /**
+         * Maximum drive speed factor. When boosting, this factor will be multiplied against the
+         * max translational speed.
+         */
+        public static final double MAX_SPEED_FACTOR         = 1;
+
+        /**
+         * Slow mode drive speed factor. When running in slow mode, this factor will be
+         * multiplied against the max translational speed.
+         */
+        public static final double SLOW_SPEED_FACTOR        = .1;
+
+    }
+
+    public static final class FieldConstants {
+        public static final double FIELD_EXTENT_METRES_Y = 8.211;
+        public static final double FIELD_EXTENT_METRES_X = 16.541;
     }
 
     public static final class Swerve {
 
-        public static final class Chassis {
+        /**
+         * Front to back from the middle of the wheels
+         */
+        public static final double                     WHEEL_BASE_METRES         = inchesToMeters(21);
+        /**
+         * Side to side from the middle of the wheels
+         */
+        public static final double                     TRACK_WIDTH_METRES        = inchesToMeters(21.75);
 
-            /**
-             * Front to back from the middle of the wheels
-             */
-            public static final double     WHEEL_BASE_METRES                      = inchesToMeters(21);
-            /**
-             * Side to side from the middle of the wheels
-             */
-            public static final double     TRACK_WIDTH_METRES                     = inchesToMeters(21.75);
+        public static final double                     SDS_MK4I_WHEEL_RADIUS_M   = 0.0051;
 
-            public static final double     SDS_MK4I_WHEEL_RADIUS_METRES           = 0.0051;
-            /**
-             * Specify the maximum speed a module can physically reach in m/s.
-             * The SDS
-             * <a href="https://www.swervedrivespecialties.com/products/mk4i-swerve-module">MK4i</a>
-             * module with L2 gear ratio supports a maximum drive motor speed of 15.7ft/s (4.79m/s).
-             * 
-             * Do not use this value in software to cap how fast the robot drives on the field.
-             * For that, use {@link #MAX_TRANSLATION_SPEED_MPS}.
-             */
-            public static final double     MAX_MODULE_SPEED_MPS                   = 4.79;
-            /**
-             * Set how fast you want the robot to actually translate across the field.
-             * This is the "speed limit" of the robot.
-             *
-             * Practically speaking 4.42 m/s is a good max, but
-             * consider 1-2 for development and 2-3 for competitions.
-             */
-            public static final double     MAX_TRANSLATION_SPEED_MPS              = 4.42;
-            public static final Rotation2d MAX_ROTATIONAL_VELOCITY_PER_SEC        = Rotation2d.fromRotations(1);
-            public static final Rotation2d MIN_ROTATIONAL_VELOCITY_PER_SEC        = Rotation2d.fromDegrees(10);
-            public static final Rotation2d ROTATION_TOLERANCE                     = Rotation2d.fromDegrees(1);
-            public static final double     TRANSLATION_TOLERANCE_METRES           = 0.02;
-            public static final double     DECEL_FROM_MAX_TO_STOP_DIST_METRES     = 1.9;
-            public static final double     MAX_ROTATION_ACCELERATION_RAD_PER_SEC2 = Rotation2d.fromRotations(800).getRadians();
-            public static final double     MAX_TRANSLATION_ACCELERATION_MPS2      = 8;
+        private static final int                       ANGLE_ENCODER_UPDATE_FREQ = 10;
 
-            /**
-             * Standard drive speed factor. Regular teleop drive will use this factor of the max
-             * translational speed.
-             */
-            public static final double     GENERAL_SPEED_FACTOR                   = .5;
+        public static final SwerveTranslationConfig    TRANSLATION_CONFIG        = new SwerveTranslationConfig(
+            0.02,
+            1.0,
+            4.79,
+            4.79,
+            12.0,
+            1.2, 0, 0);
 
-            /**
-             * Maximum drive speed factor. When boosting, this factor will be multiplied against the
-             * max translational speed.
-             * todo: tune
-             */
-            public static final double     MAX_SPEED_FACTOR                       = 1;
+        public static final SwerveRotationConfig       ROTATION_CONFIG           = new SwerveRotationConfig(
+            /* min rot vel radPS */ Rotation2d.fromDegrees(10).getRadians(),
+            /* max rot vel radPS */ Rotation2d.fromRotations(1).getRadians(),
+            /* max rotation jump speed */ Rotation2d.fromDegrees(205).getRadians(),
+            /* slow zone */ Rotation2d.fromDegrees(35).getRadians(),
+            /* max rotation accel */ Rotation2d.fromRotations(1310).getRadians(),
+            /* rotation tolerance */ Rotation2d.fromDegrees(2).getRadians(),
+            0.8, 0, 0);
 
-            /**
-             * Slow mode drive speed factor. When running in slow mode, this factor will be
-             * multiplied against the max translational speed.
-             * todo: tune
-             */
-            public static final double     SLOW_SPEED_FACTOR                      = .1;
 
-            public static final class HeadingPIDConfig {
-                public static final double P = 0.8;
-                // .002 is too low but stable
-                public static final double I = 0;
-                public static final double D = 0;
-            }
+        private static final MotorConfig               ANGLE_MOTOR_CONFIG        = new MotorConfig(
+            true,
+            20, 12,
+            0.25,
+            150.0 / 7 /* SDS MK4i 150/7:1 */,
+            0.0125, 0, 0, 0, 0);
 
-            public static final class VelocityPIDConfig {
-                // public static final double P = 15;
-                // public static final double P = 1.5;
-                public static final double P = 1.2;
-                // .002 is too low but stable
-                public static final double I = 0;
-                public static final double D = 0;
+        private static final MotorConfig               DRIVE_MOTOR_CONFIG        = new MotorConfig(
+            true,
+            40, 12,
+            0.25, 6.75 /* SDS MK4i L2 --> 6.75:1 */,
+            0.11, 0, 0, 0, 0);
 
-            }
-        }
+        private static final EncoderConfig             ANGLE_ENCODER_CONFIG      = new EncoderConfig(false, 0.005, 5);
 
-        public static final class Motor {
-            public boolean            inverted;
-            public int                currentLimitAmps;
-            public double             nominalVoltage;
-            public double             rampRate;
-            public double             gearRatio;
-            public double             p;
-            public double             i;
-            public double             d;
-            public double             ff;
-            public double             iz;
-            public static final Motor DRIVE = new Motor();
+        public static final ModuleConfig               FRONT_LEFT                = new ModuleConfig(
+            "frontleft",
+            TRACK_WIDTH_METRES / 2, WHEEL_BASE_METRES / 2,
+            SDS_MK4I_WHEEL_RADIUS_M,
+            10, DRIVE_MOTOR_CONFIG,
+            11, ANGLE_MOTOR_CONFIG,
+            12, Rotation2d.fromRotations(0.281494).getDegrees(),
+            ANGLE_ENCODER_CONFIG, ANGLE_ENCODER_UPDATE_FREQ);
 
-            static {
-                DRIVE.inverted         = true;
-                DRIVE.currentLimitAmps = 40;
-                DRIVE.nominalVoltage   = 12;
-                DRIVE.rampRate         = 0.25;
-                DRIVE.gearRatio        = 6.75; // SDS MK4i L2 --> 6.75:1
-                DRIVE.p                = 0.11; // 0.0020645;
-                DRIVE.i                = 0;
-                DRIVE.d                = 0;
-                DRIVE.ff               = 0;
-                DRIVE.iz               = 0;
-            }
 
-            public static final Motor ANGLE = new Motor();
+        public static final ModuleConfig               FRONT_RIGHT               = new ModuleConfig(
+            "frontright",
+            TRACK_WIDTH_METRES / 2, -WHEEL_BASE_METRES / 2,
+            SDS_MK4I_WHEEL_RADIUS_M,
+            20, DRIVE_MOTOR_CONFIG,
+            21, ANGLE_MOTOR_CONFIG,
+            22, Rotation2d.fromRotations(0.407959).getDegrees(),
+            ANGLE_ENCODER_CONFIG, ANGLE_ENCODER_UPDATE_FREQ);
 
-            static {
-                ANGLE.inverted         = true;
-                ANGLE.currentLimitAmps = 20;        // must not exceed 30 (fuse)
-                ANGLE.nominalVoltage   = 12;
-                ANGLE.rampRate         = 0.25;
-                ANGLE.gearRatio        = 150.0 / 7; // SDS MK4i 150/7:1
-                ANGLE.p                = 0.0125;    // 0.01
-                ANGLE.i                = 0;
-                ANGLE.d                = 0;
-                ANGLE.ff               = 0;
-                ANGLE.iz               = 0;
-            }
-        }
+        public static final ModuleConfig               BACK_LEFT                 = new ModuleConfig(
+            "backleft",
+            -TRACK_WIDTH_METRES / 2, WHEEL_BASE_METRES / 2,
+            SDS_MK4I_WHEEL_RADIUS_M,
+            35, DRIVE_MOTOR_CONFIG,
+            36, ANGLE_MOTOR_CONFIG,
+            37, Rotation2d.fromRotations(0.503418).getDegrees(),
+            ANGLE_ENCODER_CONFIG, ANGLE_ENCODER_UPDATE_FREQ);
 
-        public static final class Module {
-            /**
-             * The name of the module is used in debugging, but it is also used to
-             * reference modules in the YAGSL config (if that implementation is used).
-             * Be sure to give this name the same name as the yagsl config file (e.g.
-             * src/main/deploy/swerve/neo/modules/backleft.json) --> "backleft"
-             */
-            public String              name;
-            public double              wheelRadiusMetres;
-            public Translation2d       locationMetres;
-            public int                 driveCANID;
-            public int                 angleCANID;
-            public int                 encoderCANID;
-            public double              encoderAbsoluteOffsetDegrees;
-            public static final Module BACK_LEFT = new Module();
+        public static final ModuleConfig               BACK_RIGHT                = new ModuleConfig(
+            "backright",
+            -TRACK_WIDTH_METRES / 2, -WHEEL_BASE_METRES / 2,
+            SDS_MK4I_WHEEL_RADIUS_M,
+            30, DRIVE_MOTOR_CONFIG,
+            31, ANGLE_MOTOR_CONFIG,
+            32, Rotation2d.fromRotations(0.359131).getDegrees(),
+            ANGLE_ENCODER_CONFIG, ANGLE_ENCODER_UPDATE_FREQ);
 
-            static {
-                BACK_LEFT.name                         = "backleft";
-                BACK_LEFT.wheelRadiusMetres            = Chassis.SDS_MK4I_WHEEL_RADIUS_METRES;
-                BACK_LEFT.locationMetres               = new Translation2d(-TRACK_WIDTH_METRES / 2, WHEEL_BASE_METRES / 2);
-                BACK_LEFT.driveCANID                   = 35;
-                BACK_LEFT.angleCANID                   = 36;
-                BACK_LEFT.encoderCANID                 = 37;
-                BACK_LEFT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.503418).getDegrees();
-            }
+        public static final CoreSwerveConfig           CORE_SWERVE_CONFIG        = new CoreSwerveConfig(
+            WHEEL_BASE_METRES, TRACK_WIDTH_METRES, SDS_MK4I_WHEEL_RADIUS_M,
+            Robot.kDefaultPeriod,
+            TRANSLATION_CONFIG.maxModuleSpeedMPS(),
+            TRANSLATION_CONFIG.maxSpeedMPS(),
+            ROTATION_CONFIG.maxRotVelocityRadPS(),
+            FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT);
 
-            public static final Module BACK_RIGHT = new Module();
+        public static final VisionConfig               VISION_CONFIG             = new VisionConfig(
+            0, 0,
+            FieldConstants.FIELD_EXTENT_METRES_X, FieldConstants.FIELD_EXTENT_METRES_Y,
+            0.7, 0.1, .5);
 
-            static {
-                BACK_RIGHT.name                         = "backright";
-                BACK_RIGHT.wheelRadiusMetres            = Chassis.SDS_MK4I_WHEEL_RADIUS_METRES;
-                BACK_RIGHT.locationMetres               = new Translation2d(-TRACK_WIDTH_METRES / 2, -WHEEL_BASE_METRES / 2);
-                BACK_RIGHT.driveCANID                   = 30;
-                BACK_RIGHT.angleCANID                   = 31;
-                BACK_RIGHT.encoderCANID                 = 32;
-                BACK_RIGHT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.359131).getDegrees();
-            }
-
-            public static final Module FRONT_LEFT = new Module();
-
-            static {
-                FRONT_LEFT.name                         = "frontleft";
-                FRONT_LEFT.wheelRadiusMetres            = Chassis.SDS_MK4I_WHEEL_RADIUS_METRES;
-                FRONT_LEFT.locationMetres               = new Translation2d(TRACK_WIDTH_METRES / 2, WHEEL_BASE_METRES / 2);
-                FRONT_LEFT.driveCANID                   = 10;
-                FRONT_LEFT.angleCANID                   = 11;
-                FRONT_LEFT.encoderCANID                 = 12;
-                FRONT_LEFT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.281494).getDegrees();
-
-            }
-
-            public static final Module FRONT_RIGHT = new Module();
-
-            static {
-                FRONT_RIGHT.name                         = "frontright";
-                FRONT_RIGHT.wheelRadiusMetres            = Chassis.SDS_MK4I_WHEEL_RADIUS_METRES;
-                FRONT_RIGHT.locationMetres               = new Translation2d(TRACK_WIDTH_METRES / 2, -WHEEL_BASE_METRES / 2);
-                FRONT_RIGHT.driveCANID                   = 20;
-                FRONT_RIGHT.angleCANID                   = 21;
-                FRONT_RIGHT.encoderCANID                 = 22;
-                FRONT_RIGHT.encoderAbsoluteOffsetDegrees = Rotation2d.fromRotations(0.407959).getDegrees();
-            }
-        }
+        public static final SwerveDriveSubsystemConfig SUBSYSTEM_CONFIG          = new SwerveDriveSubsystemConfig(
+            true, CORE_SWERVE_CONFIG, VISION_CONFIG, TRANSLATION_CONFIG, ROTATION_CONFIG);
     }
 
     public enum BotTarget {
@@ -290,55 +227,5 @@ public final class Constants {
         public static final Pose2d BLUE_2_2_20    = new Pose2d(2, 2, Rotation2d.fromDegrees(20));
         public static final Pose2d RED_2_2_20     = new Pose2d(14.54, 2, Rotation2d.fromDegrees(-20));
 
-    }
-
-
-    public static final class VisionConstants {
-        /** Time to switch pipelines and acquire a new vision target */
-        public static final double  VISION_SWITCH_TIME_SEC         = .25;
-
-        // todo: correct this
-        public static Translation2d CAMERA_LOC_REL_TO_ROBOT_CENTER = new Translation2d(0, 30);
-
-        /**
-         * Utility method (STATIC) to map confidence and pose difference to a matrix of estimated
-         * standard
-         * deviations. The returned matrix values have been tuned based on the input and are not
-         * dynamically calculated.
-         *
-         * @param confidence rating from the vision subsystem
-         * @param poseDifferenceMetres difference between estimated pose and pose from vision
-         * @return matrix of standard deviations, or null if values are too far out of bounds
-         */
-        public static Matrix<N3, N1> getVisionStandardDeviation(PoseConfidence confidence, double poseDifferenceMetres) {
-            double xyMetresStds;
-            double degreesStds;
-
-            // todo: measure / tune these values
-            if (confidence == HIGH) {
-                xyMetresStds = 0.05;
-                degreesStds  = 2;
-            }
-            else if (confidence == MEDIUM || poseDifferenceMetres < 0.5) {
-                xyMetresStds = 0.15;
-                degreesStds  = 6;
-            }
-            else if (confidence == LOW || poseDifferenceMetres < 0.8) {
-                xyMetresStds = 0.30;
-                degreesStds  = 12;
-            }
-            else { // Covers the Confidence.NONE case
-                return null;
-            }
-
-            return VecBuilder.fill(xyMetresStds, xyMetresStds, Units.degreesToRadians(degreesStds));
-        }
-    }
-
-    public static final class AutoConstants {
-
-        public static enum AutoPattern {
-            SCORE_1_AMP, SCORE_2_AMP, SCORE_2_5_AMP, SCORE_1_SPEAKER, SCORE_3_SPEAKER, SCORE_4_SPEAKER
-        }
     }
 }

@@ -1,10 +1,10 @@
 package frc.robot.commands.swervedrive;
 
-import static frc.robot.Constants.Swerve.Chassis.GENERAL_SPEED_FACTOR;
-import static frc.robot.Constants.Swerve.Chassis.MAX_ROTATIONAL_VELOCITY_PER_SEC;
-import static frc.robot.Constants.Swerve.Chassis.MAX_SPEED_FACTOR;
-import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
-import static frc.robot.Constants.Swerve.Chassis.SLOW_SPEED_FACTOR;
+import static frc.robot.Constants.OiConstants.GENERAL_SPEED_FACTOR;
+import static frc.robot.Constants.OiConstants.MAX_SPEED_FACTOR;
+import static frc.robot.Constants.OiConstants.SLOW_SPEED_FACTOR;
+import static frc.robot.Constants.Swerve.ROTATION_CONFIG;
+import static frc.robot.Constants.Swerve.TRANSLATION_CONFIG;
 import static frc.robot.RunnymedeUtils.getRunnymedeAlliance;
 import static frc.robot.commands.operator.OperatorInput.Axis.X;
 import static frc.robot.commands.operator.OperatorInput.Axis.Y;
@@ -101,7 +101,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         if (correctedCcwRotAngularVelPct != 0) {
             // Compute omega
             lockOnSpeaker = false;
-            double w = Math.pow(correctedCcwRotAngularVelPct, 3) * MAX_ROTATIONAL_VELOCITY_PER_SEC.getRadians();
+            double w = Math.pow(correctedCcwRotAngularVelPct, 3) * ROTATION_CONFIG.maxRotVelocityRadPS();
             omega           = Rotation2d.fromRadians(w);
             // Save previous heading for when we are finished steering.
             headingSetpoint = swerve.getPose().getRotation();
@@ -118,15 +118,15 @@ public class TeleopDriveCommand extends BaseDriveCommand {
             SmartDashboard.putNumber("Drive/Teleop/correctedHeadingDeg", correctedHeadingDeg);
             Rotation2d desiredHeading = Rotation2d.fromDegrees(correctedHeadingDeg);
 
-            omega           = computeOmega(desiredHeading);
+            omega           = swerve.computeOmega(desiredHeading);
             // Save the previous heading for when the jump is done
             headingSetpoint = desiredHeading;
         }
         else if (faceSpeaker) {
-            Rotation2d desiredHeading = super.getHeadingToFieldPosition(speaker)
+            Rotation2d desiredHeading = swerve.getHeadingToFieldPosition(speaker)
                 .plus(Rotation2d.fromDegrees(180));
 
-            omega           = computeOmega(desiredHeading);
+            omega           = swerve.computeOmega(desiredHeading);
             headingSetpoint = desiredHeading;
             lockOnSpeaker   = true;
         }
@@ -134,13 +134,13 @@ public class TeleopDriveCommand extends BaseDriveCommand {
             // Translating only. Just drive on the last heading we knew.
 
             if (lockOnSpeaker) {
-                headingSetpoint = getHeadingToFieldPosition(speaker).plus(Rotation2d.fromDegrees(180));
+                headingSetpoint = swerve.getHeadingToFieldPosition(speaker).plus(Rotation2d.fromDegrees(180));
             }
             else if (headingSetpoint == null) {
                 headingSetpoint = swerve.getPose().getRotation();
             }
 
-            omega = computeOmega(headingSetpoint);
+            omega = swerve.computeOmega(headingSetpoint);
         }
 
         // write to dashboard
@@ -194,7 +194,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         magnitude = Math.pow(magnitude, 3);
 
         // convert from % to mps
-        magnitude = magnitude * boostFactor * MAX_TRANSLATION_SPEED_MPS;
+        magnitude = magnitude * boostFactor * TRANSLATION_CONFIG.maxSpeedMPS();
 
         // convert to vector
         return new Translation2d(magnitude, angle);

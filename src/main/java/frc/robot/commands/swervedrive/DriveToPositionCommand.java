@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
+import static frc.robot.Constants.Swerve.TRANSLATION_CONFIG;
 import static frc.robot.RunnymedeUtils.getRunnymedeAlliance;
 
 public class DriveToPositionCommand extends BaseDriveCommand {
@@ -67,7 +68,7 @@ public class DriveToPositionCommand extends BaseDriveCommand {
     @Override
     public void execute() {
         super.execute();
-        driveToFieldPose(new Pose2d(location, heading));
+        swerve.driveToFieldPose(new Pose2d(location, heading), TRANSLATION_CONFIG.maxSpeedMPS());
     }
 
     @Override
@@ -78,6 +79,6 @@ public class DriveToPositionCommand extends BaseDriveCommand {
     @Override
     public boolean isFinished() {
         super.isFinished();
-        return isCloseEnough(location) && isCloseEnough(heading);
+        return swerve.isCloseEnough(location) && swerve.isCloseEnough(heading);
     }
 }
