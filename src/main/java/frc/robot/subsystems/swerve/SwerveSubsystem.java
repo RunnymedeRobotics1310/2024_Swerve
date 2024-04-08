@@ -7,6 +7,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static ca.team1310.swervedrive.utils.SwerveUtils.difference;
@@ -161,6 +162,7 @@ public class SwerveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         drive.updateOdometry();
+        postTelemetry();
     }
 
     public SwerveDriveSubsystemTelemetry getTelemetry() {
@@ -171,6 +173,12 @@ public class SwerveSubsystem extends SubsystemBase {
             desiredFieldOrientedVelocity,
             desiredFieldOrientedRotation,
             deltaToFieldPose);
+    }
+
+    private void postTelemetry() {
+        SwerveDriveSubsystemTelemetry telemetry = getTelemetry();
+        // todo: implement. Consider by level
+        SmartDashboard.putData(telemetry.fieldAwareDriveTelemetry().field());
     }
 
     @Override

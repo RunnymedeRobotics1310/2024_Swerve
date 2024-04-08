@@ -3,7 +3,11 @@ package ca.team1310.swervedrive.odometry.hardware;
 import ca.team1310.swervedrive.odometry.Gyro;
 import ca.team1310.swervedrive.telemetry.GyroTelemetry;
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 public class MXPNavX implements Gyro {
     private final AHRS navx;
@@ -38,6 +42,11 @@ public class MXPNavX implements Gyro {
     @Override
     public double getYaw() {
         return navx.getYaw() - yawOffset;
+    }
+
+    @Override
+    public void updateOdometryForSimulation(SwerveDriveKinematics kinematics, SwerveModuleState[] states, Pose2d[] modulePoses,
+        Field2d field) {
     }
 
     @Override

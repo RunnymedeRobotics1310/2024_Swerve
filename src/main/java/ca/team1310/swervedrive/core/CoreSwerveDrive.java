@@ -1,12 +1,16 @@
 package ca.team1310.swervedrive.core;
 
 import ca.team1310.swervedrive.core.config.CoreSwerveConfig;
+import ca.team1310.swervedrive.core.config.ModuleConfig;
 import ca.team1310.swervedrive.telemetry.CoreSwerveDriveTelemetry;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.RobotBase;
 
 import java.util.Arrays;
 
@@ -26,10 +30,10 @@ public class CoreSwerveDrive {
     public CoreSwerveDrive(CoreSwerveConfig cfg) {
         // order matters in case we want to use AdvantageScope
         modules                 = new SwerveModule[4];
-        modules[0]              = new SwerveModule(cfg.frontLeftModuleConfig());
-        modules[1]              = new SwerveModule(cfg.frontRightModuleConfig());
-        modules[2]              = new SwerveModule(cfg.backLeftModuleConfig());
-        modules[3]              = new SwerveModule(cfg.backRightModuleConfig());
+        modules[0]              = createModule(cfg.frontLeftModuleConfig());
+        modules[1]              = createModule(cfg.frontRightModuleConfig());
+        modules[2]              = createModule(cfg.backLeftModuleConfig());
+        modules[3]              = createModule(cfg.backRightModuleConfig());
 
         kinematics              = new SwerveDriveKinematics(
             Arrays.stream(modules).map(SwerveModule::getLocation).toArray(Translation2d[]::new));
@@ -44,11 +48,25 @@ public class CoreSwerveDrive {
         this.wheelRadiusMetres  = cfg.wheelRadiusMetres();
     }
 
+    private SwerveModule createModule(ModuleConfig cfg) {
+        if (RobotBase.isSimulation()) {
+            return new SwerveModuleSimulation(cfg);
+        }
+        return new SwerveModuleImpl(cfg);
+    }
+
     protected final SwerveModulePosition[] getModulePositions() {
         return Arrays.stream(modules).map(SwerveModule::getPosition).toArray(SwerveModulePosition[]::new);
     }
 
-    private SwerveModuleState[] getStates() {
+    protected Pose2d[] getModulePoses(Pose2d robotPose) {
+        return Arrays.stream(modules).map(m -> {
+            Transform2d tx = new Transform2d(m.getLocation(), m.getState().angle);
+            return robotPose.plus(tx);
+        }).toArray(Pose2d[]::new);
+    }
+
+    protected SwerveModuleState[] getStates() {
         return Arrays.stream(modules).map(SwerveModule::getState).toArray(SwerveModuleState[]::new);
     }
 

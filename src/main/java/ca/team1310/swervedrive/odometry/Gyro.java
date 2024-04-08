@@ -1,7 +1,11 @@
 package ca.team1310.swervedrive.odometry;
 
 import ca.team1310.swervedrive.telemetry.GyroTelemetry;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 public interface Gyro {
     /**
@@ -23,6 +27,17 @@ public interface Gyro {
      * Get the yaw of the robot, in degrees.
      */
     double getYaw();
+
+    /**
+     * Update the gyro in simulation mode. Not used in normal operation
+     * 
+     * @param kinematics
+     * @param states
+     * @param modulePoses
+     * @param field
+     */
+    void updateOdometryForSimulation(SwerveDriveKinematics kinematics, SwerveModuleState[] states, Pose2d[] modulePoses,
+        Field2d field);
 
     GyroTelemetry getTelemetryState();
 

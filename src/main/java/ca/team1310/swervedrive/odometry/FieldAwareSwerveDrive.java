@@ -3,6 +3,7 @@ package ca.team1310.swervedrive.odometry;
 import ca.team1310.swervedrive.core.CoreSwerveDrive;
 import ca.team1310.swervedrive.core.config.CoreSwerveConfig;
 import ca.team1310.swervedrive.odometry.hardware.MXPNavX;
+import ca.team1310.swervedrive.odometry.hardware.SimulatedGyro;
 import ca.team1310.swervedrive.telemetry.FieldAwareDriveTelemetry;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -12,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 public class FieldAwareSwerveDrive extends CoreSwerveDrive {
@@ -21,7 +23,7 @@ public class FieldAwareSwerveDrive extends CoreSwerveDrive {
 
     public FieldAwareSwerveDrive(CoreSwerveConfig cfg) {
         super(cfg);
-        this.gyro      = new MXPNavX();
+        this.gyro      = RobotBase.isSimulation() ? new SimulatedGyro() : new MXPNavX();
         this.field     = new Field2d();
         this.estimator = new SwerveDrivePoseEstimator(
             kinematics,
@@ -36,7 +38,9 @@ public class FieldAwareSwerveDrive extends CoreSwerveDrive {
 
     public void updateOdometry() {
         estimator.update(gyro.getRotation2d(), getModulePositions());
-        field.setRobotPose(estimator.getEstimatedPosition());
+        Pose2d robotPose = estimator.getEstimatedPosition();
+        field.setRobotPose(robotPose);
+        gyro.updateOdometryForSimulation(kinematics, getStates(), getModulePoses(robotPose), field);
     }
 
     public void resetOdometry(Pose2d pose) {
