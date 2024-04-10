@@ -48,6 +48,11 @@ public class SwerveSubsystem extends SubsystemBase {
             config.translationConfig().velocityD());
     }
 
+    /*
+     * *********************************************************************************************
+     * Core methods for controlling the drivebase
+     */
+
     private void driveSafely(ChassisSpeeds robotOrientedVelocity) {
 
         ChassisSpeeds discretized = ChassisSpeeds.discretize(robotOrientedVelocity, robotPeriod);
@@ -156,6 +161,13 @@ public class SwerveSubsystem extends SubsystemBase {
         drive.zeroGyro();
     }
 
+    /**
+     * Change the robot's internal understanding of its position and rotation. This
+     * is not an incremental change or suggestion, it discontinuously re-sets the
+     * pose to the specified pose.
+     *
+     * @param pose the new location and heading of the robot.
+     */
     public void resetOdometry(Pose2d pose) {
         drive.resetOdometry(pose);
     }
@@ -180,18 +192,14 @@ public class SwerveSubsystem extends SubsystemBase {
         postTelemetry();
     }
 
-    public SwerveDriveSubsystemTelemetry getTelemetry() {
-        return new SwerveDriveSubsystemTelemetry(
+    private void postTelemetry() {
+        SwerveDriveSubsystemTelemetry telemetry = new SwerveDriveSubsystemTelemetry(
             drive.getCoreTelemetry(),
             drive.getFieldTelemetryState(),
             drive.getVisionTelemetry(),
             desiredFieldOrientedVelocity,
             desiredFieldOrientedRotation,
             deltaToFieldPose);
-    }
-
-    private void postTelemetry() {
-        SwerveDriveSubsystemTelemetry telemetry = getTelemetry();
         // todo: implement. Consider by level
         SmartDashboard.putData(telemetry.fieldAwareDriveTelemetry().field());
     }
@@ -205,20 +213,37 @@ public class SwerveSubsystem extends SubsystemBase {
         return String.format("SwerveDriveSubsystem Pose: %.2f,%.2f @ %.1f deg", x, y, theta);
     }
 
+    /*
+     * *********************************************************************************************
+     * Convenience methods for subsystem users
+     */
+
+    /**
+     * Determine if the robot is close enough to the desired heading to stop rotating.
+     */
     public boolean isCloseEnough(Rotation2d desiredHeading) {
         return SwerveUtils.isCloseEnough(drive.getPose().getRotation().getRadians(), desiredHeading.getRadians(),
             config.rotationConfig().toleranceRadians());
     }
 
+    /**
+     * Determine if the robot is close enough to the desired location to stop moving.
+     */
     public boolean isCloseEnough(Translation2d desiredLocation) {
         return SwerveUtils.isCloseEnough(drive.getPose().getTranslation(), desiredLocation,
             config.translationConfig().toleranceMetres());
     }
 
+    /**
+     * Determine if the robot is close enough to the desired pose to stop moving.
+     */
     public boolean isCloseEnough(Pose2d desiredPose) {
         return isCloseEnough(desiredPose.getTranslation()) && isCloseEnough(desiredPose.getRotation());
     }
 
+    /**
+     * Compute the distance to the specified field position in metres.
+     */
     public double getDistanceToFieldPositionMetres(Translation2d target) {
         return drive.getPose().getTranslation().getDistance(target);
     }
@@ -309,7 +334,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     /**
      * Utility function to compute the required rotation speed of the robot given the heading
-     * provided. Uses a PID controller to compute the offset.
+     * provided.
      *
      * @param desiredHeading the desired heading of the robot
      * @return The required rotation speed of the robot
