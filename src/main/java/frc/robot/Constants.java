@@ -160,7 +160,7 @@ public final class Constants {
             0.7, 0.1, .5);
 
         public static final SwerveDriveSubsystemConfig SUBSYSTEM_CONFIG          = new SwerveDriveSubsystemConfig(
-            true, Robot.kDefaultPeriod, CORE_SWERVE_CONFIG, VISION_CONFIG, TRANSLATION_CONFIG, ROTATION_CONFIG);
+            true, CORE_SWERVE_CONFIG, VISION_CONFIG, TRANSLATION_CONFIG, ROTATION_CONFIG);
     }
 
     public enum BotTarget {

@@ -86,15 +86,48 @@ public class CoreSwerveDrive {
         updateModules();
     }
 
+    /*
+     * TODO: Important: This needs to be done on a regular basis. We could delegate it to
+     * a calling subsystem, but it would be more robust to do this internally.
+     * The same applies to updateOdometry(). Possibly telemetry too.
+     *
+     * Should we spin up a new thread for this?
+     */
     private void updateModules() {
+
+        /*
+         * Correct the robot's trajectory while it is rotating using ChassisSpeeds.discretize()
+         *
+         * From
+         * https://www.chiefdelphi.com/t/looking-for-an-explanation-of-chassisspeeds-discretize/
+         * btwn Tony Field (1310 Mentor) and Tyler Veness WPILib developer (controls and API design)
+         *
+         * Consider a hypothetical swerve robot translating in a straight line while rotating around
+         * its center. The chassis velocities required to do that follow sinusoids (i.e., they
+         * continuously vary). The robot code can only update the velocity commands at discrete
+         * intervals, so the actual robot follows an arc away from the desired path.
+         * 
+         * ChassisSpeeds.discretize() compensates for the discretization error by selecting constant
+         * translational and rotational velocity commands that make the robot’s arc intersect the
+         * desired path at the end of the timestep, where the desired path has decoupled translation
+         * and rotation.
+         *
+         * Note that this only cancels out one cause of drift from the desired path. Another cause
+         * is the swerve’s feedback controllers not keeping up with the commands.
+         *
+         * Just like with swerve module heading optimization, all swerve code should be using this.
+         */
+        ChassisSpeeds       discretized      = ChassisSpeeds.discretize(desiredChassisSpeeds, robotPeriodSeconds);
+
+
         // calculate desired states
         Translation2d       centerOfRotation = new Translation2d();
-        SwerveModuleState[] states           = kinematics.toSwerveModuleStates(desiredChassisSpeeds, centerOfRotation);
-        SwerveDriveKinematics.desaturateWheelSpeeds(
-            states, desiredChassisSpeeds,
-            maxModuleMPS, maxTranslationMPS, maxOmegaRadPerSec);
+        SwerveModuleState[] states           = kinematics.toSwerveModuleStates(discretized, centerOfRotation);
 
-        // set states
+        // ensure that we aren't trying to drive any module faster than it's capable of driving
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, discretized, maxModuleMPS, maxTranslationMPS, maxOmegaRadPerSec);
+
+        // set the module states
         for (int i = 0; i < modules.length; i++) {
             modules[i].setDesiredState(states[i]);
         }

@@ -18,7 +18,6 @@ import static ca.team1310.swervedrive.utils.SwerveUtils.normalizeRotation;
 public class SwerveSubsystem extends SubsystemBase {
     private final RunnymedeSwerveDrive       drive;
     private final SwerveDriveSubsystemConfig config;
-    private final double                     robotPeriod;
     private final double                     maxTranslationSpeedMPS;
     private final SlewRateLimiter            xLimiter;
     private final SlewRateLimiter            yLimiter;
@@ -32,7 +31,6 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveSubsystem(SwerveDriveSubsystemConfig config) {
         this.drive                  = new VisionAwareSwerveDrive(config.coreConfig(), config.visionConfig());
         this.config                 = config;
-        this.robotPeriod            = config.robotPeriod();
         this.maxTranslationSpeedMPS = config.coreConfig().maxAttainableTranslationSpeedMetresPerSecond();
         this.xLimiter               = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
         this.yLimiter               = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
@@ -55,11 +53,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
     private void driveSafely(ChassisSpeeds robotOrientedVelocity) {
 
-        ChassisSpeeds discretized = ChassisSpeeds.discretize(robotOrientedVelocity, robotPeriod);
-
-        double        x           = discretized.vxMetersPerSecond;
-        double        y           = discretized.vyMetersPerSecond;
-        double        w           = discretized.omegaRadiansPerSecond;
+        double x = robotOrientedVelocity.vxMetersPerSecond;
+        double y = robotOrientedVelocity.vyMetersPerSecond;
+        double w = robotOrientedVelocity.omegaRadiansPerSecond;
 
         // Limit change in values. Note this may not scale
         // evenly - one may reach desired speed before another.
