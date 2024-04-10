@@ -1,5 +1,6 @@
 package frc.robot.subsystems.swerve;
 
+import ca.team1310.swervedrive.RunnymedeSwerveDrive;
 import ca.team1310.swervedrive.utils.SwerveUtils;
 import ca.team1310.swervedrive.vision.VisionAwareSwerveDrive;
 import edu.wpi.first.math.controller.PIDController;
@@ -15,8 +16,9 @@ import static ca.team1310.swervedrive.utils.SwerveUtils.normalizeRotation;
 
 
 public class SwerveSubsystem extends SubsystemBase {
-    private final VisionAwareSwerveDrive     drive;
+    private final RunnymedeSwerveDrive       drive;
     private final SwerveDriveSubsystemConfig config;
+    private final double                     robotPeriod;
     private final double                     maxTranslationSpeedMPS;
     private final SlewRateLimiter            xLimiter;
     private final SlewRateLimiter            yLimiter;
@@ -30,6 +32,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveSubsystem(SwerveDriveSubsystemConfig config) {
         this.drive                  = new VisionAwareSwerveDrive(config.coreConfig(), config.visionConfig());
         this.config                 = config;
+        this.robotPeriod            = config.robotPeriod();
         this.maxTranslationSpeedMPS = config.coreConfig().maxAttainableTranslationSpeedMetresPerSecond();
         this.xLimiter               = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
         this.yLimiter               = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
@@ -46,9 +49,12 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     private void driveSafely(ChassisSpeeds robotOrientedVelocity) {
-        double x = robotOrientedVelocity.vxMetersPerSecond;
-        double y = robotOrientedVelocity.vyMetersPerSecond;
-        double w = robotOrientedVelocity.omegaRadiansPerSecond;
+
+        ChassisSpeeds discretized = ChassisSpeeds.discretize(robotOrientedVelocity, robotPeriod);
+
+        double        x           = discretized.vxMetersPerSecond;
+        double        y           = discretized.vyMetersPerSecond;
+        double        w           = discretized.omegaRadiansPerSecond;
 
         // Limit change in values. Note this may not scale
         // evenly - one may reach desired speed before another.

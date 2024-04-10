@@ -96,9 +96,8 @@ public class CoreSwerveDrive {
 
     private void updateModules() {
         // calculate desired states
-        ChassisSpeeds       discretized      = ChassisSpeeds.discretize(desiredChassisSpeeds, robotPeriodSeconds);
         Translation2d       centerOfRotation = new Translation2d();
-        SwerveModuleState[] states           = kinematics.toSwerveModuleStates(discretized, centerOfRotation);
+        SwerveModuleState[] states           = kinematics.toSwerveModuleStates(desiredChassisSpeeds, centerOfRotation);
         SwerveDriveKinematics.desaturateWheelSpeeds(
             states, desiredChassisSpeeds,
             maxModuleMPS, maxTranslationMPS, maxOmegaRadPerSec);

@@ -1,5 +1,6 @@
 package ca.team1310.swervedrive.vision;
 
+import ca.team1310.swervedrive.RunnymedeSwerveDrive;
 import ca.team1310.swervedrive.core.config.CoreSwerveConfig;
 import ca.team1310.swervedrive.odometry.FieldAwareSwerveDrive;
 import ca.team1310.swervedrive.telemetry.VisionAwareDriveTelemetry;
@@ -19,7 +20,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 
 import static ca.team1310.swervedrive.vision.PoseConfidence.NONE;
 
-public class VisionAwareSwerveDrive extends FieldAwareSwerveDrive {
+public class VisionAwareSwerveDrive extends FieldAwareSwerveDrive implements RunnymedeSwerveDrive {
 
     private final NetworkTable         table           = NetworkTableInstance.getDefault().getTable("limelight-hugh");
     // output

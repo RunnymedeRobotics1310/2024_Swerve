@@ -5,6 +5,7 @@ import ca.team1310.swervedrive.vision.VisionConfig;
 
 public record SwerveDriveSubsystemConfig(
     boolean enabled,
+    double robotPeriod,
     CoreSwerveConfig coreConfig,
     VisionConfig visionConfig,
     SwerveTranslationConfig translationConfig,
