@@ -70,7 +70,8 @@ public class CoreSwerveDrive {
         return Arrays.stream(modules).map(SwerveModule::getState).toArray(SwerveModuleState[]::new);
     }
 
-    public void setModuleStateForTestMode(String moduleName, SwerveModuleState desiredState) {
+    public void setModuleState(String moduleName, SwerveModuleState desiredState) {
+        // This is for TEST MODE ONLY!!! Not for internal use or drive use.
         for (SwerveModule module : modules) {
             if (module.getName().equals(moduleName)) {
                 module.setDesiredState(desiredState);
@@ -79,16 +80,7 @@ public class CoreSwerveDrive {
         }
     }
 
-    /**
-     * The main internal method for controlling the drivebase. This code does not apply any
-     * limiters or validation, and should be used by implementing swerve drive subsystems
-     * only.
-     * <p>
-     * Takes the desired chassis speeds of the robot - in a robot-oriented configuration.
-     *
-     * @param rawDesiredRobotOrientedVelocity The intended velocity of the robot chassis relative to
-     * itself.
-     */
+
     public final void drive(ChassisSpeeds rawDesiredRobotOrientedVelocity) {
         this.desiredChassisSpeeds = rawDesiredRobotOrientedVelocity;
         updateModules();

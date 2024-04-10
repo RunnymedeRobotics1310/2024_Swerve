@@ -161,8 +161,17 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
 
-    public void setModuleStateForTestMode(String moduleName, SwerveModuleState desiredState) {
-        drive.setModuleStateForTestMode(moduleName, desiredState);
+    /**
+     * Set the desired module state for the named module. This should ONLY be used when testing
+     * the serve drivebase in a controlled environment.
+     *
+     * This SHOULD NOT be called during normal operation - it is designed for TEST MODE ONLY!
+     *
+     * @param moduleName the module to activate
+     * @param desiredState the state of the specified module.
+     */
+    public void setModuleState(String moduleName, SwerveModuleState desiredState) {
+        drive.setModuleState(moduleName, desiredState);
     }
 
     @Override

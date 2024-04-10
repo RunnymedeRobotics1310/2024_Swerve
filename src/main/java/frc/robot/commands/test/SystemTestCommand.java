@@ -190,49 +190,49 @@ public class SystemTestCommand extends LoggingCommand {
         case FRONT_LEFT_DRIVE: {
             double mps = motorSpeed * Constants.Swerve.TRANSLATION_CONFIG.maxModuleSpeedMPS();
             angle = Rotation2d.fromDegrees(0);
-            drive.setModuleStateForTestMode(Constants.Swerve.FRONT_LEFT.name(), new SwerveModuleState(mps, angle));
+            drive.setModuleState(Constants.Swerve.FRONT_LEFT.name(), new SwerveModuleState(mps, angle));
             break;
         }
         case FRONT_LEFT_TURN: {
             motorSpeed = 0;
             angle      = new Rotation2d(controller.getLeftX(), controller.getLeftY());
-            drive.setModuleStateForTestMode(Constants.Swerve.FRONT_LEFT.name(), new SwerveModuleState(0, angle));
+            drive.setModuleState(Constants.Swerve.FRONT_LEFT.name(), new SwerveModuleState(0, angle));
             break;
         }
         case BACK_LEFT_DRIVE: {
             double mps = motorSpeed * Constants.Swerve.TRANSLATION_CONFIG.maxModuleSpeedMPS();
             angle = Rotation2d.fromDegrees(0);
-            drive.setModuleStateForTestMode(Constants.Swerve.BACK_LEFT.name(), new SwerveModuleState(mps, angle));
+            drive.setModuleState(Constants.Swerve.BACK_LEFT.name(), new SwerveModuleState(mps, angle));
             break;
         }
         case BACK_LEFT_TURN: {
             motorSpeed = 0;
             angle      = new Rotation2d(controller.getLeftX(), controller.getLeftY());
-            drive.setModuleStateForTestMode(Constants.Swerve.BACK_LEFT.name(), new SwerveModuleState(0, angle));
+            drive.setModuleState(Constants.Swerve.BACK_LEFT.name(), new SwerveModuleState(0, angle));
             break;
         }
         case BACK_RIGHT_DRIVE: {
             double mps = motorSpeed * Constants.Swerve.TRANSLATION_CONFIG.maxModuleSpeedMPS();
             angle = Rotation2d.fromDegrees(0);
-            drive.setModuleStateForTestMode(Constants.Swerve.BACK_RIGHT.name(), new SwerveModuleState(mps, angle));
+            drive.setModuleState(Constants.Swerve.BACK_RIGHT.name(), new SwerveModuleState(mps, angle));
             break;
         }
         case BACK_RIGHT_TURN: {
             motorSpeed = 0;
             angle      = new Rotation2d(controller.getLeftX(), controller.getLeftY());
-            drive.setModuleStateForTestMode(Constants.Swerve.BACK_RIGHT.name(), new SwerveModuleState(0, angle));
+            drive.setModuleState(Constants.Swerve.BACK_RIGHT.name(), new SwerveModuleState(0, angle));
             break;
         }
         case FRONT_RIGHT_DRIVE: {
             double mps = motorSpeed * Constants.Swerve.TRANSLATION_CONFIG.maxModuleSpeedMPS();
             angle = Rotation2d.fromDegrees(0);
-            drive.setModuleStateForTestMode(Constants.Swerve.FRONT_RIGHT.name(), new SwerveModuleState(mps, angle));
+            drive.setModuleState(Constants.Swerve.FRONT_RIGHT.name(), new SwerveModuleState(mps, angle));
             break;
         }
         case FRONT_RIGHT_TURN: {
             motorSpeed = 0;
             angle      = new Rotation2d(controller.getLeftX(), controller.getLeftY());
-            drive.setModuleStateForTestMode(Constants.Swerve.FRONT_RIGHT.name(), new SwerveModuleState(0, angle));
+            drive.setModuleState(Constants.Swerve.FRONT_RIGHT.name(), new SwerveModuleState(0, angle));
             break;
         }
         }
