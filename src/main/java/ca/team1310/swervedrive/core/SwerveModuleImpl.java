@@ -57,25 +57,30 @@ class SwerveModuleImpl implements SwerveModule {
 
     private void updateMotors() {
 
-        double     currentHeadingDegrees = angleMotor.getPosition();
-        Rotation2d currentHeading        = Rotation2d.fromDegrees(currentHeadingDegrees);
+        Rotation2d        currentHeading = Rotation2d.fromDegrees(angleMotor.getPosition());
 
         // Optimize the reference state to avoid spinning further than 90 degrees
-        desiredState = SwerveModuleState.optimize(desiredState, currentHeading);
+        SwerveModuleState optimizedState = SwerveModuleState.optimize(desiredState, currentHeading);
 
         /*
+         * Scale down speed when wheels aren't facing the right direction
+         *
          * If the angle error is close to 0 degrees, we are aligned properly, so we can apply
          * full power to drive wheels. If the angle error is close to 90 degrees, driving in
-         * any direction does not help. Used cosine function on the error to scale the
-         * desired speed. If cosine is < 0 then scale to zero so that we don't invert the
-         * drive for no reason.
+         * any direction does not help.
+         *
+         * Scale speed by cosine of angle error. This scales down movement perpendicular to the
+         * desired direction of travel that can occur when modules change directions. This results
+         * in smoother driving.
          */
-        Rotation2d steerError   = desiredState.angle.minus(currentHeading);
-        double     cosineScalar = steerError.getCos();
-        desiredState.speedMetersPerSecond *= (cosineScalar < 0 ? 0 : cosineScalar);
-        driveMotor.setReferenceVelocity(desiredState.speedMetersPerSecond);
+        Rotation2d        steerError     = optimizedState.angle.minus(currentHeading);
+        double            cosineScalar   = steerError.getCos();
+        optimizedState.speedMetersPerSecond *= (cosineScalar < 0 ? 0 : cosineScalar);
 
-        angleMotor.setReferenceAngle(desiredState.angle.getDegrees());
+
+        driveMotor.setReferenceVelocity(optimizedState.speedMetersPerSecond);
+
+        angleMotor.setReferenceAngle(optimizedState.angle.getDegrees());
     }
 
     private void updateInternalEncoder() {
