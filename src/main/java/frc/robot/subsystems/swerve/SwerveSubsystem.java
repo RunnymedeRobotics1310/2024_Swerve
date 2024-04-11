@@ -1,6 +1,7 @@
 package frc.robot.subsystems.swerve;
 
 import ca.team1310.swervedrive.RunnymedeSwerveDrive;
+import ca.team1310.swervedrive.SwerveTelemetry;
 import ca.team1310.swervedrive.utils.SwerveUtils;
 import ca.team1310.swervedrive.vision.VisionAwareSwerveDrive;
 import edu.wpi.first.math.controller.PIDController;
@@ -8,7 +9,6 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static ca.team1310.swervedrive.utils.SwerveUtils.difference;
@@ -18,19 +18,18 @@ import static ca.team1310.swervedrive.utils.SwerveUtils.normalizeRotation;
 public class SwerveSubsystem extends SubsystemBase {
     private final RunnymedeSwerveDrive       drive;
     private final SwerveDriveSubsystemConfig config;
+    private final SwerveTelemetry            telemetry;
     private final double                     maxTranslationSpeedMPS;
     private final SlewRateLimiter            xLimiter;
     private final SlewRateLimiter            yLimiter;
     private final SlewRateLimiter            omegaLimiter;
     private final PIDController              headingPIDController;
     private final PIDController              velocityPIDController;
-    private Translation2d                    desiredFieldOrientedVelocity;
-    private Rotation2d                       desiredFieldOrientedRotation;
-    private Transform2d                      deltaToFieldPose;
 
     public SwerveSubsystem(SwerveDriveSubsystemConfig config) {
         this.drive                  = new VisionAwareSwerveDrive(config.coreConfig(), config.visionConfig());
         this.config                 = config;
+        this.telemetry              = config.coreConfig().telemetry();
         this.maxTranslationSpeedMPS = config.coreConfig().maxAttainableTranslationSpeedMetresPerSecond();
         this.xLimiter               = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
         this.yLimiter               = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
@@ -85,8 +84,9 @@ public class SwerveSubsystem extends SubsystemBase {
      * {@link ChassisSpeeds#fromFieldRelativeSpeeds(double, double, double, Rotation2d)}
      */
     public final void driveRobotOriented(ChassisSpeeds velocity) {
-        this.desiredFieldOrientedVelocity = new Translation2d();
-        this.desiredFieldOrientedRotation = new Rotation2d();
+        this.telemetry.fieldOrientedVelocityX     = 0;
+        this.telemetry.fieldOrientedVelocityY     = 0;
+        this.telemetry.fieldOrientedVelocityOmega = 0;
         driveSafely(velocity);
     }
 
@@ -108,13 +108,15 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param omega the rotation rate of the heading of the robot. CCW positive.
      */
     public final void driveFieldOriented(Translation2d velocity, Rotation2d omega) {
-        this.desiredFieldOrientedVelocity = velocity;
-        this.desiredFieldOrientedRotation = omega;
 
-        double        x             = velocity.getX();
-        double        y             = velocity.getY();
-        double        w             = omega.getRadians();
-        Rotation2d    theta         = drive.getPose().getRotation();
+        double     x     = velocity.getX();
+        double     y     = velocity.getY();
+        double     w     = omega.getRadians();
+        Rotation2d theta = drive.getPose().getRotation();
+
+        this.telemetry.fieldOrientedVelocityX     = x;
+        this.telemetry.fieldOrientedVelocityY     = y;
+        this.telemetry.fieldOrientedVelocityOmega = w;
 
         ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, w, theta);
         this.driveSafely(chassisSpeeds);
@@ -185,20 +187,8 @@ public class SwerveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         drive.updateOdometry();
-        postTelemetry();
     }
 
-    private void postTelemetry() {
-        SwerveDriveSubsystemTelemetry telemetry = new SwerveDriveSubsystemTelemetry(
-            drive.getCoreTelemetry(),
-            drive.getFieldTelemetryState(),
-            drive.getVisionTelemetry(),
-            desiredFieldOrientedVelocity,
-            desiredFieldOrientedRotation,
-            deltaToFieldPose);
-        // todo: implement. Consider by level
-        SmartDashboard.putData(telemetry.fieldAwareDriveTelemetry().field());
-    }
 
     @Override
     public String toString() {
@@ -262,13 +252,13 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param desiredPose the desired location on the field
      */
     public final void driveToFieldPose(Pose2d desiredPose, double maxSpeedMPS) {
-        Pose2d current = getPose();
-        deltaToFieldPose             = difference(desiredPose, current);
+        Pose2d        current  = getPose();
+        Transform2d   delta    = difference(desiredPose, current);
 
-        desiredFieldOrientedVelocity = computeVelocity(deltaToFieldPose.getTranslation(), maxSpeedMPS);
-        desiredFieldOrientedRotation = computeOmega(desiredPose.getRotation());
+        Translation2d velocity = computeVelocity(delta.getTranslation(), maxSpeedMPS);
+        Rotation2d    omega    = computeOmega(desiredPose.getRotation());
 
-        driveFieldOriented(desiredFieldOrientedVelocity, desiredFieldOrientedRotation);
+        driveFieldOriented(velocity, omega);
     }
 
     /**

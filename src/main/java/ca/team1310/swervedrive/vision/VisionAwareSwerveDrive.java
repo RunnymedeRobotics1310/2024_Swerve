@@ -1,9 +1,9 @@
 package ca.team1310.swervedrive.vision;
 
 import ca.team1310.swervedrive.RunnymedeSwerveDrive;
+import ca.team1310.swervedrive.SwerveTelemetry;
 import ca.team1310.swervedrive.core.config.CoreSwerveConfig;
 import ca.team1310.swervedrive.odometry.FieldAwareSwerveDrive;
-import ca.team1310.swervedrive.telemetry.VisionAwareDriveTelemetry;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -38,6 +38,7 @@ public class VisionAwareSwerveDrive extends FieldAwareSwerveDrive implements Run
     private final double               maxAmbiguity;
     private final double               highQualityAmbiguity;
     private final double               maxVisposDeltaDistanceMetres;
+    private final SwerveTelemetry      telemetry;
     private PoseEstimate               poseEstimate;
     private VisionPositionInfo         visPosInfo;
 
@@ -54,8 +55,9 @@ public class VisionAwareSwerveDrive extends FieldAwareSwerveDrive implements Run
         NetworkTableEntry camMode = table.getEntry("camMode");
         camMode.setNumber(visionConfig.camModeVision());
         // bootup values
-        poseEstimate = new PoseEstimate(new Pose2d(), 0, 0, 0, 0, 0, 0, null);
-        visPosInfo   = new VisionPositionInfo(new Pose2d(), 0, VecBuilder.fill(0, 0, 0), NONE, 0);
+        poseEstimate   = new PoseEstimate(new Pose2d(), 0, 0, 0, 0, 0, 0, null);
+        visPosInfo     = new VisionPositionInfo(new Pose2d(), 0, VecBuilder.fill(0, 0, 0), NONE, 0);
+        this.telemetry = coreSwerveConfig.telemetry();
     }
 
     public void updateOdometry() {
@@ -75,29 +77,32 @@ public class VisionAwareSwerveDrive extends FieldAwareSwerveDrive implements Run
             if (!RobotBase.isSimulation()) {
                 System.out.println("Failure reading data from vision subsystem: " + e);
             }
+
         }
 
         if (confidence != NONE) {
             super.addVisionMeasurement(visPosInfo.pose(), visPosInfo.timestampSeconds(), visPosInfo.deviation());
         }
-    }
 
-    public VisionAwareDriveTelemetry getVisionTelemetry() {
+        // todo: do we still need this?
         publishToField(poseEstimate.pose);
-        return new VisionAwareDriveTelemetry(
-            visPosInfo.confidence() != PoseConfidence.NONE,
-            visPosInfo.confidence(),
-            priorityId.getDouble(-1),
-            tid.getDouble(-1.0),
-            tx.getDouble(-1.0),
-            ty.getDouble(-1.0),
-            ta.getDouble(-1.0),
-            tl.getDouble(-1.0),
-            poseEstimate.pose.getTranslation().toVector().getData(),
-            poseEstimate.avgTagDist,
-            poseEstimate.tagCount,
-            aprilTagInfoArrayToString(poseEstimate.rawFiducials),
-            visPosInfo.odometryDistDelta());
+        telemetry.visionPoseUpdate     = confidence != PoseConfidence.NONE;
+        telemetry.visionPoseConfidence = confidence;
+        telemetry.visionPriorityId     = priorityId.getDouble(-1);
+        telemetry.visionTid            = tid.getDouble(-1.0);
+        telemetry.visionTx             = tx.getDouble(-1.0);
+        telemetry.visionTy             = ty.getDouble(-1.0);
+        telemetry.visionTa             = ta.getDouble(-1.0);
+        telemetry.visionTl             = tl.getDouble(-1.0);
+        telemetry.visionPoseX          = poseEstimate.pose.getX();
+        telemetry.visionPoseY          = poseEstimate.pose.getY();
+        telemetry.visionPoseHeading    = poseEstimate.pose.getRotation().getDegrees();
+        telemetry.visionTargetAvgDist  = poseEstimate.avgTagDist;
+        telemetry.visionNumTags        = poseEstimate.tagCount;
+        // todo: is this data required?
+        telemetry.visionAprilTagInfo   = aprilTagInfoArrayToString(poseEstimate.rawFiducials);
+        telemetry.visionPoseSwerveDiff = visPosInfo == null ? Double.MIN_VALUE : visPosInfo.odometryDistDelta();
+
     }
 
     /**

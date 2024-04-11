@@ -1,7 +1,7 @@
 package ca.team1310.swervedrive.odometry.hardware;
 
+import ca.team1310.swervedrive.SwerveTelemetry;
 import ca.team1310.swervedrive.odometry.Gyro;
-import ca.team1310.swervedrive.telemetry.GyroTelemetry;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -50,7 +50,10 @@ public class MXPNavX implements Gyro {
     }
 
     @Override
-    public GyroTelemetry getTelemetryState() {
-        return new GyroTelemetry(navx.getYaw(), this.getYaw());
+    public void populateTelemetry(SwerveTelemetry telemetry) {
+        telemetry.gyroRawYawDegrees      = navx.getYaw();
+        telemetry.gyroAdjustedYawDegrees = this.getYaw();
+        telemetry.gyroRawPitchDegrees    = navx.getPitch();
+        telemetry.gyroRawRollDegrees     = navx.getRoll();
     }
 }

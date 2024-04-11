@@ -1,5 +1,6 @@
 package ca.team1310.swervedrive.core.hardware.cancoder;
 
+import ca.team1310.swervedrive.SwerveTelemetry;
 import ca.team1310.swervedrive.core.config.EncoderConfig;
 import ca.team1310.swervedrive.core.AbsoluteAngleEncoder;
 import com.ctre.phoenix6.StatusCode;
@@ -46,6 +47,12 @@ public class CanCoder implements AbsoluteAngleEncoder {
     }
 
     @Override
+    public void populateTelemetry(SwerveTelemetry telemetry, int moduleIndex) {
+        telemetry.angleEncoderAbsoluteOffsetDegrees[moduleIndex]    = absoluteEncoderOffset;
+        telemetry.moduleAbsoluteEncoderPositionDegrees[moduleIndex] = getPosition();
+    }
+
+    @Override
     public double getPosition() {
         boolean readingError = isNotHealthy();
         if (readingError) {
@@ -62,7 +69,6 @@ public class CanCoder implements AbsoluteAngleEncoder {
             angle = angle.waitForUpdate(retryDelaySeconds);
         }
         if (angle.getStatus() != StatusCode.OK) {
-            readingError = true;
             DriverStation.reportWarning("CANCoder " + encoder.getDeviceID() + " reading was faulty after retrying "
                 + maximumRetries + " times. " + angle.getStatus().getDescription(), false);
             return -1.0;

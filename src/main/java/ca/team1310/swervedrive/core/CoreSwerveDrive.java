@@ -1,8 +1,7 @@
 package ca.team1310.swervedrive.core;
 
+import ca.team1310.swervedrive.SwerveTelemetry;
 import ca.team1310.swervedrive.core.config.CoreSwerveConfig;
-import ca.team1310.swervedrive.core.config.ModuleConfig;
-import ca.team1310.swervedrive.telemetry.CoreSwerveDriveTelemetry;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,38 +20,41 @@ public class CoreSwerveDrive {
     private final double                  maxModuleMPS;
     private final double                  maxTranslationMPS;
     private final double                  maxOmegaRadPerSec;
-    private final double                  trackWidthMetres;
-    private final double                  wheelBaseMetres;
-    private final double                  wheelRadiusMetres;
 
     private ChassisSpeeds                 desiredChassisSpeeds;
+    private final SwerveTelemetry         telemetry;
 
     public CoreSwerveDrive(CoreSwerveConfig cfg) {
         // order matters in case we want to use AdvantageScope
-        modules                 = new SwerveModule[4];
-        modules[0]              = createModule(cfg.frontLeftModuleConfig());
-        modules[1]              = createModule(cfg.frontRightModuleConfig());
-        modules[2]              = createModule(cfg.backLeftModuleConfig());
-        modules[3]              = createModule(cfg.backRightModuleConfig());
+        this.modules = new SwerveModule[4];
+        if (RobotBase.isSimulation()) {
+            this.modules[0] = new SwerveModuleSimulation(cfg.frontLeftModuleConfig());
+            this.modules[1] = new SwerveModuleSimulation(cfg.frontRightModuleConfig());
+            this.modules[2] = new SwerveModuleSimulation(cfg.backLeftModuleConfig());
+            this.modules[3] = new SwerveModuleSimulation(cfg.backRightModuleConfig());
+        }
+        else {
+            this.modules[0] = new SwerveModuleImpl(cfg.frontLeftModuleConfig());
+            this.modules[1] = new SwerveModuleImpl(cfg.frontRightModuleConfig());
+            this.modules[2] = new SwerveModuleImpl(cfg.backLeftModuleConfig());
+            this.modules[3] = new SwerveModuleImpl(cfg.backRightModuleConfig());
+        }
 
-        kinematics              = new SwerveDriveKinematics(
+        this.kinematics                           = new SwerveDriveKinematics(
             Arrays.stream(modules).map(SwerveModule::getLocation).toArray(Translation2d[]::new));
 
-        this.robotPeriodSeconds = cfg.robotPeriodSeconds();
-        this.maxModuleMPS       = cfg.maxAttainableModuleSpeedMetresPerSecond();
-        this.maxTranslationMPS  = cfg.maxAttainableTranslationSpeedMetresPerSecond();
-        this.maxOmegaRadPerSec  = cfg.maxAchievableRotationalVelocityRadiansPerSecond();
+        this.robotPeriodSeconds                   = cfg.robotPeriodSeconds();
+        this.maxModuleMPS                         = cfg.maxAttainableModuleSpeedMetresPerSecond();
+        this.maxTranslationMPS                    = cfg.maxAttainableTranslationSpeedMetresPerSecond();
+        this.maxOmegaRadPerSec                    = cfg.maxAchievableRotationalVelocityRadiansPerSecond();
 
-        this.trackWidthMetres   = cfg.trackWidthMetres();
-        this.wheelBaseMetres    = cfg.wheelBaseMetres();
-        this.wheelRadiusMetres  = cfg.wheelRadiusMetres();
-    }
-
-    private SwerveModule createModule(ModuleConfig cfg) {
-        if (RobotBase.isSimulation()) {
-            return new SwerveModuleSimulation(cfg);
-        }
-        return new SwerveModuleImpl(cfg);
+        this.telemetry                            = cfg.telemetry();
+        this.telemetry.maxModuleSpeedMPS          = cfg.maxAttainableModuleSpeedMetresPerSecond();
+        this.telemetry.maxTranslationSpeedMPS     = cfg.maxAttainableTranslationSpeedMetresPerSecond();
+        this.telemetry.maxRotationalVelocityRadPS = cfg.maxAchievableRotationalVelocityRadiansPerSecond();
+        this.telemetry.trackWidthMetres           = cfg.trackWidthMetres();
+        this.telemetry.wheelBaseMetres            = cfg.wheelBaseMetres();
+        this.telemetry.wheelRadiusMetres          = cfg.wheelRadiusMetres();
     }
 
     protected final SwerveModulePosition[] getModulePositions() {
@@ -78,12 +80,15 @@ public class CoreSwerveDrive {
                 break;
             }
         }
+        this.desiredChassisSpeeds = kinematics.toChassisSpeeds(getStates());
+        populateTelemetry();
     }
 
 
     public final void drive(ChassisSpeeds rawDesiredRobotOrientedVelocity) {
         this.desiredChassisSpeeds = rawDesiredRobotOrientedVelocity;
         updateModules();
+        populateTelemetry();
     }
 
     /*
@@ -119,7 +124,6 @@ public class CoreSwerveDrive {
          */
         ChassisSpeeds       discretized      = ChassisSpeeds.discretize(desiredChassisSpeeds, robotPeriodSeconds);
 
-
         // calculate desired states
         Translation2d       centerOfRotation = new Translation2d();
         SwerveModuleState[] states           = kinematics.toSwerveModuleStates(discretized, centerOfRotation);
@@ -135,39 +139,42 @@ public class CoreSwerveDrive {
 
     public final boolean lock() {
 
+        boolean moving = false;
+
         // safety code to prevent locking if robot is moving
         for (SwerveModule swerveModule : modules) {
             // do not lock if moving more than 4cm/s
             if (Math.abs(swerveModule.getState().speedMetersPerSecond) > 0.04) {
-                return false;
+                moving = true;
             }
         }
 
-        desiredChassisSpeeds = new ChassisSpeeds(0, 0, 0);
+        if (!moving) {
+            desiredChassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
-        // set speed to 0 and angle wheels to center
-        for (SwerveModule module : modules) {
-            module.setDesiredState(new SwerveModuleState(0.0, module.getPosition().angle));
+            // set speed to 0 and angle wheels to center
+            for (SwerveModule module : modules) {
+                module.setDesiredState(new SwerveModuleState(0.0, module.getPosition().angle));
+            }
         }
 
-        return true;
+        populateTelemetry();
+
+        return !moving;
     }
 
-    public CoreSwerveDriveTelemetry getCoreTelemetry() {
+    private void populateTelemetry() {
         ChassisSpeeds measuredChassisSpeeds = kinematics.toChassisSpeeds(getStates());
+        telemetry.measuredChassisSpeeds[0] = measuredChassisSpeeds.vxMetersPerSecond;
+        telemetry.measuredChassisSpeeds[1] = measuredChassisSpeeds.vyMetersPerSecond;
+        telemetry.measuredChassisSpeeds[2] = measuredChassisSpeeds.omegaRadiansPerSecond;
 
-        return new CoreSwerveDriveTelemetry(
-            this.maxModuleMPS,
-            this.maxTranslationMPS,
-            this.maxOmegaRadPerSec,
-            this.trackWidthMetres,
-            this.wheelBaseMetres,
-            this.wheelRadiusMetres,
-            modules[0].getModuleTelemetry(),
-            modules[1].getModuleTelemetry(),
-            modules[2].getModuleTelemetry(),
-            modules[3].getModuleTelemetry(),
-            desiredChassisSpeeds,
-            measuredChassisSpeeds);
+        telemetry.desiredChassisSpeeds[0]  = desiredChassisSpeeds.vxMetersPerSecond;
+        telemetry.desiredChassisSpeeds[1]  = desiredChassisSpeeds.vyMetersPerSecond;
+        telemetry.desiredChassisSpeeds[2]  = desiredChassisSpeeds.omegaRadiansPerSecond;
+
+        for (int i = 0; i < modules.length; i++) {
+            modules[i].populateTelemetry(telemetry, i);
+        }
     }
 }

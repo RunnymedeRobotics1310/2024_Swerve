@@ -1,8 +1,5 @@
 package ca.team1310.swervedrive;
 
-import ca.team1310.swervedrive.telemetry.CoreSwerveDriveTelemetry;
-import ca.team1310.swervedrive.telemetry.FieldAwareDriveTelemetry;
-import ca.team1310.swervedrive.telemetry.VisionAwareDriveTelemetry;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -84,12 +81,4 @@ public interface RunnymedeSwerveDrive {
      */
     Rotation3d getGyroRotation3d();
 
-
-    // telemetry-related
-    // todo: consolidate these & consider performance implications.
-    CoreSwerveDriveTelemetry getCoreTelemetry();
-
-    FieldAwareDriveTelemetry getFieldTelemetryState();
-
-    VisionAwareDriveTelemetry getVisionTelemetry();
 }

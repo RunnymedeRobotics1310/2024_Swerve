@@ -16,7 +16,6 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -114,9 +113,8 @@ public class TeleopDriveCommand extends BaseDriveCommand {
             // Invert and rotate as required.
             // BLUE field = MOD(-POV + 360, 360)
             // RED field = MOD(-POV + 180 + 360, 360)
-            double correctedHeadingDeg = ((rawDesiredHeadingDeg * -1) + (invert ? 180 : 0) + 360) % 360;
-            SmartDashboard.putNumber("Drive/Teleop/correctedHeadingDeg", correctedHeadingDeg);
-            Rotation2d desiredHeading = Rotation2d.fromDegrees(correctedHeadingDeg);
+            double     correctedHeadingDeg = ((rawDesiredHeadingDeg * -1) + (invert ? 180 : 0) + 360) % 360;
+            Rotation2d desiredHeading      = Rotation2d.fromDegrees(correctedHeadingDeg);
 
             omega           = swerve.computeOmega(desiredHeading);
             // Save the previous heading for when the jump is done
@@ -143,18 +141,6 @@ public class TeleopDriveCommand extends BaseDriveCommand {
             omega = swerve.computeOmega(headingSetpoint);
         }
 
-        // write to dashboard
-        SmartDashboard.putString("Drive/Teleop/Alliance", alliance.name());
-        SmartDashboard.putNumber("Drive/Teleop/vX", vX);
-        SmartDashboard.putNumber("Drive/Teleop/vY", vY);
-        SmartDashboard.putNumber("Drive/Teleop/ccwRotAngularVelPct", ccwRotAngularVelPct);
-        SmartDashboard.putNumber("Drive/Teleop/rawDesiredHeadingDeg", rawDesiredHeadingDeg);
-        SmartDashboard.putNumber("Drive/Teleop/boostFactor", boostFactor);
-
-        SmartDashboard.putString("Drive/Teleop/velocity",
-            format(velocity.getNorm()) + "m/s at " + format(velocity.getAngle()));
-        SmartDashboard.putString("Drive/Teleop/theta ", format(headingSetpoint));
-        SmartDashboard.putString("Drive/Teleop/omega", format(omega) + "/s");
         swerve.driveFieldOriented(velocity, omega);
 
     }

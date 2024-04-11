@@ -1,7 +1,7 @@
 package ca.team1310.swervedrive.core;
 
+import ca.team1310.swervedrive.SwerveTelemetry;
 import ca.team1310.swervedrive.core.config.ModuleConfig;
-import ca.team1310.swervedrive.telemetry.ModuleTelemetry;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -63,19 +63,25 @@ class SwerveModuleSimulation implements SwerveModule {
     }
 
     @Override
-    public ModuleTelemetry getModuleTelemetry() {
-        return new ModuleTelemetry(
-            name,
-            location,
-            desiredState.speedMetersPerSecond,
-            desiredState.angle.getDegrees(),
-            0,
-            0,
-            0
-        /*
-         * angleEncoder.getPosition(),
-         * angleMotor.getPosition(),
-         * driveMotor.getDistance()
-         */);
+    public void populateTelemetry(SwerveTelemetry telemetry, int moduleIndex) {
+
+        // identify the module
+        telemetry.moduleNames[moduleIndex]                  = name;
+        telemetry.moduleWheelLocations[moduleIndex * 2]     = location.getX();
+        telemetry.moduleWheelLocations[moduleIndex * 2 + 1] = location.getY();
+
+        // desired states
+        telemetry.moduleDesiredStates[moduleIndex * 2]      = desiredState.angle.getDegrees();
+        telemetry.moduleDesiredStates[moduleIndex * 2 + 1]  = desiredState.speedMetersPerSecond;
+
+        // measured states
+        double fakeAngle = desiredState.angle.getDegrees();
+        telemetry.moduleMeasuredStates[moduleIndex * 2]             = fakeAngle;
+        telemetry.moduleMeasuredStates[moduleIndex * 2 + 1]         = fakeSpeed;
+
+        // position information
+        telemetry.moduleAbsoluteEncoderPositionDegrees[moduleIndex] = fakeAngle;
+        telemetry.moduleAngleMotorPositionDegrees[moduleIndex]      = fakeAngle;
+        telemetry.moduleDriveMotorPositionMetres[moduleIndex]       = fakePos;
     }
 }

@@ -1,6 +1,6 @@
 package ca.team1310.swervedrive.core;
 
-import ca.team1310.swervedrive.telemetry.ModuleTelemetry;
+import ca.team1310.swervedrive.SwerveTelemetry;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -17,5 +17,5 @@ public interface SwerveModule {
 
     void setDesiredState(SwerveModuleState desiredState);
 
-    ModuleTelemetry getModuleTelemetry();
+    void populateTelemetry(SwerveTelemetry telemetry, int moduleIndex);
 }

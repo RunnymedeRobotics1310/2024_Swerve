@@ -1,7 +1,7 @@
 package ca.team1310.swervedrive.odometry.hardware;
 
+import ca.team1310.swervedrive.SwerveTelemetry;
 import ca.team1310.swervedrive.odometry.Gyro;
-import ca.team1310.swervedrive.telemetry.GyroTelemetry;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -26,11 +26,6 @@ public class SimulatedGyro implements Gyro {
         return this.yaw;
     }
 
-    @Override
-    public GyroTelemetry getTelemetryState() {
-        return null;
-    }
-
     public double getPitch() {
         return this.pitch;
     }
@@ -50,6 +45,14 @@ public class SimulatedGyro implements Gyro {
         this.yaw      += Units.radiansToDegrees(change);
         this.lastTime  = this.timer.get();
         field.getObject("XModules").setPoses(modulePoses);
+    }
+
+    @Override
+    public void populateTelemetry(SwerveTelemetry telemetry) {
+        telemetry.gyroRawYawDegrees      = this.getYaw();
+        telemetry.gyroAdjustedYawDegrees = this.getYaw();
+        telemetry.gyroRawPitchDegrees    = this.getPitch();
+        telemetry.gyroRawRollDegrees     = this.getRoll();
     }
 
 }

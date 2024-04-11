@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.math.util.Units.inchesToMeters;
 
+import ca.team1310.swervedrive.SwerveTelemetry;
 import frc.robot.subsystems.swerve.SwerveDriveSubsystemConfig;
 import ca.team1310.swervedrive.core.config.CoreSwerveConfig;
 import ca.team1310.swervedrive.core.config.EncoderConfig;
@@ -146,13 +147,16 @@ public final class Constants {
             32, Rotation2d.fromRotations(0.359131).getDegrees(),
             ANGLE_ENCODER_CONFIG, ANGLE_ENCODER_UPDATE_FREQ);
 
+        public static final SwerveTelemetry            TELEMETRY                 = new SwerveTelemetry(4);
+
         public static final CoreSwerveConfig           CORE_SWERVE_CONFIG        = new CoreSwerveConfig(
             WHEEL_BASE_METRES, TRACK_WIDTH_METRES, SDS_MK4I_WHEEL_RADIUS_M,
             Robot.kDefaultPeriod,
             TRANSLATION_CONFIG.maxModuleSpeedMPS(),
             TRANSLATION_CONFIG.maxSpeedMPS(),
             ROTATION_CONFIG.maxRotVelocityRadPS(),
-            FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT);
+            FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT,
+            TELEMETRY);
 
         public static final VisionConfig               VISION_CONFIG             = new VisionConfig(
             0, 0,
