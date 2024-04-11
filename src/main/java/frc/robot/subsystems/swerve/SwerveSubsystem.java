@@ -108,15 +108,25 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param omega the rotation rate of the heading of the robot. CCW positive.
      */
     public final void driveFieldOriented(Translation2d velocity, Rotation2d omega) {
+        this.telemetry.fieldOrientedDeltaToPoseX       = 0;
+        this.telemetry.fieldOrientedDeltaToPoseY       = 0;
+        this.telemetry.fieldOrientedDeltaToPoseHeading = 0;
+        this.telemetry.fieldOrientedVelocityX          = 0;
+        this.telemetry.fieldOrientedVelocityY          = 0;
+        this.telemetry.fieldOrientedVelocityOmega      = 0;
+        _driveFieldOriented(velocity, omega);
+    }
 
-        double     x     = velocity.getX();
-        double     y     = velocity.getY();
-        double     w     = omega.getRadians();
-        Rotation2d theta = drive.getPose().getRotation();
+    private final void _driveFieldOriented(Translation2d velocity, Rotation2d omega) {
 
-        this.telemetry.fieldOrientedVelocityX     = x;
-        this.telemetry.fieldOrientedVelocityY     = y;
-        this.telemetry.fieldOrientedVelocityOmega = w;
+        this.telemetry.fieldOrientedVelocityX     = velocity.getX();
+        this.telemetry.fieldOrientedVelocityY     = velocity.getY();
+        this.telemetry.fieldOrientedVelocityOmega = omega.getRadians();
+
+        double        x             = velocity.getX();
+        double        y             = velocity.getY();
+        double        w             = omega.getRadians();
+        Rotation2d    theta         = drive.getPose().getRotation();
 
         ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, w, theta);
         this.driveSafely(chassisSpeeds);
@@ -258,7 +268,11 @@ public class SwerveSubsystem extends SubsystemBase {
         Translation2d velocity = computeVelocity(delta.getTranslation(), maxSpeedMPS);
         Rotation2d    omega    = computeOmega(desiredPose.getRotation());
 
-        driveFieldOriented(velocity, omega);
+        this.telemetry.fieldOrientedDeltaToPoseX       = delta.getX();
+        this.telemetry.fieldOrientedDeltaToPoseY       = delta.getY();
+        this.telemetry.fieldOrientedDeltaToPoseHeading = delta.getRotation().getDegrees();
+
+        _driveFieldOriented(velocity, omega);
     }
 
     /**

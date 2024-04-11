@@ -5,19 +5,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public final class SwerveTelemetry {
 
-    public static final String PREFIX                        = "1310/";
+    public static final String PREFIX                          = "1310/";
 
     private final int          moduleCount;
 
     // Core
-    public double              maxModuleSpeedMPS             = Double.MIN_VALUE;
-    public double              maxTranslationSpeedMPS        = Double.MIN_VALUE;
-    public double              maxRotationalVelocityRadPS    = Double.MIN_VALUE;
-    public double              trackWidthMetres              = Double.MIN_VALUE;
-    public double              wheelBaseMetres               = Double.MIN_VALUE;
-    public double              wheelRadiusMetres             = Double.MIN_VALUE;
-    public double[]            desiredChassisSpeeds          = new double[3];
-    public double[]            measuredChassisSpeeds         = new double[3];
+    public double              maxModuleSpeedMPS               = Double.MIN_VALUE;
+    public double              maxTranslationSpeedMPS          = Double.MIN_VALUE;
+    public double              maxRotationalVelocityRadPS      = Double.MIN_VALUE;
+    public double              trackWidthMetres                = Double.MIN_VALUE;
+    public double              wheelBaseMetres                 = Double.MIN_VALUE;
+    public double              wheelRadiusMetres               = Double.MIN_VALUE;
+    public double[]            desiredChassisSpeeds            = new double[3];
+    public double[]            measuredChassisSpeeds           = new double[3];
 
     // Module
     public String[]            moduleNames;
@@ -32,39 +32,43 @@ public final class SwerveTelemetry {
     public double[]            moduleDriveMotorPositionMetres;
 
     // Gyro
-    public double              gyroRawYawDegrees             = Double.MIN_VALUE;
-    public double              gyroAdjustedYawDegrees        = Double.MIN_VALUE;
-    public double              gyroRawPitchDegrees           = Double.MIN_VALUE;
-    public double              gyroRawRollDegrees            = Double.MIN_VALUE;
+    public double              gyroRawYawDegrees               = Double.MIN_VALUE;
+    public double              gyroAdjustedYawDegrees          = Double.MIN_VALUE;
+    public double              gyroRawPitchDegrees             = Double.MIN_VALUE;
+    public double              gyroRawRollDegrees              = Double.MIN_VALUE;
 
     // Pose
-    public double              poseMetresX                   = Double.MIN_VALUE;
-    public double              poseMetresY                   = Double.MIN_VALUE;
-    public double              poseHeadingDegrees            = Double.MIN_VALUE;
+    public double              poseMetresX                     = Double.MIN_VALUE;
+    public double              poseMetresY                     = Double.MIN_VALUE;
+    public double              poseHeadingDegrees              = Double.MIN_VALUE;
 
     // Vision
-    public boolean             visionPoseUpdate              = false;
-    public PoseConfidence      visionPoseConfidence          = PoseConfidence.NONE;
-    public double              visionPriorityId              = Double.MIN_VALUE;
-    public double              visionTid                     = Double.MIN_VALUE;
-    public double              visionTx                      = Double.MIN_VALUE;
-    public double              visionTy                      = Double.MIN_VALUE;
-    public double              visionTa                      = Double.MIN_VALUE;
-    public double              visionTl                      = Double.MIN_VALUE;
-    public double              visionPoseX                   = Double.MIN_VALUE;
-    public double              visionPoseY                   = Double.MIN_VALUE;
-    public double              visionPoseHeading             = Double.MIN_VALUE;
-    public double              visionTargetAvgDist           = Double.MIN_VALUE;
-    public int                 visionNumTags                 = Integer.MIN_VALUE;
-    public String              visionAprilTagInfo            = "";
-    public double              visionPoseSwerveDiff          = Double.MIN_VALUE;
+    public boolean             visionPoseUpdate                = false;
+    public PoseConfidence      visionPoseConfidence            = PoseConfidence.NONE;
+    public double              visionPriorityId                = Double.MIN_VALUE;
+    public double              visionTid                       = Double.MIN_VALUE;
+    public double              visionTx                        = Double.MIN_VALUE;
+    public double              visionTy                        = Double.MIN_VALUE;
+    public double              visionTa                        = Double.MIN_VALUE;
+    public double              visionTl                        = Double.MIN_VALUE;
+    public double              visionPoseX                     = Double.MIN_VALUE;
+    public double              visionPoseY                     = Double.MIN_VALUE;
+    public double              visionPoseHeading               = Double.MIN_VALUE;
+    public double              visionTargetAvgDist             = Double.MIN_VALUE;
+    public int                 visionNumTags                   = Integer.MIN_VALUE;
+    public String              visionAprilTagInfo              = "";
+    public double              visionPoseSwerveDiff            = Double.MIN_VALUE;
 
     // Field Oriented
-    public double              fieldOrientedVelocityX        = Double.MIN_VALUE;
-    public double              fieldOrientedVelocityY        = Double.MIN_VALUE;
-    public double              fieldOrientedVelocityOmega    = Double.MIN_VALUE;
+    public double              fieldOrientedVelocityX          = Double.MIN_VALUE;
+    public double              fieldOrientedVelocityY          = Double.MIN_VALUE;
+    public double              fieldOrientedVelocityOmega      = Double.MIN_VALUE;
+    public double              fieldOrientedDeltaToPoseX       = Double.MIN_VALUE;
+    public double              fieldOrientedDeltaToPoseY       = Double.MIN_VALUE;
+    public double              fieldOrientedDeltaToPoseHeading = Double.MIN_VALUE;
 
-    private boolean            advantageScopeConstantsPosted = false;
+
+    private boolean            advantageScopeConstantsPosted   = false;
 
     public SwerveTelemetry(int moduleCount) {
         this.moduleCount                     = moduleCount;
@@ -157,5 +161,10 @@ public final class SwerveTelemetry {
 
         String poseVis = String.format("(%.2f, %.2f) m %.1f deg", visionPoseX, visionPoseY, visionPoseHeading);
         SmartDashboard.putString(PREFIX + "Swerve/pose_vis", poseVis);
+
+        String delta = String.format("(%.2f, %.2f) m %.1f deg", fieldOrientedDeltaToPoseX, fieldOrientedDeltaToPoseY,
+            fieldOrientedDeltaToPoseHeading);
+        SmartDashboard.putString(PREFIX + "Swerve/distance_to_pose", delta);
+
     }
 }
