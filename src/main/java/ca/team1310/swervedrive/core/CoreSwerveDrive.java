@@ -150,8 +150,6 @@ public class CoreSwerveDrive {
             module.setDesiredState(new SwerveModuleState(0.0, module.getPosition().angle));
         }
 
-        // tell kinematics that we aren't moving
-        kinematics.toSwerveModuleStates(new ChassisSpeeds());
         return true;
     }
 
