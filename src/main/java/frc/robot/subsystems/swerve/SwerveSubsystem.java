@@ -84,9 +84,14 @@ public class SwerveSubsystem extends SubsystemBase {
      * {@link ChassisSpeeds#fromFieldRelativeSpeeds(double, double, double, Rotation2d)}
      */
     public final void driveRobotOriented(ChassisSpeeds velocity) {
-        this.telemetry.fieldOrientedVelocityX     = 0;
-        this.telemetry.fieldOrientedVelocityY     = 0;
-        this.telemetry.fieldOrientedVelocityOmega = 0;
+
+        this.telemetry.fieldOrientedVelocityX          = 0;
+        this.telemetry.fieldOrientedVelocityY          = 0;
+        this.telemetry.fieldOrientedVelocityOmega      = 0;
+        this.telemetry.fieldOrientedDeltaToPoseX       = 0;
+        this.telemetry.fieldOrientedDeltaToPoseY       = 0;
+        this.telemetry.fieldOrientedDeltaToPoseHeading = 0;
+
         driveSafely(velocity);
     }
 
@@ -108,16 +113,15 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param omega the rotation rate of the heading of the robot. CCW positive.
      */
     public final void driveFieldOriented(Translation2d velocity, Rotation2d omega) {
+
         this.telemetry.fieldOrientedDeltaToPoseX       = 0;
         this.telemetry.fieldOrientedDeltaToPoseY       = 0;
         this.telemetry.fieldOrientedDeltaToPoseHeading = 0;
-        this.telemetry.fieldOrientedVelocityX          = 0;
-        this.telemetry.fieldOrientedVelocityY          = 0;
-        this.telemetry.fieldOrientedVelocityOmega      = 0;
-        _driveFieldOriented(velocity, omega);
+
+        driveFieldOrientedInternal(velocity, omega);
     }
 
-    private final void _driveFieldOriented(Translation2d velocity, Rotation2d omega) {
+    private void driveFieldOrientedInternal(Translation2d velocity, Rotation2d omega) {
 
         this.telemetry.fieldOrientedVelocityX     = velocity.getX();
         this.telemetry.fieldOrientedVelocityY     = velocity.getY();
@@ -129,7 +133,7 @@ public class SwerveSubsystem extends SubsystemBase {
         Rotation2d    theta         = drive.getPose().getRotation();
 
         ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, w, theta);
-        this.driveSafely(chassisSpeeds);
+        driveSafely(chassisSpeeds);
     }
 
     /**
@@ -272,7 +276,7 @@ public class SwerveSubsystem extends SubsystemBase {
         this.telemetry.fieldOrientedDeltaToPoseY       = delta.getY();
         this.telemetry.fieldOrientedDeltaToPoseHeading = delta.getRotation().getDegrees();
 
-        _driveFieldOriented(velocity, omega);
+        driveFieldOrientedInternal(velocity, omega);
     }
 
     /**
