@@ -4,25 +4,10 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.UsefulPoses.BLUE_2_2_20;
-import static frc.robot.Constants.UsefulPoses.RED_2_2_20;
-
-
 import frc.robot.subsystems.swerve.SwerveSubsystem;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OiConstants;
-import frc.robot.commands.CancelCommand;
 import frc.robot.commands.operator.OperatorInput;
-import frc.robot.commands.swervedrive.DriveDistanceCommand;
-import frc.robot.commands.swervedrive.DriveToPositionCommand;
-import frc.robot.commands.swervedrive.ResetOdometryCommand;
 import frc.robot.commands.swervedrive.TeleopDriveCommand;
-import frc.robot.commands.swervedrive.ZeroGyroCommand;
-import frc.robot.commands.test.SystemTestCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -46,45 +31,6 @@ public class RobotContainer {
         // Initialize all Subsystem default commands
         swerveDriveSubsystem.setDefaultCommand(new TeleopDriveCommand(swerveDriveSubsystem, operatorInput));
         // Configure the trigger bindings
-        configureBindings();
-    }
-
-    /**
-     * Use this method to define your trigger->command mappings. Triggers can be
-     * created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-     * an arbitrary
-     * predicate, or via the named factories in {@link
-     * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-     * {@link
-     * CommandXboxController
-     * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-     * PS4} controllers or
-     * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-     * joysticks}.
-     */
-    private void configureBindings() {
-        // Enter Test Mode (Start and Back pressed at the same time)
-        new Trigger(() -> (operatorInput.isToggleTestMode()))
-            .onTrue(
-                new SystemTestCommand(operatorInput, swerveDriveSubsystem));
-
-        new Trigger(operatorInput::isZeroGyro).onTrue(new ZeroGyroCommand(swerveDriveSubsystem));
-        new Trigger(operatorInput::isCancel).whileTrue(new CancelCommand(swerveDriveSubsystem));
-        new Trigger(operatorInput::isX)
-            .whileTrue(new ResetOdometryCommand(swerveDriveSubsystem, new Pose2d(1.83, 0.40, Rotation2d.fromDegrees(0))));
-
-        // drive forward
-        Translation2d          fwd         = new Translation2d(0, 7);
-        Rotation2d             fwdHeading  = Rotation2d.fromDegrees(0);
-        DriveDistanceCommand   ddc         = new DriveDistanceCommand(swerveDriveSubsystem, fwd, fwdHeading, 3);
-        // new Trigger(operatorInput::isA).onTrue(ddc);
-
-        // drive to position test
-        Translation2d          location    = new Translation2d(2, 2);
-        Rotation2d             heading     = Rotation2d.fromDegrees(-20);
-        Pose2d                 desiredPose = new Pose2d(location, heading);
-        DriveToPositionCommand dtpc        = new DriveToPositionCommand(swerveDriveSubsystem, BLUE_2_2_20, RED_2_2_20);
-
+        operatorInput.configureBindings(swerveDriveSubsystem);
     }
 }
