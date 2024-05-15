@@ -63,6 +63,12 @@ public class VisionAwareSwerveDrive extends FieldAwareSwerveDrive implements Run
     public void updateOdometry() {
         super.updateOdometry();
 
+        final String NOT_AVAILABLE = "hugh-free";
+        if (table.getEntry("pipeline").getString(NOT_AVAILABLE).equals(NOT_AVAILABLE)) {
+            // Vision system not available
+            return;
+        }
+
         VisionPositionInfo visPosInfo;
         PoseConfidence     confidence;
 
