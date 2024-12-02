@@ -1,11 +1,21 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2024.3.1"
+    id "edu.wpi.first.GradleRIO" version "2024.3.2"
+}
+
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/RunnymedeRobotics1310/RunnymedeSwerve")
+    }
+    mavenCentral()
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
@@ -50,6 +60,8 @@ def includeDesktopSupport = true
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
 dependencies {
+    implementation 'ca.team1310:swerve:1.0.0'
+
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
 
