@@ -5,6 +5,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
+import static frc.robot.Constants.Swerve.TRANSLATION_CONFIG;
+
 public class DriveRobotOrientedCommand extends BaseDriveCommand {
 
     private final Translation2d robotRelativeTranslation;
@@ -37,12 +39,12 @@ public class DriveRobotOrientedCommand extends BaseDriveCommand {
     @Override
     public void execute() {
         super.execute();
-        driveToFieldPose(desiredPose);
+        swerve.driveToFieldPose(desiredPose, TRANSLATION_CONFIG.maxSpeedMPS());
     }
 
     @Override
     public boolean isFinished() {
         super.isFinished();
-        return isCloseEnough(desiredPose.getTranslation()) && isCloseEnough(desiredPose.getRotation());
+        return swerve.isCloseEnough(desiredPose.getTranslation()) && swerve.isCloseEnough(desiredPose.getRotation());
     }
 }

@@ -34,11 +34,29 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/1310/Telemetry/Drive": "String Chooser",
+      "/SmartDashboard/1310/Telemetry/Hugh": "String Chooser",
+      "/SmartDashboard/1310/Telemetry/Swerve": "String Chooser",
       "/SmartDashboard/Auto Pattern": "String Chooser",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/navX-Sensor[4]": "Gyro"
     },
     "windows": {
+      "/SmartDashboard/1310/Telemetry/Drive": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/1310/Telemetry/Hugh": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/1310/Telemetry/Swerve": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Field": {
         "Robot": {
           "arrowSize": 25
@@ -114,8 +132,7 @@
         "open": true
       },
       "open": true
-    },
-    "visible": true
+    }
   },
   "Plot": {
     "Plot <0>": {

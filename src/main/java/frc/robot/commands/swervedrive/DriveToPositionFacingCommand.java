@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
-import static frc.robot.Constants.Swerve.Chassis.MAX_TRANSLATION_SPEED_MPS;
+import static frc.robot.Constants.Swerve.TRANSLATION_CONFIG;
 
 public class DriveToPositionFacingCommand extends BaseDriveCommand {
 
@@ -35,7 +35,7 @@ public class DriveToPositionFacingCommand extends BaseDriveCommand {
         Pose2d     current  = swerve.getPose();
         Rotation2d heading  = positionToFace.minus(current.getTranslation()).getAngle();
         Pose2d     nextPose = new Pose2d(positionToDriveToward, heading);
-        driveToFieldPose(nextPose, MAX_TRANSLATION_SPEED_MPS);
+        swerve.driveToFieldPose(nextPose, TRANSLATION_CONFIG.maxSpeedMPS());
     }
 
     @Override
@@ -46,7 +46,7 @@ public class DriveToPositionFacingCommand extends BaseDriveCommand {
     @Override
     public boolean isFinished() {
         super.isFinished();
-        Rotation2d heading = getHeadingToFieldPosition(positionToFace);
-        return isCloseEnough(positionToDriveToward) && isCloseEnough(heading);
+        Rotation2d heading = swerve.getHeadingToFieldPosition(positionToFace);
+        return swerve.isCloseEnough(positionToDriveToward) && swerve.isCloseEnough(heading);
     }
 }

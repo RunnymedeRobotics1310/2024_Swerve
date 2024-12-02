@@ -1,11 +1,9 @@
 package frc.robot.commands;
 
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.SimpleFormatter;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -240,6 +238,4 @@ public class LoggingCommand extends Command {
     public static String format(Transform2d transform) {
         return format(transform.getTranslation()) + " @ " + format(transform.getRotation());
     }
-
-
 }
