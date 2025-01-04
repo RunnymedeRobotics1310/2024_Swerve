@@ -4,9 +4,6 @@ plugins {
 }
 
 repositories {
-    maven {
-        url = uri("https://maven.pkg.github.com/RunnymedeRobotics1310/RunnymedeSwerve")
-    }
     mavenCentral()
 }
 
@@ -60,7 +57,7 @@ def includeDesktopSupport = true
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
 dependencies {
-    implementation 'ca.team1310:swerve:1.0.0'
+    implementation group: 'ca.team1310', name: 'swerve', version: '1.0.0'
 
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
